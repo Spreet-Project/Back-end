@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE shorts_id = ?")
 @Where(clause = "is_deleted = false")
 public class Shorts extends TimeStamped {
 
