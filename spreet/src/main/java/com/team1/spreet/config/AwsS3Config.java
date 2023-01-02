@@ -1,4 +1,4 @@
-package com.team1.spreet.s3;
+package com.team1.spreet.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

@@ -1,4 +1,4 @@
-package com.team1.spreet.s3;
+package com.team1.spreet.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
