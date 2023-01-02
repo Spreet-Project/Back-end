@@ -9,7 +9,7 @@ public class RestApiException extends RuntimeException{
     private String msg;
     private int statusCode;
 
-    RestApiException(ErrorStatusCode errorStatusCode) {
+    public RestApiException(ErrorStatusCode errorStatusCode) {
         this.msg = errorStatusCode.getMsg();
         this.statusCode = errorStatusCode.getStatusCode();
     }
