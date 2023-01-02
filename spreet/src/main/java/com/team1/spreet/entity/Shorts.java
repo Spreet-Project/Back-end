@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE shorts_id = ?")
 @Where(clause = "is_deleted = false")
 public class Shorts extends TimeStamped {
 
@@ -42,10 +42,10 @@ public class Shorts extends TimeStamped {
     @JoinColumn(name = "USER_ID")
     private User user;          //유저 단방향
 
-    @OneToMany(mappedBy = "SHORTS_COMMENT", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
-    @OneToMany(mappedBy = "SHORTS_LIKE", fetch = FetchType.LAZY, cascade = CascadeType.ALL
+    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<ShortsLike> shortsLikeList = new ArrayList<>();        //쇼츠 좋아요 양방향
 }

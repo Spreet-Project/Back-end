@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts_comment SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE shorts_comment SET is_deleted = true WHERE shorts_comment_id = ?")
 @Where(clause = "is_deleted = false")
 public class ShortsComment extends TimeStamped {
 
