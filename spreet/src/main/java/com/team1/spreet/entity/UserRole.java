@@ -1,5 +1,8 @@
 package com.team1.spreet.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum UserRole {
     ROLE_USER("ROLE_USER"),
     ROLE_CREW("ROLE_CREW"),
