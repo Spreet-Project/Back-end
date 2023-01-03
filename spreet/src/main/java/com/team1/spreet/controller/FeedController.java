@@ -6,10 +6,7 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.service.FeedService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +17,8 @@ public class FeedController {
 
     //feed 조회
     @GetMapping("/{feedId}")
-    public CustomResponseBody getFeed(@PathVariable Long feedId) {
-        return feedService.getFeed(feedId);
+    public CustomResponseBody getFeed(@PathVariable Long feedId, User user) {
+        return feedService.getFeed(feedId, user);
     }
     //feed 저장
     @PostMapping("")
@@ -38,5 +35,8 @@ public class FeedController {
     public CustomResponseBody deleteFeed(@PathVariable Long feedId, User user){
         return feedService.deleteFeed(feedId, user);
     }
-
+    @PostMapping("/like/{feedId}")
+    public void likeFeed(@PathVariable Long feedId, User user){
+        feedService.likeFeed(feedId, user);
+    }
 }
