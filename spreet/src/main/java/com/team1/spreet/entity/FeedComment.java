@@ -33,4 +33,8 @@ public class FeedComment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public void setDeleted(){
+        this.isDeleted = true;
+    }
 }

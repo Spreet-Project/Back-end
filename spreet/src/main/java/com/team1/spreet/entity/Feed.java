@@ -28,8 +28,8 @@ public class Feed extends TimeStamped {
     @Column(nullable = false)
     private String content;     //피드 내용
 
-    @Column(nullable = false)
-    private String image;       //피드 이미지 url
+    /*@Column(nullable = false)
+    private List<String> imageList;       //피드 이미지 url*/
 
     @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //피드 삭제 여부, 기본값=FALSE
@@ -45,4 +45,18 @@ public class Feed extends TimeStamped {
     @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<FeedLike> feedLikeList = new ArrayList<>();
+
+    public Feed(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+    }
+    public void update(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+    }
+    public void setDeleted(){
+        this.isDeleted = true;
+    }
 }
