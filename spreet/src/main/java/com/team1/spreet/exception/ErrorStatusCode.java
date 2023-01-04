@@ -11,6 +11,9 @@ public enum ErrorStatusCode {
     UNSUPPORTED_JWT_TOKEN("지원되지 않는 JWT 토큰 입니다.", HttpStatus.BAD_REQUEST.value()),
     TOKEN_ILLEGAL_ARGUMENT_EXCEPTION("잘못된 JWT 토큰입니다.", HttpStatus.BAD_REQUEST.value()),
     NULL_USER_ID_DATA_EXCEPTION("입력하신 아이디는 없는 아이디입니다.", HttpStatus.BAD_REQUEST.value()),
+    ID_ALREADY_EXISTS_EXCEPTION("입력하신 아이디는 이미 존재하는 아이디입니다.", HttpStatus.BAD_REQUEST.value()),
+    NICKNAME_ALREADY_EXISTS_EXCEPTION("입력하신 닉네임은 이미 존재하는 닉네임입니다.", HttpStatus.BAD_REQUEST.value()),
+    DELETED_ACCOUNT_EXCEPTION("최근에 회원탈퇴한 계정입니다.", HttpStatus.BAD_REQUEST.value()),
     INVALID_FILE("잘못된 형식의 파일 입니다.", HttpStatus.BAD_REQUEST.value()),
     FAIL_FILE_UPLOAD("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value());
 

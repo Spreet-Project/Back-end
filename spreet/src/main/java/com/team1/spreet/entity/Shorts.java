@@ -29,7 +29,7 @@ public class Shorts extends TimeStamped {
     private String content;     //쇼츠 내용
 
     @Column(nullable = false)
-    private String video;       //쇼츠 url
+    private String videoUrl;       //쇼츠 url
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)//쇼츠 카테고리

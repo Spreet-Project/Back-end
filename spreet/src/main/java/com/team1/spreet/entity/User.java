@@ -3,8 +3,6 @@ package com.team1.spreet.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -12,8 +10,8 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "USERS")
-@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE user_id = ?")
-@Where(clause = "is_deleted = false")
+//@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE user_id = ?")
+//@Where(clause = "is_deleted = false")
 public class User extends TimeStamped{
 
     @Id
@@ -23,9 +21,6 @@ public class User extends TimeStamped{
 
     @Column(nullable = false, unique = true)
     private String loginId;     //로그인 아이디
-
-    @Column(nullable = false)
-    private String username;    //유저 실명
 
     @Column(nullable = false, unique = true)
     private String nickname;    //유저 닉네임
@@ -41,14 +36,14 @@ public class User extends TimeStamped{
     private UserRole userRole;  //유저 역할
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;  //유저 탈퇴 여부, 기본값=FALSE
+    private boolean isDeleted;  //유저 탈퇴 여부, 기본값=FALSE
 
-    public User(String loginId, String username, String nickname, String password, String email) {
+    public User(String loginId, String nickname, String password, String email) {
         this.loginId = loginId;
-        this.username = username;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
         this.userRole = UserRole.ROLE_USER;
+        this.isDeleted = Boolean.FALSE;
     }
 }
