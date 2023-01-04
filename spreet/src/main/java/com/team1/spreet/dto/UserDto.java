@@ -18,10 +18,12 @@ public class UserDto {
 //        @Pattern(regexp = "^*[a-zA-Z][0-9][\\{\\}\\[\\]\\/?.,;:|\\)*~`!^\\-_+<>@\\#$%&\\\\\\=\\(\\'\\\"]")
         @NotBlank(message = "아이디는 필수 입력 항목입니다.")
         private String loginId;
+
         @Size(min = 2, max = 10, message = "닉네임은 2~10자 이내의 길이로만 이루어질 수 있습니다.")
         @NotBlank(message = "닉네임은 필수 입력 항목입니다.")
-        private String nickname;
 
+        private String nickname;
+        
         //6~15자, (알파벳, 숫자)가능, 특수문자 필수
         @Size(min = 6, max = 15, message = "비밀번호는 6~15자 이내의 길이로만 이루어질 수 있습니다.")
         @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")

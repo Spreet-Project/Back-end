@@ -15,8 +15,9 @@ public enum ErrorStatusCode {
     NICKNAME_ALREADY_EXISTS_EXCEPTION("입력하신 닉네임은 이미 존재하는 닉네임입니다.", HttpStatus.BAD_REQUEST.value()),
     DELETED_ACCOUNT_EXCEPTION("최근에 회원탈퇴한 계정입니다.", HttpStatus.BAD_REQUEST.value()),
     INVALID_FILE("잘못된 형식의 파일 입니다.", HttpStatus.BAD_REQUEST.value()),
-    FAIL_FILE_UPLOAD("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value());
-
+    FAIL_FILE_UPLOAD("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+    NOT_EXIST_FEED("피드가 존재하지 않습니다", HttpStatus.NO_CONTENT.value()),
+    NOT_EXIST_FEED_COMMENT("댓글이 존재하지 않습니다",HttpStatus.NO_CONTENT.value());
     private final String msg;
     private final int statusCode;
 
