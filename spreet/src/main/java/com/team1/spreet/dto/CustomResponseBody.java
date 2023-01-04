@@ -2,7 +2,9 @@ package com.team1.spreet.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.exception.SuccessStatusCode;
+import lombok.Getter;
 
+@Getter
 public class CustomResponseBody <T>{
     private String msg;
     private int statusCode;

@@ -4,6 +4,7 @@ import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.FeedDto;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.exception.SuccessStatusCode;
+import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,8 @@ public class FeedController {
 
     //feed 조회
     @GetMapping("/{feedId}")
-    public CustomResponseBody getFeed(@PathVariable Long feedId, User user) {
-        return feedService.getFeed(feedId, user);
+    public CustomResponseBody getFeed(@PathVariable Long feedId, UserDetailsImpl userDetailsImpl) {
+        return feedService.getFeed(feedId, userDetailsImpl);
     }
     //feed 저장
     @PostMapping("")
@@ -32,11 +33,11 @@ public class FeedController {
     }
     //feed 삭제
     @DeleteMapping("/{feedId}")
-    public CustomResponseBody deleteFeed(@PathVariable Long feedId, User user){
+    public CustomResponseBody<SuccessStatusCode> deleteFeed(@PathVariable Long feedId, User user){
         return feedService.deleteFeed(feedId, user);
     }
     @PostMapping("/like/{feedId}")
-    public void likeFeed(@PathVariable Long feedId, User user){
-        feedService.likeFeed(feedId, user);
+    public CustomResponseBody likeFeed(@PathVariable Long feedId, User user){
+        return feedService.likeFeed(feedId, user);
     }
 }

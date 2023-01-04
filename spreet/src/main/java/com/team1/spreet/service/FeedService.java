@@ -6,10 +6,8 @@ import com.team1.spreet.entity.*;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
-import com.team1.spreet.repository.FeedCommentRepository;
-import com.team1.spreet.repository.FeedLikeRepository;
-import com.team1.spreet.repository.FeedRepository;
-import com.team1.spreet.repository.ImageRepository;
+import com.team1.spreet.repository.*;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +23,11 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final ImageRepository imageRepository;
-    public CustomResponseBody<FeedDto.ResponseDto> getFeed(Long feedId, User user) {
-        Feed feed = feedRepository.findById(feedId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
-        );
+    private final UserRepository userRepository;
+
+    public CustomResponseBody<FeedDto.ResponseDto> getFeed(Long feedId, UserDetailsImpl userDetailsImpl) {
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
+        User user = checkUser(userDetailsImpl);    //userDetailsImpl user 찾기
         Long feedLike = feedLikeRepository.countByFeedIdAndIsLikeTrue(feedId);
         FeedLike feedLike1 = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId);
         FeedDto.ResponseDto responseDto = new FeedDto.ResponseDto(feed, user.getNickname(), feedLike, feedLike1.isLike());
@@ -62,14 +61,19 @@ public class FeedService {
     }
     //feed 좋아요
     @Transactional
-    public void likeFeed(Long feedId, User user) {
+    public CustomResponseBody likeFeed(Long feedId, User user) {
         Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         FeedLike feedLike = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId);
         if (feedLike == null) {
             FeedLike addFeedLike = new FeedLike(true, feed, user);
             feedLikeRepository.save(addFeedLike);
+            return new CustomResponseBody(SuccessStatusCode.LIKE_FEED,addFeedLike.isLike());
+        }else if(feedLike.isLike()){
+            feedLike.clickLike();
+            return new CustomResponseBody(SuccessStatusCode.CANCEL_LIKE_FEED,feedLike.isLike());
         }else{
             feedLike.clickLike();
+            return new CustomResponseBody(SuccessStatusCode.LIKE_FEED,feedLike.isLike());
         }
     }
     //새로운 이미지 저장
@@ -89,10 +93,15 @@ public class FeedService {
         }
     }
     private Feed checkFeed(Long feedId){
-        Feed feed = feedRepository.findById(feedId).orElseThrow(
+        return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
-        );;
-        return feed;
+        );
+    }
+    //user 정보 가져오기
+    private User checkUser(UserDetailsImpl userDetailsImpl) {
+        return userRepository.findByLoginId(userDetailsImpl.getUsername()).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+        );
     }
 }
 
