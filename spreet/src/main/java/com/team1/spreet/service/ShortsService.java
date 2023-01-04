@@ -5,12 +5,14 @@ import com.team1.spreet.dto.ShortsDto;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.ShortsComment;
 import com.team1.spreet.entity.ShortsLike;
+import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
+import com.team1.spreet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,10 +31,11 @@ public class ShortsService {
 	private final ShortsRepository shortsRepository;
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
+	private final UserRepository userRepository;
 
 	// shorts 등록
-	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto) {
-		//User user = SecurityUtil.getCurrentUser();
+	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, Long userId) {
+		User user = getUser(userId);
 
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 		Shorts shorts = new Shorts(requestDto, user, videoUrl);
@@ -43,11 +46,12 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	public SuccessStatusCode updateShorts(ShortsDto.RequestDto requestDto, Long shortsId) {
-		//User user = SecurityUtil.getCurrentUser();
-		Shorts shorts = checkShorts(shortsId);
+	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, Long userId) {
+		User user = getUser(userId);
 
+		Shorts shorts = checkShorts(shortsId);
 		String videoUrl = null;
+
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
 			if (!requestDto.getFile().isEmpty()) {
 				//첨부파일 수정시 기존 첨부파일 삭제
@@ -67,8 +71,9 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	public SuccessStatusCode deleteShorts(Long shortsId) {
-		//User user = SecurityUtil.getCurrentUser();
+	public SuccessStatusCode deleteShorts(Long shortsId, Long userId) {
+		User user = getUser(userId);
+
 		Shorts shorts = checkShorts(shortsId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
@@ -77,37 +82,34 @@ public class ShortsService {
 		return SuccessStatusCode.DELETE_SHORTS;
 	}
 
-	// shorts 상세조회
+	// shorts 상세조회, 로그인 유저에게만 허용할 것인지?
 	@Transactional(readOnly = true)
-	public ShortsDto.ResponseDto getShorts(Long shortsId) {
-		//User user = SecurityUtil.getCurrentUser();
+	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
+		User user = getUser(userId);
 
 		Shorts shorts = checkShorts(shortsId);
-		checkOwner(shorts, user.getId());
 
 		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
 		for (ShortsComment comment : shorts.getShortsCommentList()) {
 			commentList.add(new ShortsCommentDto.ResponseDto(comment));
 		}
-		boolean likeCheck = checkLike(shortsId, user.getId());
 
-		return new ShortsDto.ResponseDto(shorts, likeCheck, commentList);
+		return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, user.getId()), commentList);
 	}
 
-	// 카테고리별 shorts 조회(페이징)
+	// 카테고리별 shorts 조회(페이징), 로그인 유저에게만 허용할 것인지?
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(String category, int page, int size,
-		Pageable pageable) {
-		//User user = SecurityUtil.getCurrentUser();
+	public List<ShortsDto.ResponseDto> getShortsByCategory(String category, int page, int size, Long userId) {
+		User user = getUser(userId);
 
-		pageable = PageRequest.of(page - 1, size);
+		Pageable pageable = PageRequest.of(page - 1, size);
 		Page<Shorts> pageShorts = shortsRepository.findShortsByCategoryOrderByCreatedAtDesc(
 			category, pageable);
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 		for (Shorts shorts : pageShorts) {
-			shortsList.add(
-				new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), user.getId())));
+			shortsList.add(new ShortsDto.ResponseDto(shorts,
+				checkLike(shorts.getId(), user.getId()), null));
 		}
 		return shortsList;
 	}
@@ -131,7 +133,14 @@ public class ShortsService {
 	private boolean checkLike(Long shortsId, Long userId) {
 		Optional<ShortsLike> shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId,
 			userId);
-		return shortsLike.isEmpty();
+		return shortsLike.isPresent();
+	}
+
+	// user 객체 가져오기
+	private User getUser(Long userId) {
+		return userRepository.findById(userId).orElseThrow(
+			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+		);
 	}
 
 }

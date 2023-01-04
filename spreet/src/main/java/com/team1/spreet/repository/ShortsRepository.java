@@ -1,7 +1,6 @@
 package com.team1.spreet.repository;
 
 import com.team1.spreet.entity.Shorts;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,4 @@ public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 	@Query(nativeQuery = true, value = "select * from shorts s where is_deleted=false "
 		+ "and s.category = :category order by s.created_at desc")
 	Page<Shorts> findShortsByCategoryOrderByCreatedAtDesc(String category, Pageable pageable);
-
-	Optional<Shorts> findByIdAndDeletedFalse(Long aLong);
 }

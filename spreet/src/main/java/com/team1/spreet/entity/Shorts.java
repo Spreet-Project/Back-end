@@ -37,7 +37,7 @@ public class Shorts extends TimeStamped {
     private Category category;
 
     @Column(nullable = false)
-    private int likeCount;
+    private Long likeCount = 0L;
 
     @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //쇼츠 삭제 여부, 기본값=FALSE
@@ -61,7 +61,7 @@ public class Shorts extends TimeStamped {
         this.user = user;
     }
 
-    public void update(ShortsDto.RequestDto requestDto, User user, String videoUrl) {
+    public void update(ShortsDto.UpdateRequestDto requestDto, User user, String videoUrl) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.videoUrl = videoUrl;

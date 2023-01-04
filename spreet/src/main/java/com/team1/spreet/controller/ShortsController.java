@@ -5,14 +5,16 @@ import com.team1.spreet.dto.ShortsDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.service.ShortsService;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,30 +26,40 @@ public class ShortsController {
 
 	private final ShortsService shortsService;
 
+	// shorts 등록
 	@PostMapping
-	public CustomResponseBody<ShortsDto.ResponseDto> saveShorts(@RequestBody ShortsDto.RequestDto requestDto) {
-		return new CustomResponseBody<>(shortsService.saveShorts(requestDto));
+	public CustomResponseBody<ShortsDto.ResponseDto> saveShorts(@ModelAttribute @Valid ShortsDto.RequestDto requestDto,
+		@AuthenticationPrincipal UserDetails userDetails) {
+		return new CustomResponseBody<>(shortsService.saveShorts(requestDto, Long.parseLong(userDetails.getUsername())));
 	}
 
+	// shorts 수정
 	@PutMapping("/{shortsId}")
-	public CustomResponseBody<ShortsDto.ResponseDto> updateShorts(@RequestBody ShortsDto.RequestDto requestDto, @PathVariable Long shortsId) {
-		return new CustomResponseBody<>(shortsService.updateShorts(requestDto, shortsId));
+	public CustomResponseBody<ShortsDto.ResponseDto> updateShorts(@ModelAttribute ShortsDto.UpdateRequestDto requestDto,
+		@PathVariable Long shortsId, @AuthenticationPrincipal UserDetails userDetails) {
+		return new CustomResponseBody<>(shortsService.updateShorts(requestDto, shortsId, Long.parseLong(userDetails.getUsername())));
 	}
 
+	// shorts 삭제
+	@DeleteMapping("/{shortsId}")
+	public CustomResponseBody<ShortsDto.ResponseDto> deleteShorts(@PathVariable Long shortsId,
+		@AuthenticationPrincipal UserDetails userDetails) {
+		return new CustomResponseBody<>(shortsService.deleteShorts(shortsId, Long.parseLong(userDetails.getUsername())));
+	}
+
+	// shorts 상세조회
 	@GetMapping("/{shortsId}")
-	public CustomResponseBody<ShortsDto.ResponseDto> getShorts(@PathVariable Long shortsId) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId));
+	public CustomResponseBody<ShortsDto.ResponseDto> getShorts(@PathVariable Long shortsId,
+		@AuthenticationPrincipal UserDetails userDetails) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId, Long.parseLong(userDetails.getUsername())));
 	}
 
+	// shorts 카테고리별 조회
 	@GetMapping
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory
 		(@RequestParam(value = "category") String category, @RequestParam(value = "page") int page,
-			@RequestParam(defaultValue = "10") int size, Pageable pageable) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, pageable));
+			@RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserDetails userDetails) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, Long.parseLong(userDetails.getUsername())));
 	}
 
-	@DeleteMapping("/{shortsId}")
-	public CustomResponseBody<ShortsDto.ResponseDto> deleteShorts(@PathVariable Long shortsId) {
-		return new CustomResponseBody<>(shortsService.deleteShorts(shortsId));
-	}
 }
