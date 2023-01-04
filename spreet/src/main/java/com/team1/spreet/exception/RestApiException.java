@@ -13,4 +13,9 @@ public class RestApiException extends RuntimeException{
         this.msg = errorStatusCode.getMsg();
         this.statusCode = errorStatusCode.getStatusCode();
     }
+
+    public RestApiException(SuccessStatusCode successStatusCode) {
+        this.msg = successStatusCode.getMsg();
+        this.statusCode = successStatusCode.getStatusCode();
+    }
 }

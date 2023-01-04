@@ -25,13 +25,13 @@ public class User extends TimeStamped{
     private String loginId;     //로그인 아이디
 
     @Column(nullable = false)
-    private String password;    //유저 비밀번호
-
-    @Column(nullable = false)
     private String username;    //유저 실명
 
     @Column(nullable = false, unique = true)
     private String nickname;    //유저 닉네임
+
+    @Column(nullable = false)
+    private String password;    //유저 비밀번호
 
     @Column(nullable = false)
     private String email;       //유저 이메일
@@ -42,4 +42,13 @@ public class User extends TimeStamped{
 
     @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //유저 탈퇴 여부, 기본값=FALSE
+
+    public User(String loginId, String username, String nickname, String password, String email) {
+        this.loginId = loginId;
+        this.username = username;
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.userRole = UserRole.ROLE_USER;
+    }
 }
