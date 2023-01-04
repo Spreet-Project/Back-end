@@ -33,12 +33,10 @@ public class JwtUtil {
     //사용자 권한 값의 KEY
     public static final String AUTHORIZATION_KEY = "auth";
     //Token 식별자
-    private static final String BEARER_PREFIX = "Bearer";
+    private static final String BEARER_PREFIX = "Bearer ";
     //토큰 만료 시간
     private static final long TOKEN_TIME = 15 * 60 * 1000L;
 
-    @Value("{jwt.security.key}")
-    private String securityKey;
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
