@@ -29,9 +29,6 @@ public class Feed extends TimeStamped {
     private String content;     //피드 내용
 
     @Column(nullable = false)
-    private String image;       //피드 이미지 url
-
-    @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //피드 삭제 여부, 기본값=FALSE
 
     @ManyToOne(fetch = FetchType.LAZY)
