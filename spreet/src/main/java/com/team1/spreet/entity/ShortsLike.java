@@ -21,9 +21,6 @@ public class ShortsLike {
     @Column(name = "SHORTS_LIKE_ID")
     private Long id;
 
-    @Column(nullable = false)
-    private boolean isLike;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHORTS_ID", nullable = false)
     private Shorts shorts;
@@ -35,14 +32,6 @@ public class ShortsLike {
     public ShortsLike(Shorts shorts, User user) {
         this.shorts = shorts;
         this.user = user;
-        this.isLike = true;
     }
 
-    public void shortsLike() {
-        this.isLike = true;
-    }
-
-    public void shortsDisLike() {
-        this.isLike = false;
-    }
 }
