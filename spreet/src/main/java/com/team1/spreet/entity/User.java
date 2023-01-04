@@ -24,9 +24,6 @@ public class User extends TimeStamped{
     @Column(nullable = false, unique = true)
     private String loginId;     //로그인 아이디
 
-    @Column(nullable = false)
-    private String username;    //유저 실명
-
     @Column(nullable = false, unique = true)
     private String nickname;    //유저 닉네임
 
@@ -43,9 +40,8 @@ public class User extends TimeStamped{
     @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //유저 탈퇴 여부, 기본값=FALSE
 
-    public User(String loginId, String username, String nickname, String password, String email) {
+    public User(String loginId, String nickname, String password, String email) {
         this.loginId = loginId;
-        this.username = username;
         this.nickname = nickname;
         this.password = password;
         this.email = email;

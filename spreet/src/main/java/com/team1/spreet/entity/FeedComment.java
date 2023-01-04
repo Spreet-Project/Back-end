@@ -37,4 +37,13 @@ public class FeedComment extends TimeStamped {
     public void setDeleted(){
         this.isDeleted = true;
     }
+    public void update(String content){
+        this.content = content;
+    }
+
+    public FeedComment(String content, Feed feed, User user) {
+        this.content = content;
+        this.feed = feed;
+        this.user = user;
+    }
 }

@@ -1,6 +1,7 @@
 package com.team1.spreet.service;
 
 import com.team1.spreet.dto.CustomResponseBody;
+import com.team1.spreet.dto.FeedCommentDto;
 import com.team1.spreet.dto.FeedDto;
 import com.team1.spreet.entity.*;
 import com.team1.spreet.exception.ErrorStatusCode;
@@ -9,6 +10,7 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.*;
 import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,20 +26,30 @@ public class FeedService {
     private final FeedCommentRepository feedCommentRepository;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
-
+    @Transactional(readOnly = true)
+    public CustomResponseBody getRecentFeed() {
+        return new CustomResponseBody(SuccessStatusCode.GET_RECENT_FEED);
+    }
+    @Transactional(readOnly = true)
     public CustomResponseBody<FeedDto.ResponseDto> getFeed(Long feedId, UserDetailsImpl userDetailsImpl) {
         Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         User user = checkUser(userDetailsImpl);    //userDetailsImpl user 찾기
         Long feedLike = feedLikeRepository.countByFeedIdAndIsLikeTrue(feedId);
-        FeedLike feedLike1 = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId);
-        FeedDto.ResponseDto responseDto = new FeedDto.ResponseDto(feed, user.getNickname(), feedLike, feedLike1.isLike());
+        FeedLike isLike = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId);
+        List<FeedComment> feedCommentList= feedCommentRepository.findAllByFeedId(feedId);
+        FeedCommentDto.CommentListDto commentListDto = new FeedCommentDto.CommentListDto();
+        for (FeedComment feedComment : feedCommentList) {
+            commentListDto.addComment(new FeedCommentDto.ResponseDto(feedComment, user.getNickname()));
+        }
+        FeedDto.ResponseDto responseDto = new FeedDto.ResponseDto(feed, user.getNickname(), feedLike, isLike.isLike(), commentListDto);
         return new CustomResponseBody<FeedDto.ResponseDto>(SuccessStatusCode.GET_FEED, responseDto);
     }
     @Transactional
-    public CustomResponseBody<SuccessStatusCode> saveFeed(FeedDto.RequestDto requestDto, User user) {  //user는 userDetail로 변경 예정
+    public CustomResponseBody<SuccessStatusCode> saveFeed(FeedDto.RequestDto requestDto, UserDetails userDetails) {
+        User user = userRepository.findById(Long.valueOf(userDetails.getUsername())).orElse(null);
         Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);
         feedRepository.save(feed);    //feed 저장
-        saveImage(requestDto.getMultipartFileList(), feed);    //새로운 이미지 저장
+        saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
         return new CustomResponseBody<>(SuccessStatusCode.SAVE_FEED);
     }
     @Transactional
@@ -45,7 +57,7 @@ public class FeedService {
         Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
         deleteImage(feedId);    //기존에 업로드된 이미지 제거
-        saveImage(requestDto.getMultipartFileList(), feed);    //새로운 이미지 저장
+        saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
         return new CustomResponseBody<SuccessStatusCode>(SuccessStatusCode.UPDATE_FEED);
     }
     @Transactional

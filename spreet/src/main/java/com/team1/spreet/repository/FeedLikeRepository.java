@@ -7,6 +7,4 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
     long countByFeedIdAndIsLikeTrue(Long feedId);
 
     FeedLike findByUserIdAndFeedId(Long userId, Long feedId);
-
-
 }

@@ -7,6 +7,9 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.FeedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +19,11 @@ public class FeedController {
 
     private final FeedService feedService;
 
+    //feed 최신순 조회
+    @GetMapping("/recent")
+    public CustomResponseBody getRecentFeed(Pageable pageable){
+        return feedService.getRecentFeed();
+    }
     //feed 조회
     @GetMapping("/{feedId}")
     public CustomResponseBody getFeed(@PathVariable Long feedId, UserDetailsImpl userDetailsImpl) {
@@ -23,8 +31,8 @@ public class FeedController {
     }
     //feed 저장
     @PostMapping("")
-    public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute FeedDto.RequestDto requestDto, User user){
-        return feedService.saveFeed(requestDto, user);
+    public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute FeedDto.RequestDto requestDto, @AuthenticationPrincipal UserDetails userDetails){
+        return feedService.saveFeed(requestDto, userDetails);
     }
     //feed 수정
     @PutMapping("/{feedId}")
