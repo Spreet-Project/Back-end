@@ -47,6 +47,7 @@ public class Shorts extends TimeStamped {
     private User user;          //유저 단방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("desc")
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL

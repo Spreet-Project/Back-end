@@ -2,6 +2,7 @@ package com.team1.spreet.controller;
 
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.ShortsDto;
+import com.team1.spreet.entity.Category;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.service.ShortsService;
 import java.util.List;
@@ -57,7 +58,7 @@ public class ShortsController {
 	// shorts 카테고리별 조회
 	@GetMapping
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory
-		(@RequestParam(value = "category") String category, @RequestParam(value = "page") int page,
+		(@RequestParam(value = "category") Category category, @RequestParam(value = "page") int page,
 			@RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserDetails userDetails) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, Long.parseLong(userDetails.getUsername())));
 	}

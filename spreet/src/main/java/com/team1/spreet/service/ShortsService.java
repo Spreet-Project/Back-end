@@ -2,6 +2,7 @@ package com.team1.spreet.service;
 
 import com.team1.spreet.dto.ShortsCommentDto;
 import com.team1.spreet.dto.ShortsDto;
+import com.team1.spreet.entity.Category;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.ShortsComment;
 import com.team1.spreet.entity.ShortsLike;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,12 +101,11 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징), 로그인 유저에게만 허용할 것인지?
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(String category, int page, int size, Long userId) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		User user = getUser(userId);
 
-		Pageable pageable = PageRequest.of(page - 1, size);
-		Page<Shorts> pageShorts = shortsRepository.findShortsByCategoryOrderByCreatedAtDesc(
-			category, pageable);
+		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Page<Shorts> pageShorts = shortsRepository.findShortsByCategory(category, pageable);
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 		for (Shorts shorts : pageShorts) {
@@ -131,16 +132,14 @@ public class ShortsService {
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	private boolean checkLike(Long shortsId, Long userId) {
-		Optional<ShortsLike> shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId,
-			userId);
+		Optional<ShortsLike> shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId);
 		return shortsLike.isPresent();
 	}
 
 	// user 객체 가져오기
 	private User getUser(Long userId) {
 		return userRepository.findById(userId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
-		);
+			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
 	}
 
 }
