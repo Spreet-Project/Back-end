@@ -4,7 +4,10 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import lombok.Getter;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
 public class UserDto {
@@ -45,5 +48,18 @@ public class UserDto {
     public static class LoginRequestDto {
         private String loginId;
         private String password;
+    }
+
+    @Getter
+    public static class KakaoInfoDto {
+        private Long id;
+        private String nickname;
+        private String email;
+
+        public KakaoInfoDto(Long id, String nickname, String email) {
+            this.id = id;
+            this.nickname = nickname;
+            this.email = email;
+        }
     }
 }
