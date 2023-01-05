@@ -52,7 +52,8 @@ public class ShortsController {
 	@GetMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> getShorts(@PathVariable Long shortsId,
 		@AuthenticationPrincipal UserDetails userDetails) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId, Long.parseLong(userDetails.getUsername())));
+		Long userId = userDetails == null ? 0L : Long.parseLong(userDetails.getUsername());
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId, userId));
 	}
 
 	// shorts 카테고리별 조회
@@ -60,7 +61,8 @@ public class ShortsController {
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory
 		(@RequestParam(value = "category") Category category, @RequestParam(value = "page") int page,
 			@RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserDetails userDetails) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, Long.parseLong(userDetails.getUsername())));
+		Long userId = userDetails == null ? 0L : Long.parseLong(userDetails.getUsername());
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, userId));
 	}
 
 }

@@ -16,7 +16,6 @@ import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,7 +51,7 @@ public class ShortsService {
 		User user = getUser(userId);
 
 		Shorts shorts = checkShorts(shortsId);
-		String videoUrl = null;
+		String videoUrl;
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
 			if (!requestDto.getFile().isEmpty()) {
@@ -84,11 +83,9 @@ public class ShortsService {
 		return SuccessStatusCode.DELETE_SHORTS;
 	}
 
-	// shorts 상세조회, 로그인 유저에게만 허용할 것인지?
+	// shorts 상세조회
 	@Transactional(readOnly = true)
 	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
-		User user = getUser(userId);
-
 		Shorts shorts = checkShorts(shortsId);
 
 		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
@@ -96,21 +93,30 @@ public class ShortsService {
 			commentList.add(new ShortsCommentDto.ResponseDto(comment));
 		}
 
-		return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, user.getId()), commentList);
+		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
+			return new ShortsDto.ResponseDto(shorts, false, commentList);
+		} else {
+			return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, userId), commentList);
+		}
 	}
 
-	// 카테고리별 shorts 조회(페이징), 로그인 유저에게만 허용할 것인지?
+	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
-		User user = getUser(userId);
-
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<Shorts> pageShorts = shortsRepository.findShortsByCategory(category, pageable);
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
-		for (Shorts shorts : pageShorts) {
-			shortsList.add(new ShortsDto.ResponseDto(shorts,
-				checkLike(shorts.getId(), user.getId()), null));
+
+		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
+			for (Shorts shorts : pageShorts) {
+				shortsList.add(new ShortsDto.ResponseDto(shorts, false, null));
+			}
+		} else {
+			for (Shorts shorts : pageShorts) {
+				shortsList.add(new ShortsDto.ResponseDto(shorts,
+					checkLike(shorts.getId(), userId), null));
+			}
 		}
 		return shortsList;
 	}
@@ -132,8 +138,8 @@ public class ShortsService {
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	private boolean checkLike(Long shortsId, Long userId) {
-		Optional<ShortsLike> shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId);
-		return shortsLike.isPresent();
+		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
+		return shortsLike != null;
 	}
 
 	// user 객체 가져오기
