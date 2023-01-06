@@ -127,11 +127,11 @@ public class ShortsService {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		List<ShortsDto.SimpleResponseDto> rap = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> gravity = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[1], pageable);
+		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[2], pageable);
+		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[3], pageable);
+		List<ShortsDto.SimpleResponseDto> gravity = getShortsList(category[4], pageable);
+		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[5], pageable);
 
 		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, gravity, etc);
 	}
