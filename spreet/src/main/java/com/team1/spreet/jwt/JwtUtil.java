@@ -1,5 +1,6 @@
 package com.team1.spreet.jwt;
 
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import io.jsonwebtoken.*;
@@ -67,6 +68,19 @@ public class JwtUtil {
                 Jwts.builder()
                         .setSubject(authentication.getName())
                         .claim(AUTHORIZATION_KEY, authorities)
+                        .setExpiration(new Date(date.getTime() + TOKEN_TIME))
+                        .setIssuedAt(date)
+                        .signWith(key, signatureAlgorithm)
+                        .compact();
+    }
+
+    public String createToken(String loginId, UserRole userRole) {
+        Date date = new Date();
+
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(loginId)
+                        .claim(AUTHORIZATION_KEY, userRole)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
