@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -12,8 +14,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "USERS")
-//@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE user_id = ?")
-//@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE user_id = ?")
+@Where(clause = "is_deleted = false")
 public class User extends TimeStamped{
 
     @Id
@@ -24,7 +26,7 @@ public class User extends TimeStamped{
     @Column(nullable = false, unique = true)
     private String loginId;     //로그인 아이디
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String nickname;    //유저 닉네임
 
     @Column(nullable = false)

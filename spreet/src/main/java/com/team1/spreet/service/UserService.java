@@ -44,15 +44,14 @@ public class UserService {
     public CustomResponseBody signup(final UserDto.SignupRequestDto requestDto) {
         User user = userRepository.findByNickname(requestDto.getNickname()).orElse(null);
 
-        if(userRepository.existsByLoginIdAndIsDeleted(requestDto.getLoginId(), true))
-            throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
+//        if(userRepository.existsByLoginIdAndIsDeleted(requestDto.getLoginId(), true))
+//            throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
 
         if (userRepository.findByLoginId(requestDto.getLoginId()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.ID_ALREADY_EXISTS_EXCEPTION);
         } else if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
         }
-
 
         userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword())));
         return new CustomResponseBody(SuccessStatusCode.SIGNUP_SUCCESS);
