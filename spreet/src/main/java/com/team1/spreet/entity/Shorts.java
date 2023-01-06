@@ -1,5 +1,6 @@
 package com.team1.spreet.entity;
 
+import com.team1.spreet.dto.ShortsDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,9 @@ public class Shorts extends TimeStamped {
     private Category category;
 
     @Column(nullable = false)
+    private Long likeCount = 0L;
+
+    @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //쇼츠 삭제 여부, 기본값=FALSE
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,9 +47,34 @@ public class Shorts extends TimeStamped {
     private User user;          //유저 단방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("desc")
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<ShortsLike> shortsLikeList = new ArrayList<>();        //쇼츠 좋아요 양방향
+
+    public Shorts(ShortsDto.RequestDto requestDto, User user, String videoUrl) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.videoUrl = videoUrl;
+        this.category = requestDto.getCategory();
+        this.user = user;
+    }
+
+    public void update(ShortsDto.UpdateRequestDto requestDto, User user, String videoUrl) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.videoUrl = videoUrl;
+        this.category = requestDto.getCategory();
+        this.user = user;
+    }
+
+    public void addLike() {
+        this.likeCount++;
+    }
+
+    public void cancleLike() {
+        this.likeCount--;
+    }
 }
