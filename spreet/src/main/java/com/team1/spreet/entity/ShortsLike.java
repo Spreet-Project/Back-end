@@ -15,9 +15,6 @@ public class ShortsLike {
     @Column(name = "SHORTS_LIKE_ID")
     private Long id;
 
-    @Column
-    private boolean isLike = Boolean.FALSE;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHORTS_ID")
     private Shorts shorts;

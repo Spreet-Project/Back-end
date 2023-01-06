@@ -8,4 +8,7 @@ import java.util.List;
 public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> {
     List<FeedComment> findAllByFeedId(Long feedId);
 
+    FeedComment findByUserIdAndId(Long userId, Long Id);
+
+
 }

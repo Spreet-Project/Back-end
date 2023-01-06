@@ -21,9 +21,9 @@ public class FeedCommentDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
-        public ResponseDto(FeedComment feedComment, String nickname) {
+        public ResponseDto(FeedComment feedComment) {
             this.commentId = feedComment.getId();
-            this.nickname = nickname;
+            this.nickname = feedComment.getUser().getNickname();
             this.content = feedComment.getContent();
             this.createdAt = feedComment.getCreatedAt();
             this.modifiedAt = feedComment.getModifiedAt();

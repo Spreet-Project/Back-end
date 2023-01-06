@@ -1,10 +1,18 @@
 package com.team1.spreet.repository;
 
+import com.team1.spreet.entity.Feed;
 import com.team1.spreet.entity.FeedLike;
+import com.team1.spreet.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
-    long countByFeedIdAndIsLikeTrue(Long feedId);
+import java.util.Optional;
 
-    FeedLike findByUserIdAndFeedId(Long userId, Long feedId);
+public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
+    long countByFeedId(Long feedId);
+
+    Optional<FeedLike> findByUserAndFeed(User user, Feed feed);
+
+    boolean existsByUserAndFeed(User user, Feed feed);
+
+
 }
