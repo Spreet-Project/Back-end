@@ -8,6 +8,7 @@ import com.team1.spreet.security.exceptionhandler.CustomAuthenticaionEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,10 +35,12 @@ public class WebSecurityConfig {
         http
                 .csrf().disable();
 
-        http
-                .authorizeHttpRequests(auth -> auth
-                .antMatchers("/api/user/**").permitAll()
-                .anyRequest().authenticated());
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests()
+            .antMatchers("/api/user/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
+            .antMatchers(HttpMethod.GET, ".api/shorts").permitAll()
+            .anyRequest().authenticated();
 
         http
                 .logout()
@@ -63,10 +66,6 @@ public class WebSecurityConfig {
 
                 .and()
                 .cors()
-
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
                 .apply(new JwtConfig(jwtUtil, om));
