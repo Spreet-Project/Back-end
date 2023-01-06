@@ -61,10 +61,49 @@ public class ShortsDto {
 			this.title = shorts.getTitle();
 			this.content = shorts.getContent();
 			this.videoUrl = shorts.getVideoUrl();
-			this.category = shorts.getCategory().toString();
+			this.category = shorts.getCategory().value();
 			this.likeCount = shorts.getLikeCount();
 			this.isLike = isLike;
 			this.shortsCommentList = shortsCommentList;
+		}
+	}
+
+	@NoArgsConstructor
+	@Getter
+	public static class SimpleResponseDto {
+		private Long shortsId;
+		private String title;
+		private String videoUrl;
+		private String category;
+
+		public SimpleResponseDto(Shorts shorts) {
+			this.shortsId = shorts.getId();
+			this.category = shorts.getCategory().value();
+			this.title = shorts.getTitle();
+			this.videoUrl = shorts.getVideoUrl();
+		}
+	}
+
+	@NoArgsConstructor
+	@Getter
+	public static class CategoryResponseDto {
+		private List<ShortsDto.SimpleResponseDto> rapList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> djList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> beatBoxList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> streetDancList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> gravityList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> etcList = new ArrayList<>();
+
+		public CategoryResponseDto(List<SimpleResponseDto> rapList, List<SimpleResponseDto> djList,
+			List<SimpleResponseDto> beatBoxList, List<SimpleResponseDto> streetDancList,
+			List<SimpleResponseDto> gravityList, List<SimpleResponseDto> etcList) {
+
+			this.rapList = rapList;
+			this.djList = djList;
+			this.beatBoxList = beatBoxList;
+			this.streetDancList = streetDancList;
+			this.gravityList = gravityList;
+			this.etcList = etcList;
 		}
 	}
 }
