@@ -25,4 +25,13 @@ public class FeedLike {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public FeedLike(boolean isLike, Feed feed, User user) {
+        this.isLike = isLike;
+        this.feed = feed;
+        this.user = user;
+    }
+    public void clickLike(){
+        this.isLike = !isLike;
+    }
 }

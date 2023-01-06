@@ -42,4 +42,18 @@ public class Feed extends TimeStamped {
     @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<FeedLike> feedLikeList = new ArrayList<>();
+
+    public Feed(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+    }
+    public void update(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+    }
+    public void setDeleted(){
+        this.isDeleted = true;
+    }
 }

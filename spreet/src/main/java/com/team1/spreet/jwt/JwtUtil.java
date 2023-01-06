@@ -37,7 +37,7 @@ public class JwtUtil {
     //토큰 만료 시간
     private static final long TOKEN_TIME = 15 * 60 * 1000L;
 
-    private Key key;
+    private final Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     public JwtUtil(@Value("${jwt.security.key}") String securityKey) {

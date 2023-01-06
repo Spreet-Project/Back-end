@@ -1,4 +1,4 @@
-package com.team1.spreet.security;
+package com.team1.spreet.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.config.JwtConfig;
