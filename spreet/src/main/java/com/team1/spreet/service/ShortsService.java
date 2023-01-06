@@ -17,7 +17,6 @@ import com.team1.spreet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -104,21 +103,37 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		Page<Shorts> pageShorts = shortsRepository.findShortsByCategory(category, pageable);
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategory(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
 		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
-			for (Shorts shorts : pageShorts) {
+			for (Shorts shorts : shortsByCategory) {
 				shortsList.add(new ShortsDto.ResponseDto(shorts, false, null));
 			}
 		} else {
-			for (Shorts shorts : pageShorts) {
+			for (Shorts shorts : shortsByCategory) {
 				shortsList.add(new ShortsDto.ResponseDto(shorts,
 					checkLike(shorts.getId(), userId), null));
 			}
 		}
 		return shortsList;
+	}
+
+	// 모든 카테고리 최신 shorts 10개씩 조회
+	@Transactional(readOnly = true)
+	public ShortsDto.CategoryResponseDto getAllCategory() {
+		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAVITY, Category.ETC};
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+		List<ShortsDto.SimpleResponseDto> rap = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> gravity = getShortsList(category[0], pageable);
+		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[0], pageable);
+
+		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, gravity, etc);
 	}
 
 	// shorts 가 존재하는지 확인
@@ -146,6 +161,18 @@ public class ShortsService {
 	private User getUser(Long userId) {
 		return userRepository.findById(userId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
+	}
+
+	// 각 카테고리별 최신 shorts 10개 가져오기
+	private List<ShortsDto.SimpleResponseDto> getShortsList(Category category, Pageable pageable) {
+		List<Shorts> shortsList	= shortsRepository.findShortsByCategory(category, pageable).getContent();
+
+		List<ShortsDto.SimpleResponseDto> dtoList = new ArrayList<>();
+		for (Shorts shorts : shortsList) {
+			dtoList.add(new ShortsDto.SimpleResponseDto(shorts));
+		}
+
+		return dtoList;
 	}
 
 }

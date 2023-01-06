@@ -65,4 +65,10 @@ public class ShortsController {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, userId));
 	}
 
+	// 모든 카테고리 최신 shorts 10개씩 조회
+	@GetMapping("/category")
+	public CustomResponseBody<ShortsDto.CategoryResponseDto> getAllCategory() {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_ALL_CATEGORY, shortsService.getAllCategory());
+	}
+
 }
