@@ -10,4 +10,5 @@ public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 
 	//카테고리별 조회
 	Page<Shorts> findShortsByCategory(Category category, Pageable pageable);
+  
 }

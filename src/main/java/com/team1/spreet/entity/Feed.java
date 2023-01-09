@@ -35,6 +35,7 @@ public class Feed extends TimeStamped {
     @JoinColumn(name = "USER_ID")
     private User user;          //유저 primary key
 
+
     @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL
     , orphanRemoval = true)
     private List<FeedComment> feedCommentList = new ArrayList<>();

@@ -33,5 +33,4 @@ public class ShortsLike {
         this.shorts = shorts;
         this.user = user;
     }
-
 }

@@ -27,4 +27,5 @@ public class FeedLike {
         this.user = user;
         this.feed = feed;
     }
+
 }

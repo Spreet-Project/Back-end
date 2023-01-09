@@ -46,4 +46,5 @@ public class FeedComment extends TimeStamped {
         this.feed = feed;
         this.user = user;
     }
+
 }
