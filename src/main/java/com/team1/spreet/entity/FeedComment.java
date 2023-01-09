@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE feed_comment SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE feed_comment SET is_deleted = true WHERE feed_comment_id = ?")
 @Where(clause = "is_deleted = false")
 public class FeedComment extends TimeStamped {
 
@@ -33,4 +33,18 @@ public class FeedComment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public void setDeleted(){
+        this.isDeleted = true;
+    }
+    public void update(String content){
+        this.content = content;
+    }
+
+    public FeedComment(String content, Feed feed, User user) {
+        this.content = content;
+        this.feed = feed;
+        this.user = user;
+    }
+
 }

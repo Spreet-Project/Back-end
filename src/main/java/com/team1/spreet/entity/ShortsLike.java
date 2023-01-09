@@ -1,10 +1,16 @@
 package com.team1.spreet.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,14 +21,16 @@ public class ShortsLike {
     @Column(name = "SHORTS_LIKE_ID")
     private Long id;
 
-    @Column
-    private boolean isLike = Boolean.FALSE;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SHORTS_ID")
+    @JoinColumn(name = "SHORTS_ID", nullable = false)
     private Shorts shorts;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
+
+    public ShortsLike(Shorts shorts, User user) {
+        this.shorts = shorts;
+        this.user = user;
+    }
 }

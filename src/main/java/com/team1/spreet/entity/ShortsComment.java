@@ -1,17 +1,24 @@
 package com.team1.spreet.entity;
 
+import com.team1.spreet.dto.ShortsCommentDto;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts_comment SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE shorts_comment SET is_deleted = true WHERE shorts_comment_id = ?")
 @Where(clause = "is_deleted = false")
 public class ShortsComment extends TimeStamped {
 
@@ -33,4 +40,14 @@ public class ShortsComment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public ShortsComment(ShortsCommentDto.RequestDto requestDto, Shorts shorts, User user) {
+        this.content = requestDto.getContent();
+        this.shorts = shorts;
+        this.user = user;
+    }
+
+    public void updateShortsComment(ShortsCommentDto.RequestDto requestDto) {
+        this.content = requestDto.getContent();
+    }
 }

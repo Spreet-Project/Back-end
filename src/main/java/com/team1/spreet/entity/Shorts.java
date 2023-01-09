@@ -1,5 +1,6 @@
 package com.team1.spreet.entity;
 
+import com.team1.spreet.dto.ShortsDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE shorts SET is_deleted = true WHERE shorts_id = ?")
 @Where(clause = "is_deleted = false")
 public class Shorts extends TimeStamped {
 
@@ -29,11 +30,14 @@ public class Shorts extends TimeStamped {
     private String content;     //쇼츠 내용
 
     @Column(nullable = false)
-    private String video;       //쇼츠 url
+    private String videoUrl;       //쇼츠 url
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)//쇼츠 카테고리
     private Category category;
+
+    @Column(nullable = false)
+    private Long likeCount = 0L;
 
     @Column(nullable = false)
     private boolean isDeleted = Boolean.FALSE;  //쇼츠 삭제 여부, 기본값=FALSE
@@ -42,10 +46,35 @@ public class Shorts extends TimeStamped {
     @JoinColumn(name = "USER_ID")
     private User user;          //유저 단방향
 
-    @OneToMany(mappedBy = "SHORTS_COMMENT", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("desc")
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
-    @OneToMany(mappedBy = "SHORTS_LIKE", fetch = FetchType.LAZY, cascade = CascadeType.ALL
+    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<ShortsLike> shortsLikeList = new ArrayList<>();        //쇼츠 좋아요 양방향
+
+    public Shorts(ShortsDto.RequestDto requestDto, User user, String videoUrl) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.videoUrl = videoUrl;
+        this.category = requestDto.getCategory();
+        this.user = user;
+    }
+
+    public void update(ShortsDto.UpdateRequestDto requestDto, User user, String videoUrl) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.videoUrl = videoUrl;
+        this.category = requestDto.getCategory();
+        this.user = user;
+    }
+
+    public void addLike() {
+        this.likeCount++;
+    }
+
+    public void cancleLike() {
+        this.likeCount--;
+    }
 }

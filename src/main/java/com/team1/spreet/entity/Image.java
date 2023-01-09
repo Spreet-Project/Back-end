@@ -1,31 +1,28 @@
 package com.team1.spreet.entity;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
-public class FeedLike {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "FEED_LIKE_ID")
+    @Column(name = "IMAGE_ID")
     private Long id;
+
+    @Column
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FEED_ID")
     private Feed feed;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
-    private User user;
-
-    public FeedLike(User user, Feed feed) {
-        this.user = user;
+    public Image(String imageUrl, Feed feed) {
+        this.imageUrl = imageUrl;
         this.feed = feed;
     }
-
 }
