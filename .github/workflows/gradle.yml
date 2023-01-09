@@ -45,7 +45,19 @@ jobs:
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
       shell: bash  
-       
+    
+    - name: make application.properties
+      run: |
+        echo ">> mkdir & touch"
+        mkdir -p ./src/main/resources
+        cd ./src/main/resources
+        touch ./application-security.properties
+        echo ">> copy application-security.properties"
+        echo "${{ secrets.APPLICATION_SECURITY_PROPERTIES }}" >> ./application-security.properties
+        echo "server.port=8080" >> ./application-security.properties
+        
+      shell: bash
+    
     # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
