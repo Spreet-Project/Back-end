@@ -23,10 +23,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'
-        
-    - name: Run chmod to make gradlew executable
-      run: chmod +x ./gradlew    
+        distribution: 'temurin'  
         
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
@@ -55,6 +52,9 @@ jobs:
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
         arguments: clean build -x test
+        
+    - name: Run chmod to make gradlew executable
+      run: chmod +x ./gradlew      
         
     # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
