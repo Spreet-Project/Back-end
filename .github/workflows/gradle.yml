@@ -32,6 +32,18 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         
+    - name: make application.properties
+      run: |
+        echo ">> mkdir & touch"
+        mkdir -p ./src/main/resources
+        cd ./src/main/resources
+        touch ./application-security.properties
+        echo ">> copy application-security.properties"
+        echo "${{ secrets.APPLICATION_SECURITY_PROPERTIES }}" >> ./application-security.properties
+        echo "server.port=8080" >> ./application-security.properties
+        
+      shell: bash    
+        
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew    
 
@@ -45,18 +57,6 @@ jobs:
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
       shell: bash  
-    
-    - name: make application.properties
-      run: |
-        echo ">> mkdir & touch"
-        mkdir -p ./src/main/resources
-        cd ./src/main/resources
-        touch ./application-security.properties
-        echo ">> copy application-security.properties"
-        echo "${{ secrets.APPLICATION_SECURITY_PROPERTIES }}" >> ./application-security.properties
-        echo "server.port=8080" >> ./application-security.properties
-        
-      shell: bash
     
     # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
@@ -96,7 +96,7 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: Run chmod to make gradlew executable
+    - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew      
     - name: Build with Gradle
       run: ./gradlew build
