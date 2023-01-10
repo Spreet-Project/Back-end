@@ -39,6 +39,9 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
+	//이메일 인증
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
