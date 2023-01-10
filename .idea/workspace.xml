@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b7ab38f-e13a-49ca-84ed-d6c9e53a9594" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/team1/spreet/config/EmailConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/team1/spreet/controller/EmailController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/team1/spreet/service/EmailService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/team1/spreet/service/implement/EmailServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/team1/spreet/exception/ErrorStatusCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/team1/spreet/exception/ErrorStatusCode.java" afterDir="false" />
-    </list>
+    <list default="true" id="5b7ab38f-e13a-49ca-84ed-d6c9e53a9594" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -157,7 +148,7 @@
       <workItem from="1673018295013" duration="331000" />
       <workItem from="1673019817903" duration="37000" />
       <workItem from="1673019864269" duration="1007000" />
-      <workItem from="1673323300275" duration="9604000" />
+      <workItem from="1673323300275" duration="10180000" />
     </task>
     <servers />
   </component>
