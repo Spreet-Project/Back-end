@@ -87,23 +87,22 @@ public class ShortsDto {
 	@NoArgsConstructor
 	@Getter
 	public static class CategoryResponseDto {
-		private List<ShortsDto.SimpleResponseDto> rapList = new ArrayList<>();
-		private List<ShortsDto.SimpleResponseDto> djList = new ArrayList<>();
-		private List<ShortsDto.SimpleResponseDto> beatBoxList = new ArrayList<>();
-		private List<ShortsDto.SimpleResponseDto> streetDancList = new ArrayList<>();
-		private List<ShortsDto.SimpleResponseDto> gravityList = new ArrayList<>();
-		private List<ShortsDto.SimpleResponseDto> etcList = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> rap = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> dj = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> beatBox = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> streetDance = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> gravity = new ArrayList<>();
+		private List<ShortsDto.SimpleResponseDto> etc = new ArrayList<>();
 
-		public CategoryResponseDto(List<SimpleResponseDto> rapList, List<SimpleResponseDto> djList,
-			List<SimpleResponseDto> beatBoxList, List<SimpleResponseDto> streetDancList,
-			List<SimpleResponseDto> gravityList, List<SimpleResponseDto> etcList) {
-
-			this.rapList = rapList;
-			this.djList = djList;
-			this.beatBoxList = beatBoxList;
-			this.streetDancList = streetDancList;
-			this.gravityList = gravityList;
-			this.etcList = etcList;
+		public CategoryResponseDto(List<SimpleResponseDto> rap, List<SimpleResponseDto> dj,
+			List<SimpleResponseDto> beatBox, List<SimpleResponseDto> streetDance,
+			List<SimpleResponseDto> gravity, List<SimpleResponseDto> etc) {
+			this.rap = rap;
+			this.dj = dj;
+			this.beatBox = beatBox;
+			this.streetDance = streetDance;
+			this.gravity = gravity;
+			this.etc = etc;
 		}
 	}
 }
