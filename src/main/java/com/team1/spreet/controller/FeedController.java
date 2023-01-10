@@ -20,15 +20,15 @@ public class FeedController {
 
     //feed 최신순 조회
     @GetMapping("/recent")
-    public CustomResponseBody<Page<FeedDto.RecentFeedDto>> getRecentFeed(@RequestParam(value ="page") int page, @RequestParam(value = "size") int size,
+    public CustomResponseBody<Page<FeedDto.RecentFeedDto>> getRecentFeed(@RequestParam(value ="page") int page,
                                                                          @AuthenticationPrincipal UserDetails userDetails){
-        Long userId = userDetails.getUsername() == null ? 0L : Long.parseLong(userDetails.getUsername());
-        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getRecentFeed(page, size, userId));
+        Long userId = userDetails == null ? 0L : Long.parseLong(userDetails.getUsername());
+        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getRecentFeed(page, userId));
     }
     //feed 조회
     @GetMapping("/{feedId}")
     public CustomResponseBody<FeedDto.ResponseDto> getFeed(@PathVariable Long feedId, @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = userDetails.getUsername() == null ? 0L : Long.parseLong(userDetails.getUsername());
+        Long userId = userDetails == null ? 0L : Long.parseLong(userDetails.getUsername());
         return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getFeed(feedId, userId));
     }
     //feed 저장

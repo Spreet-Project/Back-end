@@ -1,7 +1,6 @@
 package com.team1.spreet.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.spreet.config.JwtConfig;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.team1.spreet.security.exceptionhandler.CustomAuthenticaionEntryPoint;
@@ -40,6 +39,7 @@ public class WebSecurityConfig {
             .antMatchers("/api/user/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
             .antMatchers(HttpMethod.GET, ".api/shorts").permitAll()
+            .antMatchers(HttpMethod.GET,"/api/feed/**").permitAll()
             .anyRequest().authenticated();
 
         http
