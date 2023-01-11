@@ -42,13 +42,17 @@ public class User extends TimeStamped{
     @Column(nullable = false)
     private boolean isDeleted;  //유저 탈퇴 여부, 기본값=FALSE
 
-    public User(String loginId, String nickname, String password, String email) {
+    @Column(nullable = false)
+    private boolean isCrew;    //크루회원 여부
+
+    public User(String loginId, String nickname, String password, String email, UserRole userRole) {
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
-        this.userRole = UserRole.ROLE_USER;
+        this.userRole = userRole;
         this.isDeleted = Boolean.FALSE;
+        this.isCrew = Boolean.FALSE;
     }
 
     public User(Long kakaoId, String nickname, String password, String email) {
@@ -58,10 +62,19 @@ public class User extends TimeStamped{
         this.email = email;
         this.userRole = UserRole.ROLE_USER;
         this.isDeleted = Boolean.FALSE;
+        this.isCrew = Boolean.FALSE;
     }
 
     public User kakaoIdUpdate(Long kakaoId) {
         this.loginId = kakaoId.toString();
         return this;
+    }
+
+    public void approveCrew() {
+        this.isCrew = true;
+    }
+
+    public void rejectCrew() {
+        this.userRole = UserRole.ROLE_USER;
     }
 }

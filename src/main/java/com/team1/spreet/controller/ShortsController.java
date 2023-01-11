@@ -5,6 +5,8 @@ import com.team1.spreet.dto.ShortsDto;
 import com.team1.spreet.entity.Category;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.service.ShortsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "shorts")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/shorts")
@@ -28,6 +31,7 @@ public class ShortsController {
 	private final ShortsService shortsService;
 
 	// shorts 등록
+	@ApiOperation(value = "쇼츠 등록 API")
 	@PostMapping
 	public CustomResponseBody<ShortsDto.ResponseDto> saveShorts(@ModelAttribute @Valid ShortsDto.RequestDto requestDto,
 		@AuthenticationPrincipal UserDetails userDetails) {
@@ -35,6 +39,7 @@ public class ShortsController {
 	}
 
 	// shorts 수정
+	@ApiOperation(value = "쇼츠 수정 API")
 	@PutMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> updateShorts(@ModelAttribute ShortsDto.UpdateRequestDto requestDto,
 		@PathVariable Long shortsId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -42,6 +47,7 @@ public class ShortsController {
 	}
 
 	// shorts 삭제
+	@ApiOperation(value = "쇼츠 삭제 API")
 	@DeleteMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> deleteShorts(@PathVariable Long shortsId,
 		@AuthenticationPrincipal UserDetails userDetails) {
@@ -49,6 +55,7 @@ public class ShortsController {
 	}
 
 	// shorts 상세조회
+	@ApiOperation(value = "쇼츠 상세조회 API")
 	@GetMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> getShorts(@PathVariable Long shortsId,
 		@AuthenticationPrincipal UserDetails userDetails) {
@@ -57,6 +64,7 @@ public class ShortsController {
 	}
 
 	// shorts 카테고리별 조회
+	@ApiOperation(value = "쇼츠 카테고리별 조회 API")
 	@GetMapping
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory
 		(@RequestParam(value = "category") Category category, @RequestParam(value = "page") int page,
@@ -66,6 +74,7 @@ public class ShortsController {
 	}
 
 	// 모든 카테고리 최신 shorts 10개씩 조회
+	@ApiOperation(value = "쇼츠 모든 카테고리 조회 API")
 	@GetMapping("/category")
 	public CustomResponseBody<ShortsDto.CategoryResponseDto> getAllCategory() {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_ALL_CATEGORY, shortsService.getAllCategory());

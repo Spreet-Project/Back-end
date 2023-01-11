@@ -34,7 +34,7 @@ public class ShortsLikeService {
 
 		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, user.getId()).orElse(null);
 		if (findShortsLike != null) {
-			shorts.cancleLike();
+			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);
 			return new CustomResponseBody<>(SuccessStatusCode.SHORTS_DISLIKE, new ShortsLikeDto.ResponseDto(false));
 		} else {
