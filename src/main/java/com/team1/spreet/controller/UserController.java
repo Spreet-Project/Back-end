@@ -48,10 +48,19 @@ public class UserController {
         return userService.login(requestDto, httpServletResponse);
     }
 
-    //소셜 로그인 추가 예정!
     @ApiOperation(value = "카카오 로그인 API")
     @GetMapping("/kakao/callback")
     public CustomResponseBody kakaoLogin(@RequestParam String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
         return userService.kakaoLogin(code, httpServletResponse);
+    }
+
+    @PostMapping("/id-check")
+    public CustomResponseBody idCheck(@RequestParam String loginId) {
+        return userService.idCheck(loginId);
+    }
+
+    @PostMapping("/nickname-check")
+    public CustomResponseBody nicknameCheck(@RequestParam String nickname) {
+        return userService.nicknameCheck(nickname);
     }
 }
