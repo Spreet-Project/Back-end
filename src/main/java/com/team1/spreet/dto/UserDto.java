@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 public class UserDto {
@@ -44,10 +45,8 @@ public class UserDto {
         @ApiParam(value = "회원 구분")
         private UserRole userRole;
 
-        private boolean isDeleted = Boolean.FALSE;
-
         public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email);
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole);
         }
     }
 
@@ -70,6 +69,25 @@ public class UserDto {
             this.id = id;
             this.nickname = nickname;
             this.email = email;
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
+    public static class CrewResponseDto {
+        @ApiParam(value = "로그인 ID")
+        private String loginId;
+
+        @ApiParam(value = "닉네임")
+        private String nickname;
+
+        @ApiParam(value = "크루회원 여부")
+        private boolean isCrew;
+
+        public CrewResponseDto(User user) {
+            this.loginId = user.getLoginId();
+            this.nickname = user.getNickname();
+            this.isCrew = user.isCrew();
         }
     }
 }

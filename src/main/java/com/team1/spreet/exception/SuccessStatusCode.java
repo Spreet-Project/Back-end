@@ -28,7 +28,10 @@ public enum SuccessStatusCode {
     CANCEL_LIKE_FEED("피드 좋아요 취소",HttpStatus.OK.value()),
     SAVE_FEED_COMMENT("댓글 작성 완료",HttpStatus.OK.value()),
     UPDATE_FEED_COMMENT("댓글 수정 완료",HttpStatus.OK.value()),
-    DELETE_FEED_COMMENT("댓글 삭제 완료",HttpStatus.OK.value());
+    DELETE_FEED_COMMENT("댓글 삭제 완료",HttpStatus.OK.value()),
+    GET_CREW_LIST("크루 회원 승인 대기 리스트 조회 성공", HttpStatus.OK.value()),
+    APPROVE_ROLE_CREW("크루 회원 승인 성공", HttpStatus.OK.value()),
+    REJECT_ROLE_CREW("크루 회원 거절 성공", HttpStatus.OK.value());
 
     private final String msg;
     private final int statusCode;

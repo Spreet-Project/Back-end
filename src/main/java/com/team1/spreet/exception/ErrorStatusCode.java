@@ -21,7 +21,9 @@ public enum ErrorStatusCode {
     UNAVAILABLE_MODIFICATION("작성자만 수정/삭제 할 수 있습니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_FOUND_SHORTS_COMMENT("존재하지 않는 Shorts 댓글 입니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_FEED("피드가 존재하지 않습니다", HttpStatus.NO_CONTENT.value()),
-    NOT_EXIST_FEED_COMMENT("댓글이 존재하지 않습니다",HttpStatus.NO_CONTENT.value());
+    NOT_EXIST_FEED_COMMENT("댓글이 존재하지 않습니다",HttpStatus.NO_CONTENT.value()),
+    WAITING_CREW_APPROVAL("크루회원 승인 대기 중입니다.", HttpStatus.BAD_REQUEST.value()),
+    NOT_FOUND_USER("회원을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST.value());
 
     private final String msg;
     private final int statusCode;
