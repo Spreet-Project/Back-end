@@ -41,6 +41,9 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
+	  // swagger
+ 	  implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+
     //이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
