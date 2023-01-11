@@ -96,6 +96,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public CustomResponseBody sendSimpleMessage(String email)throws Exception {
+        if (userRepository.findByEmail(email).isPresent()){ throw new RestApiException(ErrorStatusCode.EMAIL_ALREADY_EXIST);}
+
+
         ePw = createKey();
         MimeMessage message = createMessage(email);
         upsert(new EmailConfirm(email,ePw));

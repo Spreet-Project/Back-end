@@ -100,7 +100,7 @@ public class UserService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "a2347db1ceee37de238b04db40b8bb4e");
-        body.add("redirect_url", "http://localhost:8080/api/user/callback");
+        body.add("redirect_url", "https://sparta-rara.shop/api/user/kakako/callback");
         body.add("code", code);
 
         //HTTP 요청 보내기
@@ -167,5 +167,17 @@ public class UserService {
             userRepository.save(kakaoUser);
         }
         return kakaoUser;
+    }
+
+    public CustomResponseBody idCheck(String loginId) {
+        if(userRepository.findByLoginId(loginId).isPresent())
+            throw new RestApiException(ErrorStatusCode.ID_ALREADY_EXISTS_EXCEPTION);
+        return new CustomResponseBody(SuccessStatusCode.ID_DUPLICATE_CHECK);
+    }
+
+    public CustomResponseBody nicknameCheck(String nickname) {
+        if(userRepository.findByNickname(nickname).isPresent())
+            throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
+        return new CustomResponseBody(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
     }
 }

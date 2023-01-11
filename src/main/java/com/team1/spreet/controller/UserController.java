@@ -19,20 +19,32 @@ public class UserController {
 
     private final UserService userService;
 
+    //local signup
     @PostMapping("/signup")
     public CustomResponseBody signup(@RequestBody @Valid final UserDto.SignupRequestDto requestDto) {
         log.info("requestDto : " + requestDto);
         return userService.signup(requestDto);
     }
 
+    //local login
     @PostMapping("/login")
     public CustomResponseBody login(@RequestBody final UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
         return userService.login(requestDto, httpServletResponse);
     }
 
-    //소셜 로그인 추가 예정!
+    //kakao login
     @GetMapping("/kakao/callback")
     public CustomResponseBody kakaoLogin(@RequestParam String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
         return userService.kakaoLogin(code, httpServletResponse);
+    }
+
+    @PostMapping("/id-check")
+    public CustomResponseBody idCheck(@RequestParam String loginId) {
+        return userService.idCheck(loginId);
+    }
+
+    @PostMapping("/nickname-check")
+    public CustomResponseBody nicknameCheck(@RequestParam String nickname) {
+        return userService.nicknameCheck(nickname);
     }
 }
