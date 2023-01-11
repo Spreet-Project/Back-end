@@ -1,10 +1,18 @@
 package com.team1.spreet.service.implement;
 
+import com.team1.spreet.dto.CustomResponseBody;
+import com.team1.spreet.dto.EmailDto;
+import com.team1.spreet.entity.EmailConfirm;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
+import com.team1.spreet.exception.SuccessStatusCode;
+import com.team1.spreet.repository.EmailConfirmRepository;
+import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.service.EmailConfirmService;
 import com.team1.spreet.service.EmailService;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -14,18 +22,22 @@ import javax.mail.internet.MimeMessage;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
+@Getter
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
+    private final EmailConfirmRepository emailConfirmRepository;
+    private final UserRepository userRepository;
+    private final EmailConfirmService emailConfirmService;
 
-    public static final String ePw = createKey();
+    public String ePw;
 
     private MimeMessage createMessage(String to)throws Exception {
-      log.info("보내는 대상 : " + to);
-      log.info("인증 번호 : " + ePw);
         MimeMessage message = emailSender.createMimeMessage();
+        log.info("보내는 대상 : " + to);
+        log.info("인증 번호 : " + ePw);
 
         message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
         message.setSubject("이메일 인증 테스트");
@@ -50,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
         return message;
     }
 
-    public static String createKey() {
+    public String createKey() {
         StringBuffer key = new StringBuffer();
         Random random = new Random();
 
@@ -75,17 +87,35 @@ public class EmailServiceImpl implements EmailService {
         return key.toString();
     }
 
+    private void upsert(EmailConfirm emailConfirm) throws Exception {
+        if(emailConfirmService.findByEmail(emailConfirm.getEmail()) != null)
+            emailConfirmService.update(emailConfirm.getEmail(), emailConfirm.getConfirmCode());
+        else
+            emailConfirmService.save(emailConfirm);
+    }
+
     @Override
-    public String sendSimpleMessage(String to)throws Exception {
-        MimeMessage message = createMessage(to);
+    public CustomResponseBody sendSimpleMessage(String email)throws Exception {
+        ePw = createKey();
+        MimeMessage message = createMessage(email);
+        upsert(new EmailConfirm(email,ePw));
         try {   //예외 처리
             emailSender.send(message);
         } catch (MailException e) {
             e.printStackTrace();
             throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
         }
-        return ePw;
+        return new CustomResponseBody(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 
+    @Override
+    public CustomResponseBody emailConfirm(EmailDto emailDto) {
+        if(emailConfirmService.findByEmail(emailDto.getEmail())==null)
+            throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_NULL_EXCEPTION);
 
+        if(emailDto.getConfirmCode().equals(emailConfirmService.findByEmail(emailDto.getEmail()).getConfirmCode()))
+            return new CustomResponseBody(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
+        else
+            throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_INCORRECT);
+    }
 }
