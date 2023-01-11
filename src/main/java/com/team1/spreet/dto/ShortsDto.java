@@ -138,20 +138,20 @@ public class ShortsDto {
 		@ApiParam(value = "스트릿댄스 리스트")
 		private List<ShortsDto.SimpleResponseDto> streetDance = new ArrayList<>();
 
-		@ApiParam(value = "그래비티 리스트")
-		private List<ShortsDto.SimpleResponseDto> gravity = new ArrayList<>();
+		@ApiParam(value = "그래피티 리스트")
+		private List<ShortsDto.SimpleResponseDto> graffiti = new ArrayList<>();
 
 		@ApiParam(value = "기타 리스트")
 		private List<ShortsDto.SimpleResponseDto> etc = new ArrayList<>();
 
 		public CategoryResponseDto(List<SimpleResponseDto> rap, List<SimpleResponseDto> dj,
 			List<SimpleResponseDto> beatBox, List<SimpleResponseDto> streetDance,
-			List<SimpleResponseDto> gravity, List<SimpleResponseDto> etc) {
+			List<SimpleResponseDto> graffiti, List<SimpleResponseDto> etc) {
 			this.rap = rap;
 			this.dj = dj;
 			this.beatBox = beatBox;
 			this.streetDance = streetDance;
-			this.gravity = gravity;
+			this.graffiti = graffiti;
 			this.etc = etc;
 		}
 	}

@@ -123,17 +123,17 @@ public class ShortsService {
 	// 모든 카테고리 최신 shorts 10개씩 조회
 	@Transactional(readOnly = true)
 	public ShortsDto.CategoryResponseDto getAllCategory() {
-		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAVITY, Category.ETC};
+		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAFFITI, Category.ETC};
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		List<ShortsDto.SimpleResponseDto> rap = getShortsList(category[0], pageable);
 		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[1], pageable);
 		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[2], pageable);
 		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[3], pageable);
-		List<ShortsDto.SimpleResponseDto> gravity = getShortsList(category[4], pageable);
+		List<ShortsDto.SimpleResponseDto> graffiti = getShortsList(category[4], pageable);
 		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[5], pageable);
 
-		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, gravity, etc);
+		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, graffiti, etc);
 	}
 
 	// shorts 가 존재하는지 확인
