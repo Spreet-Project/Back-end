@@ -1,16 +1,18 @@
 package com.team1.spreet.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(value = "Swagger")
+@Api(tags = "Swagger")
 @RestController
 @RequestMapping("/api")
 public class SwaggerController {
+	@ApiOperation(value = "Swagger Document API")
 	@GetMapping("/doc")
 	public void redirectSwagger(HttpServletResponse response) throws IOException {
 		response.sendRedirect("https://sparta-rara.shop/swagger-ui/index.html");
