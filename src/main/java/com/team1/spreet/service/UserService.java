@@ -99,7 +99,7 @@ public class UserService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "a2347db1ceee37de238b04db40b8bb4e");
-        body.add("redirect_url", "https://sparta-rara.shop/api/user/kakako/callback");
+        body.add("redirect_url", "http://localhost:3000/api/user/kakao/callback");
         body.add("code", code);
 
         //HTTP 요청 보내기
