@@ -12,7 +12,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "feed")
 @RestController
@@ -25,6 +33,7 @@ public class FeedController {
     //feed 최신순 조회
     @ApiOperation(value = "피드 최신순 조회 API")
     @GetMapping("/recent")
+
     public CustomResponseBody<Page<FeedDto.RecentFeedDto>> getRecentFeed(@RequestParam(value ="page") @ApiParam(value = "조회할 페이지") int page,
         @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") int size,
         @AuthenticationPrincipal UserDetails userDetails){
