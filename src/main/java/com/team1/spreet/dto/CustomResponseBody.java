@@ -2,18 +2,20 @@ package com.team1.spreet.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.exception.SuccessStatusCode;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class CustomResponseBody <T>{
-    @ApiParam(value = "결과 메세지")
+    @ApiModelProperty(value = "결과 메세지")
     private String msg;
 
-    @ApiParam(value = "상태 코드")
+    @ApiModelProperty(value = "상태 코드")
     private int statusCode;
 
-    @ApiParam(value = "반환 데이터")
+    @ApiModelProperty(value = "반환 데이터")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private T data;
 

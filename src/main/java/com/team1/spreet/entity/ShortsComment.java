@@ -1,6 +1,5 @@
 package com.team1.spreet.entity;
 
-import com.team1.spreet.dto.ShortsCommentDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,13 +40,13 @@ public class ShortsComment extends TimeStamped {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    public ShortsComment(ShortsCommentDto.RequestDto requestDto, Shorts shorts, User user) {
-        this.content = requestDto.getContent();
+    public ShortsComment(String content, Shorts shorts, User user) {
+        this.content = content;
         this.shorts = shorts;
         this.user = user;
     }
 
-    public void updateShortsComment(ShortsCommentDto.RequestDto requestDto) {
-        this.content = requestDto.getContent();
+    public void updateShortsComment(String content) {
+        this.content = content;
     }
 }
