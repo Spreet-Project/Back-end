@@ -33,6 +33,7 @@ public class FeedController {
     //feed 최신순 조회
     @ApiOperation(value = "피드 최신순 조회 API")
     @GetMapping("/recent")
+
     public CustomResponseBody<Page<FeedDto.RecentFeedDto>> getRecentFeed(@RequestParam(value ="page") @ApiParam(value = "조회할 페이지") int page,
         @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") int size,
         @AuthenticationPrincipal UserDetails userDetails){

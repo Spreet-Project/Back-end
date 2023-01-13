@@ -22,6 +22,7 @@ public enum ErrorStatusCode {
     NOT_FOUND_SHORTS_COMMENT("존재하지 않는 Shorts 댓글 입니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_FEED("피드가 존재하지 않습니다", HttpStatus.NO_CONTENT.value()),
     NOT_EXIST_FEED_COMMENT("댓글이 존재하지 않습니다",HttpStatus.NO_CONTENT.value()),
+    NOT_EXIST_ALERT("존재하지 않는 알람입니다",HttpStatus.NO_CONTENT.value()),
     WAITING_CREW_APPROVAL("크루회원 승인 대기 중입니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_FOUND_USER("회원을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST.value()),
     EMAIL_ILLEGAL_EXCAPTION("입력하신 이메일은 유효하지 않는 이메일입니다.", HttpStatus.BAD_REQUEST.value()),
