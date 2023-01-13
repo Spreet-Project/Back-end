@@ -11,6 +11,9 @@ import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
+import java.util.UUID;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -25,10 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
 
 @Service
@@ -100,7 +99,7 @@ public class UserService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "a2347db1ceee37de238b04db40b8bb4e");
-        body.add("redirect_url", "http://localhost:8080/api/user/callback");
+        body.add("redirect_url", "http://localhost:3000/api/user/kakao/callback");
         body.add("code", code);
 
         //HTTP 요청 보내기
@@ -167,5 +166,17 @@ public class UserService {
             userRepository.save(kakaoUser);
         }
         return kakaoUser;
+    }
+
+    public CustomResponseBody idCheck(String loginId) {
+        if(userRepository.findByLoginId(loginId).isPresent())
+            throw new RestApiException(ErrorStatusCode.ID_ALREADY_EXISTS_EXCEPTION);
+        return new CustomResponseBody(SuccessStatusCode.ID_DUPLICATE_CHECK);
+    }
+
+    public CustomResponseBody nicknameCheck(String nickname) {
+        if(userRepository.findByNickname(nickname).isPresent())
+            throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
+        return new CustomResponseBody(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
     }
 }

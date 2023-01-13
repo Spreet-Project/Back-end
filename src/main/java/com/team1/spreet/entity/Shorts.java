@@ -1,15 +1,24 @@
 package com.team1.spreet.entity;
 
-import com.team1.spreet.dto.ShortsDto;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,26 +56,25 @@ public class Shorts extends TimeStamped {
     private User user;          //유저 단방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("desc")
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<ShortsLike> shortsLikeList = new ArrayList<>();        //쇼츠 좋아요 양방향
 
-    public Shorts(ShortsDto.RequestDto requestDto, User user, String videoUrl) {
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
+    public Shorts(String title, String content, String videoUrl, Category category, User user) {
+        this.title = title;
+        this.content = content;
         this.videoUrl = videoUrl;
-        this.category = requestDto.getCategory();
+        this.category = category;
         this.user = user;
     }
 
-    public void update(ShortsDto.UpdateRequestDto requestDto, User user, String videoUrl) {
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
+    public void update(String title, String content, String videoUrl, Category category, User user) {
+        this.title = title;
+        this.content = content;
         this.videoUrl = videoUrl;
-        this.category = requestDto.getCategory();
+        this.category = category;
         this.user = user;
     }
 
@@ -74,7 +82,7 @@ public class Shorts extends TimeStamped {
         this.likeCount++;
     }
 
-    public void cancleLike() {
+    public void cancelLike() {
         this.likeCount--;
     }
 }

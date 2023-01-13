@@ -5,7 +5,7 @@ public enum Category {
     DJ("DJ"),
     BEAT_BOX("BEAT_BOX"),
     STREET_DANCE("STREET_DANCE"),
-    GRAVITY("GRAVITY"),
+    GRAFFITI("GRAFFITI"),
     ETC("ETC");
 
     private final String category;

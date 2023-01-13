@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.team1.spreet.security.exceptionhandler.CustomAuthenticaionEntryPoint;
+import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import javax.servlet.http.HttpSession;
 
 @Configuration  //Bean을 등록하기 위함이거나 설정파일을 만들기 위한 어노테이션
 @RequiredArgsConstructor
@@ -38,8 +37,15 @@ public class WebSecurityConfig {
         http.authorizeRequests()
             .antMatchers("/api/user/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
-            .antMatchers(HttpMethod.GET, ".api/shorts").permitAll()
-            .antMatchers(HttpMethod.GET,"/api/feed/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/user/**").permitAll()
+            .antMatchers("/api/doc").permitAll()
+            .antMatchers("/swagger-ui/**").permitAll()
+            .antMatchers("/swagger-resources/**").permitAll()
+            .antMatchers("/swagger-ui.html").permitAll()
+            .antMatchers("/v2/api-docs").permitAll()
+            .antMatchers("/v3/api-docs").permitAll()
+            .antMatchers("/webjars/**").permitAll()
             .anyRequest().authenticated();
 
         http

@@ -30,8 +30,7 @@ public class ShortsCommentService {
 
 		Shorts shorts = checkShorts(shortsId);
 
-		ShortsComment shortsComment = new ShortsComment(requestDto, shorts, user);
-		shortsCommentRepository.saveAndFlush(shortsComment);
+		ShortsComment shortsComment = shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
 
 		return new ShortsCommentDto.ResponseDto(shortsComment);
 	}
@@ -43,7 +42,7 @@ public class ShortsCommentService {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shortsComment, user.getId())) {
-			shortsComment.updateShortsComment(requestDto);
+			shortsComment.updateShortsComment(requestDto.getContent());
 		}
 		return new ShortsCommentDto.ResponseDto(shortsComment);
 	}
