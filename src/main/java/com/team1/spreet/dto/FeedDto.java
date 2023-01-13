@@ -2,7 +2,7 @@ package com.team1.spreet.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.entity.Feed;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,13 +15,13 @@ public class FeedDto {
     @Getter
     @Setter
     public static class RequestDto {
-        @ApiParam(value = "제목", required = true)
+        @ApiModelProperty(value = "제목", required = true)
         private String title;
 
-        @ApiParam(value = "게시글 내용", required = true)
+        @ApiModelProperty(value = "게시글 내용", required = true)
         private String content;
 
-        @ApiParam(value = "이미지 파일", required = false)
+        @ApiModelProperty(value = "이미지 파일", required = false)
         private List<MultipartFile> file;
 
     }
@@ -29,28 +29,28 @@ public class FeedDto {
     @NoArgsConstructor
     @Getter
     public static class ResponseDto {
-        @ApiParam(value = "피드 ID")
+        @ApiModelProperty(value = "피드 ID")
         private Long feedId;
 
-        @ApiParam(value = "닉네임")
+        @ApiModelProperty(value = "닉네임")
         private String nickname;
 
-        @ApiParam(value = "제목")
+        @ApiModelProperty(value = "제목")
         private String title;
 
-        @ApiParam(value = "게시글 내용")
+        @ApiModelProperty(value = "게시글 내용")
         private String content;
 
-        @ApiParam(value = "이미지 url 리스트")
+        @ApiModelProperty(value = "이미지 url 리스트")
         private List<String> imageUrlList;
 
-        @ApiParam(value = "좋아요 개수")
+        @ApiModelProperty(value = "좋아요 개수")
         private Long feedLike;
 
-        @ApiParam(value = "좋아요 상태")
+        @ApiModelProperty(value = "좋아요 상태")
         private boolean isLike;
 
-        @ApiParam(value = "피드 댓글 리스트")
+        @ApiModelProperty(value = "피드 댓글 리스트")
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private List<FeedCommentDto.ResponseDto> commentList;
 
@@ -69,10 +69,10 @@ public class FeedDto {
     @NoArgsConstructor
     @Getter
     public static class RecentFeedDto{
-        @ApiParam(value = "피드 ID")
+        @ApiModelProperty(value = "피드 ID")
         private Long feedId;
 
-        @ApiParam(value = "제목")
+        @ApiModelProperty(value = "제목")
         private String title;
 
         public RecentFeedDto(Feed feed) {

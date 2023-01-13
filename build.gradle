@@ -58,7 +58,6 @@ dependencies {
     implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
 }
 
-
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
 jar {
     enabled = false

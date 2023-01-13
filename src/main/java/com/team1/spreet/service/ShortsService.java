@@ -38,9 +38,8 @@ public class ShortsService {
 		User user = getUser(userId);
 
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
-		Shorts shorts = new Shorts(requestDto, user, videoUrl);
 
-		shortsRepository.saveAndFlush(shorts);
+		shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
 
 		return SuccessStatusCode.SAVE_SHORTS;
 	}
@@ -64,7 +63,7 @@ public class ShortsService {
 				//첨부파일 수정 안함
 				videoUrl = shorts.getVideoUrl();
 			}
-			shorts.update(requestDto, user, videoUrl);
+			shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory(), user);
 		}
 		return SuccessStatusCode.UPDATE_SHORTS;
 	}
@@ -136,6 +135,12 @@ public class ShortsService {
 		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, graffiti, etc);
 	}
 
+	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
+	private boolean checkLike(Long shortsId, Long userId) {
+		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
+		return shortsLike != null;
+	}
+
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
 		return shortsRepository.findById(shortsId).orElseThrow(
@@ -149,12 +154,6 @@ public class ShortsService {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 		return true;
-	}
-
-	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
-	private boolean checkLike(Long shortsId, Long userId) {
-		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
-		return shortsLike != null;
 	}
 
 	// user 객체 가져오기
