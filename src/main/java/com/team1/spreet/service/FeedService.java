@@ -37,10 +37,10 @@ public class FeedService {
 
     //feed 최신순 조회
     @Transactional(readOnly = true)
-    public Page<FeedDto.RecentFeedDto> getRecentFeed(int page, Long userId) {
+    public Page<FeedDto.RecentFeedDto> getRecentFeed(int page, int size, Long userId) {
         //pageable 속성값 설정
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page - 1,10, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return feedRepository.findAll(pageable).map(FeedDto.RecentFeedDto::entityToDto);    //Feed 엔티티를 Dto로 변환
     }
     //feed 조회
