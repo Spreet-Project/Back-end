@@ -1,6 +1,8 @@
 package com.team1.spreet.dto;
 
+import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.ShortsComment;
+import com.team1.spreet.entity.User;
 import io.swagger.annotations.ApiParam;
 import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
@@ -14,6 +16,10 @@ public class ShortsCommentDto {
 		@NotBlank(message = "댓글을 입력해 주세요.")
 		@ApiParam(value = "댓글 내용", required = true)
 		private String content;
+
+		public ShortsComment toEntity(Shorts shorts, User user) {
+			return new ShortsComment(this.content, shorts, user);
+		}
 	}
 
 	@NoArgsConstructor

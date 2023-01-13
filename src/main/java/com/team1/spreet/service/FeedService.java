@@ -31,6 +31,10 @@ public class FeedService {
     private final FeedCommentRepository feedCommentRepository;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
+    private final AlertService alertService;
+    private final AlertRepository alertRepository;
+    private final SubscribeRepository subscribeRepository;
+
     //feed 최신순 조회
     @Transactional(readOnly = true)
     public Page<FeedDto.RecentFeedDto> getRecentFeed(int page, int size, Long userId) {
@@ -43,7 +47,6 @@ public class FeedService {
     @Transactional(readOnly = true)
     public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        User user = checkUser(userId);    //userDetails로 user 찾기
         Long feedLike = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
         //댓글 목록 조회
         List<FeedCommentDto.ResponseDto> commentList = new ArrayList<>();
@@ -57,9 +60,13 @@ public class FeedService {
         for (Image image : imageList) {
             imageUrlList.add(image.getImageUrl());
         }
-        //좋아요 여부 확인
-        boolean isLike = feedLikeRepository.existsByUserAndFeed(user, feed);
-        return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, isLike, commentList);
+        //로그인 여부 및 좋아요 여부 확인
+        if (userId != 0L) {
+            boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
+            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, isLike, commentList);
+        }else{
+            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, false, commentList);
+        }
         }
     //feed 저장
     @Transactional
@@ -68,6 +75,16 @@ public class FeedService {
         Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
+        //구독자에게 알림 생성
+        List<Subscribe> subscribes = subscribeRepository.findAllByPublisher(user).orElse(null);
+        if(subscribes!=null){
+            for (Subscribe subscribe : subscribes) {
+                alertService.send(user.getId(),
+                        "새로운 feed가 생성되었습니다"+System.lineSeparator()+user.getNickname()+": "+feed.getTitle(),
+                        "localhost:8080/api/feed/"+feed.getId(),
+                        subscribe.getSubscriber().getId());
+            }
+        }
         return SuccessStatusCode.SAVE_FEED;
     }
     //feed 수정

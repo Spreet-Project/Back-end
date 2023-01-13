@@ -1,7 +1,7 @@
 package com.team1.spreet.dto;
 
 import com.team1.spreet.entity.FeedComment;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,25 +10,25 @@ import lombok.Getter;
 public class FeedCommentDto {
     @Getter
     public static class RequestDto{
-        @ApiParam(value = "피드 댓글 내용", required = true)
+        @ApiModelProperty(value = "피드 댓글 내용", required = true)
         private String content;
     }
 
     @Getter
     public static class ResponseDto{
-        @ApiParam(value = "피드 댓글 ID")
+        @ApiModelProperty(value = "피드 댓글 ID")
         private Long commentId;
 
-        @ApiParam(value = "닉네임")
+        @ApiModelProperty(value = "닉네임")
         private String nickname;
 
-        @ApiParam(value = "피드 댓글 내용")
+        @ApiModelProperty(value = "피드 댓글 내용")
         private String content;
 
-        @ApiParam(value = "작성 일자")
+        @ApiModelProperty(value = "작성 일자")
         private LocalDateTime createdAt;
 
-        @ApiParam(value = "수정 일자")
+        @ApiModelProperty(value = "수정 일자")
         private LocalDateTime modifiedAt;
 
         public ResponseDto(FeedComment feedComment) {
@@ -41,7 +41,7 @@ public class FeedCommentDto {
     }
     @Getter
     public static class CommentListDto{
-        @ApiParam(value = "피드 댓글 리스트")
+        @ApiModelProperty(value = "피드 댓글 리스트")
         private List<ResponseDto> commentList = new ArrayList<>();
 
         public void addComment(ResponseDto responseDto) {

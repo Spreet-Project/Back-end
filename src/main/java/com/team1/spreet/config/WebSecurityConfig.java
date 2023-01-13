@@ -37,7 +37,7 @@ public class WebSecurityConfig {
         http.authorizeRequests()
             .antMatchers("/api/user/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
-            .antMatchers(HttpMethod.GET, ".api/shorts").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
             .antMatchers("/api/doc").permitAll()
             .antMatchers("/swagger-ui/**").permitAll()
             .antMatchers("/swagger-resources/**").permitAll()
@@ -83,7 +83,6 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.addAllowedOrigin("http://localhost:3000");
-//        config.addAllowedOrigin("https://dev.d2hev55rb01409.amplifyapp.com/");
 
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
 
