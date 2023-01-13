@@ -1,10 +1,8 @@
 package com.team1.spreet.service;
 
-import com.team1.spreet.dto.ShortsCommentDto;
 import com.team1.spreet.dto.ShortsDto;
 import com.team1.spreet.entity.Category;
 import com.team1.spreet.entity.Shorts;
-import com.team1.spreet.entity.ShortsComment;
 import com.team1.spreet.entity.ShortsLike;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
@@ -86,15 +84,10 @@ public class ShortsService {
 	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
 		Shorts shorts = checkShorts(shortsId);
 
-		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
-		for (ShortsComment comment : shorts.getShortsCommentList()) {
-			commentList.add(new ShortsCommentDto.ResponseDto(comment));
-		}
-
 		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
-			return new ShortsDto.ResponseDto(shorts, false, commentList);
+			return new ShortsDto.ResponseDto(shorts, false);
 		} else {
-			return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, userId), commentList);
+			return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, userId));
 		}
 	}
 
@@ -108,12 +101,11 @@ public class ShortsService {
 
 		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
 			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts, false, null));
+				shortsList.add(new ShortsDto.ResponseDto(shorts, false));
 			}
 		} else {
 			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts,
-					checkLike(shorts.getId(), userId), null));
+				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userId)));
 			}
 		}
 		return shortsList;
@@ -143,9 +135,12 @@ public class ShortsService {
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findById(shortsId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
-		);
+		Shorts shorts = shortsRepository.findByIdWithUser(shortsId);
+
+		if (shorts == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS);
+		}
+		return shorts;
 	}
 
 	// shorts 작성자와 user 가 같은지 확인

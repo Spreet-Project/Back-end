@@ -1,6 +1,5 @@
 package com.team1.spreet.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.entity.Category;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.User;
@@ -54,7 +53,7 @@ public class ShortsDto {
 		@NotBlank(message = "내용을 입력해 주세요.")
 		private String content;
 
-		@ApiModelProperty(value = "영상 파일", required = false)
+		@ApiModelProperty(value = "영상 파일")
 		private MultipartFile file;               // shorts 수정시, 영상 수정 없이 글만 수정 가능
 
 		@ApiModelProperty(value = "카테고리", required = true)
@@ -89,11 +88,7 @@ public class ShortsDto {
 		@ApiModelProperty(value = "좋아요 상태")
 		private boolean isLike;      //좋아요 상태(true, false)
 
-		@ApiModelProperty(value = "쇼츠 댓글 리스트")
-		@JsonInclude(JsonInclude.Include.NON_EMPTY)
-		private List<ShortsCommentDto.ResponseDto> shortsCommentList = new ArrayList<>();
-
-		public ResponseDto(Shorts shorts, boolean isLike, List<ShortsCommentDto.ResponseDto> shortsCommentList) {
+		public ResponseDto(Shorts shorts, boolean isLike) {
 			this.shortsId = shorts.getId();
 			this.nickname = shorts.getUser().getNickname();
 			this.title = shorts.getTitle();
@@ -102,7 +97,6 @@ public class ShortsDto {
 			this.category = shorts.getCategory().value();
 			this.likeCount = shorts.getLikeCount();
 			this.isLike = isLike;
-			this.shortsCommentList = shortsCommentList;
 		}
 	}
 

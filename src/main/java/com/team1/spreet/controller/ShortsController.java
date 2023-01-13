@@ -50,7 +50,7 @@ public class ShortsController {
 	// shorts 삭제
 	@ApiOperation(value = "쇼츠 삭제 API")
 	@DeleteMapping("/{shortsId}")
-	public CustomResponseBody<ShortsDto.ResponseDto> deleteShorts(@PathVariable @ApiParam(value = "삭제할 쇼츠 ID") Long shortsId,
+	public CustomResponseBody<SuccessStatusCode> deleteShorts(@PathVariable @ApiParam(value = "삭제할 쇼츠 ID") Long shortsId,
 		@AuthenticationPrincipal UserDetails userDetails) {
 		return new CustomResponseBody<>(shortsService.deleteShorts(shortsId, Long.parseLong(userDetails.getUsername())));
 	}
