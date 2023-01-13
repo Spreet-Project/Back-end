@@ -16,6 +16,7 @@ public enum SuccessStatusCode {
     GET_SHORTS_BY_ALL_CATEGORY("모든 카테고리 Shorts 조회 성공", HttpStatus.OK.value()),
     SHORTS_LIKE("Shorts 좋아요 성공", HttpStatus.OK.value()),
     SHORTS_DISLIKE("Shorts 좋아요 취소 성공", HttpStatus.OK.value()),
+    GET_SHORTS_COMMENTS("Shorts 댓글 리스트 조회 성공", HttpStatus.OK.value()),
     SAVE_SHORTS_COMMENT("Shorts 댓글 등록 성공", HttpStatus.OK.value()),
     UPDATE_SHORTS_COMMENT("Shorts 댓글 수정 성공", HttpStatus.OK.value()),
     DELETE_SHORTS_COMMENT("Shorts 댓글 삭제 성공", HttpStatus.OK.value()),
@@ -40,7 +41,6 @@ public enum SuccessStatusCode {
     EMAIL_CONFIRM_SUCCESS("이메일 인증 성공", HttpStatus.OK.value()),
     ID_DUPLICATE_CHECK("아이디 중복 확인 성공. 사용 가능한 아이디입니다.", HttpStatus.OK.value()),
     NICKNAME_DUPLICATE_CHECK("닉네임 중복 확인 성공. 사용 가능한 닉네임입니다.", HttpStatus.OK.value());
-
 
     private final String msg;
     private final int statusCode;

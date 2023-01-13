@@ -43,7 +43,6 @@ public class FeedController {
     //feed 조회
     @ApiOperation(value = "피드 상세조회 API")
     @GetMapping("/{feedId}")
-
     public CustomResponseBody<FeedDto.ResponseDto> getFeed(@PathVariable @ApiParam(value = "조회할 피드 ID") Long feedId,
         @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = userDetails.getUsername() == null ? 0L : Long.parseLong(userDetails.getUsername());
