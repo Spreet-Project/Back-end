@@ -39,6 +39,17 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+	// swagger
+	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+
+//	//이메일 인증
+//	implementation 'org.springframework.boot:spring-boot-starter-mail'
+//	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+//	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.5.RELEASE'
+//	// https://mvnrepository.com/artifact/org.redisson/redisson
+//	implementation 'org.redisson:redisson:3.16.8'
+//	// https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
+//	implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
@@ -48,4 +59,11 @@ jar {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+tasks.withType(Jar) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	manifest {
+		attributes["Main-Class"] = "com.example.backendapp.BackendAppApplication"
+	}
 }

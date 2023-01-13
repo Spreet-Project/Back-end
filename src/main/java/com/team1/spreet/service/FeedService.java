@@ -31,6 +31,10 @@ public class FeedService {
     private final FeedCommentRepository feedCommentRepository;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
+    private final AlertService alertService;
+    private final AlertRepository alertRepository;
+    private final SubscribeRepository subscribeRepository;
+
     //feed 최신순 조회
     @Transactional(readOnly = true)
     public Page<FeedDto.RecentFeedDto> getRecentFeed(int page, Long userId) {
@@ -71,6 +75,16 @@ public class FeedService {
         Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
+        //구독자에게 알림 생성
+        List<Subscribe> subscribes = subscribeRepository.findAllByPublisher(user).orElse(null);
+        if(subscribes!=null){
+            for (Subscribe subscribe : subscribes) {
+                alertService.send(user.getId(),
+                        "새로운 feed가 생성되었습니다"+System.lineSeparator()+user.getNickname()+": "+feed.getTitle(),
+                        "localhost:8080/api/feed/"+feed.getId(),
+                        subscribe.getSubscriber().getId());
+            }
+        }
         return SuccessStatusCode.SAVE_FEED;
     }
     //feed 수정

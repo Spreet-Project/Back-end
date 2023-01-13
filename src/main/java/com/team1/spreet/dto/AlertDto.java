@@ -1,10 +1,10 @@
 package com.team1.spreet.dto;
 
-import com.team1.spreet.entity.Notification;
+import com.team1.spreet.entity.Alert;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class NotificationDto {
+public class AlertDto {
     @NoArgsConstructor
     @Getter
     public static class ResponseDto{
@@ -13,11 +13,11 @@ public class NotificationDto {
         private String url;
         private boolean isRead;
 
-        public ResponseDto(Notification notification) {
-            this.id = notification.getId();
-            this.content = notification.getContent();
-            this.url = notification.getUrl();
-            this.isRead = notification.isRead();
+        public ResponseDto(Alert alert) {
+            this.id = alert.getId();
+            this.content = alert.getContent();
+            this.url = alert.getUrl();
+            this.isRead = alert.isRead();
         }
     }
 }

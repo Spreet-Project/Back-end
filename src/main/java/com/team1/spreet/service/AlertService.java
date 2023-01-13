@@ -5,12 +5,13 @@ import com.team1.spreet.entity.Alert;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.repository.EmitterRepository;
+import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.AlertRepository;
+import com.team1.spreet.repository.EmitterRepository;
 import com.team1.spreet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -20,86 +21,97 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
-    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+public class AlertService {
+
     private final EmitterRepository emitterRepository;
     private final AlertRepository alertRepository;
     private final UserRepository userRepository;
+//    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter subscribe(Long userId, String lastEventId) {
-        String emitterId = makeIdIncludeTime(userId);
-        /*
-        sse 연결 요청에 대한 응답으로 emitter 를 만들어 반환한다
-        DEFAULT_TIMEOUT 만큼 연결을 유지하고 시간이 지나면 클라이언트에서 재연결 요청을 보낸다 -> 왜 굳이 시간제한을 두지?
-        userId가 포함된 emitterId를 키값으로 emitter 저장
-        * */
-        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        //시간 초과 및 요청이 정상 작동되지 않으면 emitter 를 삭제한다
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
-
-        //503에러 발생 예방을 위한 더미 데이터 전송
-        String eventId = makeIdIncludeTime(userId);
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
-
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방, lastEventId는 프론트에서 보내준다
-        if (hasLostData(lastEventId)) {
-            sendLostData(lastEventId, userId, emitterId, emitter);
+//로그인 시 미수신 알람을 보낸다
+    public void alertEvent(User user) {
+        String userNickname = user.getNickname();
+        Map<String, SseEmitter> emitters = emitterRepository.findAll();
+        if(emitters.containsKey(userNickname)){
+            SseEmitter emitter = emitters.get(userNickname);
+            try {
+                List<Alert> alerts = alertRepository.findAllByReceiverAndIsReadFalse(user.getNickname());
+                for (Alert alert : alerts) {
+                    if (!alert.isRead()) {
+                        emitter.send(SseEmitter
+                                .event()
+                                .name("미수신 알림")
+                                .data(alert));
+                    }
+                }
+            } catch (Exception e) {
+                emitters.remove(userNickname);
+            }
         }
-        return emitter;
     }
-
-    public void send(Long userId, String content, String url) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public void send(Long senderId, String content, String url, Long receiverId) {
+        User sender = userRepository.findById(senderId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
-        Alert notification = notificationRepository.save(createNotification(content, url, false, user));
-
-        String receiverId = String.valueOf(userId);
-        String eventId = receiverId + "_" + System.currentTimeMillis();
-        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
+        User receiver = userRepository.findById(receiverId).orElseThrow(
+                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+        );
+        Alert alert = alertRepository.save(new Alert(content, url, false, sender.getNickname(), receiver.getNickname()));
+//        String receiverId = String.valueOf(userId);
+//        String eventId = receiverId + "_" + System.currentTimeMillis();
+        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByUserNickname(receiver.getNickname());
         emitters.forEach(
                 (key, emitter) -> {
-                    emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, new AlertDto.ResponseDto(notification));
+                    emitterRepository.saveEventCache(key, alert);
+                    sendAlert(emitter, key, new AlertDto.ResponseDto(alert));
                 }
         );
     }
-    private Alert createNotification(String content, String url, boolean isRead, User user) {
-        return new Alert(content, url, isRead, user);
-    }
-
-    private String makeIdIncludeTime(Long userId) {
-        return userId + "_" + System.currentTimeMillis();
-    }
-    private void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
+//    private Alert createAlert(String content, String url, boolean isRead, String sender, String receiver) {
+//        return new Alert(content, url, isRead, sender, receiver);
+//    }
+    private void sendAlert(SseEmitter emitter, String receiverNickname, Object alertResponseDto) {
         try {
             emitter.send(SseEmitter.event()
-                    .id(eventId)
-                    .data(data));
+                    .data(alertResponseDto));
         } catch (IOException exception) {
-            emitterRepository.deleteById(emitterId);
+            emitterRepository.deleteByUserNickname(receiverNickname);
         }
     }
-    private boolean hasLostData(String lastEventId) {
-        return !lastEventId.isEmpty();
-    }
-    private void sendLostData(String lastEventId, Long userId, String emitterId, SseEmitter emitter) {
-        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(userId));
-        eventCaches.entrySet().stream()
-                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                .forEach(entry -> sendNotification(emitter, entry.getKey(), emitterId, entry.getValue()));
-    }
-
-    public List<AlertDto.ResponseDto> getAllnotification(Long userId) {
+//    private boolean hasLostData(String lastEventId) {
+//        return !lastEventId.isEmpty();
+//    }
+//    private void sendLostData(String lastEventId, Long userId, String emitterId, SseEmitter emitter) {
+//        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByUserNickname(String.valueOf(userId));
+//        eventCaches.entrySet().stream()
+//                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+//                .forEach(entry -> sendAlert(emitter, entry.getKey(), entry.getValue()));
+//    }
+    @Transactional(readOnly = true)
+    public List<AlertDto.ResponseDto> getAllAlert(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
         List<AlertDto.ResponseDto> alertList = new ArrayList<>();
-        List<Alert> alerts = alertRepository.findAllByReceiver(user.getNickname());
+        List<Alert> alerts = alertRepository.findAllByReceiverAndIsReadFalse(user.getNickname());
         for (Alert alert : alerts) {
             alertList.add(new AlertDto.ResponseDto(alert));
         }
         return alertList;
+    }
+    @Transactional
+    public SuccessStatusCode ReadAlert(Long alertId, long userId) {
+        Alert alert = alertRepository.findById(alertId).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_ALERT)
+        );
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+        );
+        if(!alert.getReceiver().equals(user.getNickname())){
+            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
+        }
+        alert.ReadAlert();
+        alertRepository.delete(alert);
+        return SuccessStatusCode.READ_ALERT;
     }
 }
