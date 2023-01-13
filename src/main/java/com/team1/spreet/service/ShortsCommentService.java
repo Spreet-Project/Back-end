@@ -11,6 +11,8 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +59,21 @@ public class ShortsCommentService {
 			shortsCommentRepository.deleteById(shortsCommentId);
 		}
 		return SuccessStatusCode.DELETE_SHORTS_COMMENT;
+	}
+
+	// shortsComment 조회
+	public List<ShortsCommentDto.ResponseDto> getCommentList(Long shortsId) {
+		if (!shortsRepository.existsById(shortsId)) {
+			throw new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS);
+		}
+
+		List<ShortsComment> comments = shortsCommentRepository.findByShortsId(shortsId);
+
+		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
+		for (ShortsComment comment : comments) {
+			commentList.add(new ShortsCommentDto.ResponseDto(comment));
+		}
+		return commentList;
 	}
 
 	// shorts 가 존재하는지 확인
