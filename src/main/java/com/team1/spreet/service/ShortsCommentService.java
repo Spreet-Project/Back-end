@@ -27,18 +27,17 @@ public class ShortsCommentService {
 	private final UserRepository userRepository;
 
 	// shortsComment 등록
-	public ShortsCommentDto.ResponseDto saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, Long userId) {
+	public SuccessStatusCode saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, Long userId) {
 		User user = getUser(userId);
 
 		Shorts shorts = checkShorts(shortsId);
+		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
 
-		ShortsComment shortsComment = shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
-
-		return new ShortsCommentDto.ResponseDto(shortsComment);
+		return SuccessStatusCode.SAVE_SHORTS_COMMENT;
 	}
 
 	// shortsComment 수정
-	public ShortsCommentDto.ResponseDto updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, Long userId) {
+	public SuccessStatusCode updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, Long userId) {
 		User user = getUser(userId);
 
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
@@ -46,7 +45,7 @@ public class ShortsCommentService {
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shortsComment, user.getId())) {
 			shortsComment.updateShortsComment(requestDto.getContent());
 		}
-		return new ShortsCommentDto.ResponseDto(shortsComment);
+		return SuccessStatusCode.UPDATE_SHORTS_COMMENT;
 	}
 
 	// shortsComment 삭제
@@ -62,12 +61,13 @@ public class ShortsCommentService {
 	}
 
 	// shortsComment 조회
+	@Transactional(readOnly = true)
 	public List<ShortsCommentDto.ResponseDto> getCommentList(Long shortsId) {
-		if (!shortsRepository.existsById(shortsId)) {
+		if (shortsRepository.findById(shortsId).isEmpty()) {
 			throw new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS);
 		}
 
-		List<ShortsComment> comments = shortsCommentRepository.findByShortsId(shortsId);
+		List<ShortsComment> comments = shortsCommentRepository.findByShortsIdWithUserOrderByCreatedAtDesc(shortsId);
 
 		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
 		for (ShortsComment comment : comments) {
