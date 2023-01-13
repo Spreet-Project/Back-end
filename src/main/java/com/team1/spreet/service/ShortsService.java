@@ -128,7 +128,7 @@ public class ShortsService {
 	}
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
-	private boolean checkLike(Long shortsId, Long userId) {
+	public boolean checkLike(Long shortsId, Long userId) {
 		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
 		return shortsLike != null;
 	}
