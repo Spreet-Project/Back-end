@@ -15,6 +15,8 @@ import com.team1.spreet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ public class ShortsService {
 	private final UserRepository userRepository;
 
 	// shorts 등록
+	@CacheEvict(value = "shorts", allEntries = true)
 	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, Long userId) {
 		User user = getUser(userId);
 
@@ -43,6 +46,7 @@ public class ShortsService {
 	}
 
 	// shorts 수정
+	@CacheEvict(key = "#shortsId", value = "shorts")
 	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, Long userId) {
 		User user = getUser(userId);
 
@@ -68,6 +72,7 @@ public class ShortsService {
 
 
 	// shorts 삭제
+	@CacheEvict(key = "#shortsId", value = "shorts")
 	public SuccessStatusCode deleteShorts(Long shortsId, Long userId) {
 		User user = getUser(userId);
 
@@ -80,6 +85,7 @@ public class ShortsService {
 	}
 
 	// shorts 상세조회
+	@Cacheable(key = "#shortsId", value = "shorts")
 	@Transactional(readOnly = true)
 	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
 		Shorts shorts = checkShorts(shortsId);
@@ -92,6 +98,7 @@ public class ShortsService {
 	}
 
 	// 카테고리별 shorts 조회(페이징)
+	@Cacheable(cacheNames = "categories")
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -112,6 +119,7 @@ public class ShortsService {
 	}
 
 	// 모든 카테고리 최신 shorts 10개씩 조회
+	@Cacheable(cacheNames = "allCategories")
 	@Transactional(readOnly = true)
 	public ShortsDto.CategoryResponseDto getAllCategory() {
 		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAFFITI, Category.ETC};
@@ -128,7 +136,8 @@ public class ShortsService {
 	}
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
-	private boolean checkLike(Long shortsId, Long userId) {
+	@Cacheable(key = "#shortsId + #userId", value = "shortsLike")
+	public boolean checkLike(Long shortsId, Long userId) {
 		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
 		return shortsLike != null;
 	}

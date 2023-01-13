@@ -1,5 +1,6 @@
 package com.team1.spreet.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.team1.spreet.entity.Category;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.User;
@@ -63,6 +64,7 @@ public class ShortsDto {
 
 	@NoArgsConstructor
 	@Getter
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class ResponseDto {
 		@ApiModelProperty(value = "쇼츠 ID")
 		private Long shortsId;
