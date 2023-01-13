@@ -19,6 +19,7 @@ public enum SuccessStatusCode {
     SAVE_SHORTS_COMMENT("Shorts 댓글 등록 성공", HttpStatus.OK.value()),
     UPDATE_SHORTS_COMMENT("Shorts 댓글 수정 성공", HttpStatus.OK.value()),
     DELETE_SHORTS_COMMENT("Shorts 댓글 삭제 성공", HttpStatus.OK.value()),
+    GET_SHORTS_COMMENTS("Shorts 댓글 리스트 조회 성공", HttpStatus.OK.value()),
     SAVE_FEED("피드 작성 완료",HttpStatus.OK.value()),
     UPDATE_FEED("피드 수정 완료",HttpStatus.OK.value()),
     DELETE_FEED("피드 삭제 완료",HttpStatus.OK.value()),
