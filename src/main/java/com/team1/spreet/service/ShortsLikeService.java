@@ -12,7 +12,6 @@ import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,6 @@ public class ShortsLikeService {
 
 
 	// shortsLike 등록
-	@CacheEvict(value = "shortsLike", key = "#shortsId + #userId")
 	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, Long userId) {
 		User user = userRepository.findById(userId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
