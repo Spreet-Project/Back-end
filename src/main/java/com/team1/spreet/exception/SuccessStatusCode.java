@@ -32,8 +32,14 @@ public enum SuccessStatusCode {
     SUBSCRIBE("구독 성공",HttpStatus.OK.value()),
     CANCEL_SUBSCRIBE("구독 취소",HttpStatus.OK.value()),
     GET_ALERTS("알람 조회 성공",HttpStatus.OK.value()),
-    READ_ALERT("알람 확인",HttpStatus.OK.value());
-
+    READ_ALERT("알람 확인",HttpStatus.OK.value()),
+    GET_CREW_LIST("크루 회원 승인 대기 리스트 조회 성공", HttpStatus.OK.value()),
+    APPROVE_ROLE_CREW("크루 회원 승인 성공", HttpStatus.OK.value()),
+    REJECT_ROLE_CREW("크루 회원 거절 성공", HttpStatus.OK.value()),
+    EMAIL_SEND_SUCCESS("이메일 전송 성공", HttpStatus.OK.value()),
+    EMAIL_CONFIRM_SUCCESS("이메일 인증 성공", HttpStatus.OK.value()),
+    ID_DUPLICATE_CHECK("아이디 중복 확인 성공. 사용 가능한 아이디입니다.", HttpStatus.OK.value()),
+    NICKNAME_DUPLICATE_CHECK("닉네임 중복 확인 성공. 사용 가능한 닉네임입니다.", HttpStatus.OK.value());
 
 
     private final String msg;
