@@ -11,6 +11,6 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
 
     Optional<FeedLike> findByUserAndFeed(User user, Feed feed);
 
-    boolean existsByUserAndFeed(User user, Feed feed);
+    boolean existsByUserIdAndFeed(Long userId, Feed feed);
 
 }

@@ -67,3 +67,10 @@ jar {
 tasks.named('test') {
     useJUnitPlatform()
 }
+tasks.withType(Jar) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	manifest {
+		attributes["Main-Class"] = "com.example.backendapp.BackendAppApplication"
+	}
+}
