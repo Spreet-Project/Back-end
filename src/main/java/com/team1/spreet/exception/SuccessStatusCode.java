@@ -16,6 +16,7 @@ public enum SuccessStatusCode {
     GET_SHORTS_BY_ALL_CATEGORY("모든 카테고리 Shorts 조회 성공", HttpStatus.OK.value()),
     SHORTS_LIKE("Shorts 좋아요 성공", HttpStatus.OK.value()),
     SHORTS_DISLIKE("Shorts 좋아요 취소 성공", HttpStatus.OK.value()),
+    GET_SHORTS_COMMENTS("Shorts 댓글 리스트 조회 성공", HttpStatus.OK.value()),
     SAVE_SHORTS_COMMENT("Shorts 댓글 등록 성공", HttpStatus.OK.value()),
     UPDATE_SHORTS_COMMENT("Shorts 댓글 수정 성공", HttpStatus.OK.value()),
     DELETE_SHORTS_COMMENT("Shorts 댓글 삭제 성공", HttpStatus.OK.value()),
