@@ -26,7 +26,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
@@ -83,11 +82,7 @@ public class UserService {
         //4. JWT 토큰 반환
         String createToken = jwtUtil.createToken(kakaoUser.getLoginId(), kakaoUser.getUserRole());
 
-
-        // cookie 저장소에 쿠키 저장 로직
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
-        cookie.setPath("/");
-        httpServletResponse.addCookie(cookie);
+        httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
         return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS);
     }
