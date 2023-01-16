@@ -55,7 +55,7 @@ public class ShortsCommentService {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shortsComment, user.getId())) {
-			shortsCommentRepository.deleteById(shortsCommentId);
+			shortsCommentRepository.updateIsDeletedTrue(shortsCommentId);
 		}
 		return SuccessStatusCode.DELETE_SHORTS_COMMENT;
 	}
@@ -63,11 +63,11 @@ public class ShortsCommentService {
 	// shortsComment 조회
 	@Transactional(readOnly = true)
 	public List<ShortsCommentDto.ResponseDto> getCommentList(Long shortsId) {
-		if (shortsRepository.findById(shortsId).isEmpty()) {
+		if (shortsRepository.findByIdAndIsDeletedFalse(shortsId).isEmpty()) {
 			throw new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS);
 		}
 
-		List<ShortsComment> comments = shortsCommentRepository.findByShortsIdWithUserOrderByCreatedAtDesc(shortsId);
+		List<ShortsComment> comments = shortsCommentRepository.findByShortsIdWithUserAndIsDeletedFalseOrderByCreatedAtDesc(shortsId);
 
 		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
 		for (ShortsComment comment : comments) {
@@ -78,14 +78,14 @@ public class ShortsCommentService {
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findById(shortsId).orElseThrow(
+		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
 		);
 	}
 
 	// shortsComment 가 존재하는지 확인
 	private ShortsComment checkShortsComment(Long shortsCommentId) {
-		return shortsCommentRepository.findById(shortsCommentId).orElseThrow(
+		return shortsCommentRepository.findByIdAndIsDeletedFalse(shortsCommentId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS_COMMENT)
 		);
 	}

@@ -9,6 +9,7 @@ import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
+import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
@@ -30,6 +31,7 @@ public class ShortsService {
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final UserRepository userRepository;
+	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
 	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, Long userId) {
@@ -74,7 +76,7 @@ public class ShortsService {
 		Shorts shorts = checkShorts(shortsId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
-			shortsRepository.deleteById(shortsId);
+			deleteShortsById(shortsId);
 		}
 		return SuccessStatusCode.DELETE_SHORTS;
 	}
@@ -95,7 +97,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategory(category, pageable).getContent();
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
@@ -129,18 +131,16 @@ public class ShortsService {
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	public boolean checkLike(Long shortsId, Long userId) {
-		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId).orElse(null);
+		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
+			.orElse(null);
 		return shortsLike != null;
 	}
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		Shorts shorts = shortsRepository.findByIdWithUser(shortsId);
-
-		if (shorts == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS);
-		}
-		return shorts;
+		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
+			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
+		);
 	}
 
 	// shorts 작성자와 user 가 같은지 확인
@@ -159,7 +159,7 @@ public class ShortsService {
 
 	// 각 카테고리별 최신 shorts 10개 가져오기
 	private List<ShortsDto.SimpleResponseDto> getShortsList(Category category, Pageable pageable) {
-		List<Shorts> shortsList	= shortsRepository.findShortsByCategory(category, pageable).getContent();
+		List<Shorts> shortsList	= shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.SimpleResponseDto> dtoList = new ArrayList<>();
 		for (Shorts shorts : shortsList) {
@@ -167,6 +167,13 @@ public class ShortsService {
 		}
 
 		return dtoList;
+	}
+
+	private void deleteShortsById(Long shortsId) {
+		List<Long> commentIds = shortsCommentRepository.findIdsByShortId(shortsId);
+		shortsCommentRepository.updateIsDeletedTrueByIds(commentIds);
+		shortsLikeRepository.deleteByShortsId(shortsId);
+		shortsRepository.updateIsDeletedTrue(shortsId);
 	}
 
 }
