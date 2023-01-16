@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "feedComment")
 @RestController
 @RequiredArgsConstructor
@@ -38,5 +40,12 @@ public class FeedCommentController {
     @DeleteMapping("/comment/{commentId}")
     private CustomResponseBody<SuccessStatusCode> deleteFeedComment(@PathVariable @ApiParam(value = "댓글 삭제할 피드 ID") Long commentId, @AuthenticationPrincipal UserDetails userDetails) {
         return new CustomResponseBody<>(feedCommentService.deleteFeedComment(commentId, userDetails));
+    }
+
+    //댓글 조회
+    @ApiOperation(value = "피드 댓글 조회 API")
+    @GetMapping("/{feedId}/comment")
+    private CustomResponseBody<List<FeedCommentDto.ResponseDto>> getFeedComment(@PathVariable @ApiParam(value = "댓글 리스트를 조회할 피드 ID") Long feedId) {
+        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED_COMMENTS,feedCommentService.getFeedComment(feedId));
     }
 }

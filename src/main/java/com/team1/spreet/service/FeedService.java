@@ -1,7 +1,6 @@
 package com.team1.spreet.service;
 
 import com.team1.spreet.dto.CustomResponseBody;
-import com.team1.spreet.dto.FeedCommentDto;
 import com.team1.spreet.dto.FeedDto;
 import com.team1.spreet.dto.FeedLikeDto;
 import com.team1.spreet.entity.*;
@@ -10,7 +9,6 @@ import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,28 +30,40 @@ public class FeedService {
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final AlertService alertService;
-    private final AlertRepository alertRepository;
     private final SubscribeRepository subscribeRepository;
 
     //feed 최신순 조회
     @Transactional(readOnly = true)
-    public Page<FeedDto.RecentFeedDto> getRecentFeed(int page, int size, Long userId) {
+    public List<FeedDto.ResponseDto> getRecentFeed(int page, int size, Long userId) {
         //pageable 속성값 설정
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return feedRepository.findAll(pageable).map(FeedDto.RecentFeedDto::entityToDto);    //Feed 엔티티를 Dto로 변환
+        List<Feed> feedList = feedRepository.findAll(pageable).getContent();    //페이징한 feed 리스트
+        //반환할 feedList 생성
+        List<FeedDto.ResponseDto> recentFeedList = new ArrayList<>();
+        for (Feed feed : feedList) {
+            Long feedLike = feedLikeRepository.countByFeedId(feed.getId());    //좋아요 개수 조회
+            //저장된 이미지 조회
+            List<String> imageUrlList = new ArrayList<>();
+            List<Image> imageList = imageRepository.findAllByFeedId(feed.getId());
+            for (Image image : imageList) {
+                imageUrlList.add(image.getImageUrl());
+            }
+            boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
+            //로그인 여부에 따라 좋아요 추가
+            if (userId != 0L) {
+                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, isLike));
+            }else{
+                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, false));
+            }
+        }
+        return recentFeedList;
     }
     //feed 조회
     @Transactional(readOnly = true)
     public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         Long feedLike = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
-        //댓글 목록 조회
-        List<FeedCommentDto.ResponseDto> commentList = new ArrayList<>();
-        List<FeedComment> feedCommentList= feedCommentRepository.findAllByFeedId(feedId);
-        for (FeedComment feedComment : feedCommentList) {
-            commentList.add(new FeedCommentDto.ResponseDto(feedComment));
-        }
         //저장된 이미지 조회
         List<String> imageUrlList = new ArrayList<>();
         List<Image> imageList = imageRepository.findAllByFeedId(feedId);
@@ -63,11 +73,11 @@ public class FeedService {
         //로그인 여부 및 좋아요 여부 확인
         if (userId != 0L) {
             boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
-            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, isLike, commentList);
+            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, isLike);
         }else{
-            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, false, commentList);
+            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, false);
         }
-        }
+    }
     //feed 저장
     @Transactional
     public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetails userDetails) {
