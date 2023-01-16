@@ -11,7 +11,7 @@ public interface ShortsLikeRepository  extends JpaRepository<ShortsLike, Long> {
 
 	@Query("select s from ShortsLike s where s.shorts.id = :shortsId and "
 		+ "s.shorts.isDeleted = false and s.user.id = :userId and s.user.isDeleted = false")
-	Optional<ShortsLike> findByShortsIdAndUserIdAndDeletedIsFalse(@Param("shortsId") Long shortsId,
+	Optional<ShortsLike> findByShortsIdAndUserIdAndIsDeletedFalse(@Param("shortsId") Long shortsId,
 		@Param("userId") Long userId);
 
 	@Modifying

@@ -12,14 +12,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 	@Query("select distinct s from Shorts s where s.id = :shortsId and s.isDeleted = false")
-	Optional<Shorts> findByIdAndDeletedIsFalse(@Param("shortsId")Long shortsId);
+	Optional<Shorts> findByIdAndIsDeletedFalse(@Param("shortsId")Long shortsId);
 
 	@Modifying
-	@Query("UPDATE Shorts s SET s.isDeleted = true WHERE s.id = :shortsId")
-	void updateDeletedIsTrue(@Param("shortsId") Long shortsId);
+	@Query("update Shorts s set s.isDeleted = true where s.id = :shortsId")
+	void updateIsDeletedTrue(@Param("shortsId") Long shortsId);
 
 	//카테고리별 조회
 	@Query("select s from Shorts s where s.category = :category and s.isDeleted = false")
-	Page<Shorts> findShortsByCategoryAndDeletedIsFalse(@Param("category")Category category, Pageable pageable);
+	Page<Shorts> findShortsByCategoryAndIsDeletedFalse(@Param("category")Category category, Pageable pageable);
 
 }

@@ -10,19 +10,19 @@ import org.springframework.data.repository.query.Param;
 
 public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Long> {
     @Query("select distinct sc, sc.user.nickname from ShortsComment sc join fetch sc.user "
-        + "where sc.shorts.id = :shortsId and sc.shorts.isDeleted = false order by sc.createdAt desc")
-    List<ShortsComment> findByShortsIdWithUserAndDeletedIsFalseOrderByCreatedAtDesc(@Param("shortsId") Long shortsId);
+        + "where sc.shorts.id = :shortsId and sc.isDeleted = false order by sc.createdAt desc")
+    List<ShortsComment> findByShortsIdWithUserAndIsDeletedFalseOrderByCreatedAtDesc(@Param("shortsId") Long shortsId);
 
     @Query("select distinct sc from ShortsComment sc where sc.id = :shortsCommentId and sc.isDeleted = false")
-    Optional<ShortsComment> findByIdAndDeletedIsFalse(Long shortsCommentId);
+    Optional<ShortsComment> findByIdAndIsDeletedFalse(Long shortsCommentId);
 
     @Modifying
-    @Query("update ShortsComment sc SET sc.isDeleted = true WHERE sc.id = :shortsCommentId")
-    void updateDeletedIsTrue(@Param("shortsCommentId") Long shortsCommentId);
+    @Query("update ShortsComment sc set sc.id = :shortsCommentId WHERE sc.isDeleted = true")
+    void updateIsDeletedTrue(@Param("shortsCommentId") Long shortsCommentId);
 
     @Modifying
     @Query("update ShortsComment sc SET sc.isDeleted = true WHERE sc.id in :shortsCommentIds")
-    void updateDeletedIsTrueByIds(@Param("shortsCommentIds") List<Long> shortsCommentIds);
+    void updateIsDeletedTrueByIds(@Param("shortsCommentIds") List<Long> shortsCommentIds);
 
     @Query("select sc.id from ShortsComment sc where sc.shorts.id = :shortsId and sc.isDeleted = false")
     List<Long> findIdsByShortId(@Param("shortsId") Long shortsId);

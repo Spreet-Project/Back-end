@@ -32,7 +32,7 @@ public class ShortsLikeService {
 
 		Shorts shorts = checkShorts(shortsId);
 
-		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndDeletedIsFalse(shortsId, user.getId()).orElse(null);
+		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, user.getId()).orElse(null);
 		if (findShortsLike != null) {
 			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);
