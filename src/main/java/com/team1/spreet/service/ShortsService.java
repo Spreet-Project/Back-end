@@ -97,7 +97,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndDeletedIsFalse(category, pageable).getContent();
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
@@ -131,14 +131,14 @@ public class ShortsService {
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	public boolean checkLike(Long shortsId, Long userId) {
-		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndDeletedIsFalse(shortsId, userId)
+		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
 			.orElse(null);
 		return shortsLike != null;
 	}
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findByIdAndDeletedIsFalse(shortsId).orElseThrow(
+		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
 		);
 	}
@@ -159,7 +159,7 @@ public class ShortsService {
 
 	// 각 카테고리별 최신 shorts 10개 가져오기
 	private List<ShortsDto.SimpleResponseDto> getShortsList(Category category, Pageable pageable) {
-		List<Shorts> shortsList	= shortsRepository.findShortsByCategoryAndDeletedIsFalse(category, pageable).getContent();
+		List<Shorts> shortsList	= shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.SimpleResponseDto> dtoList = new ArrayList<>();
 		for (Shorts shorts : shortsList) {
@@ -171,9 +171,9 @@ public class ShortsService {
 
 	private void deleteShortsById(Long shortsId) {
 		List<Long> commentIds = shortsCommentRepository.findIdsByShortId(shortsId);
-		shortsCommentRepository.updateDeletedIsTrueByIds(commentIds);
+		shortsCommentRepository.updateIsDeletedTrueByIds(commentIds);
 		shortsLikeRepository.deleteByShortsId(shortsId);
-		shortsRepository.updateDeletedIsTrue(shortsId);
+		shortsRepository.updateIsDeletedTrue(shortsId);
 	}
 
 }
