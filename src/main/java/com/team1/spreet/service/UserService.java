@@ -83,7 +83,6 @@ public class UserService {
         //4. JWT 토큰 반환
         String createToken = jwtUtil.createToken(kakaoUser.getLoginId(), kakaoUser.getUserRole());
 
-
         // cookie 저장소에 쿠키 저장 로직
         Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
         cookie.setPath("/");
@@ -167,6 +166,13 @@ public class UserService {
             userRepository.save(kakaoUser);
         }
         return kakaoUser;
+    }
+
+    public CustomResponseBody userQuit(String loginId) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new RestApiException(ErrorStatusCode.NOT_FOUND_USER));
+        user.userQuit(true);
+        userRepository.save(user);
+        return new CustomResponseBody(SuccessStatusCode.USER_QUIT_SUCCESS);
     }
 
     public CustomResponseBody idCheck(String loginId) {

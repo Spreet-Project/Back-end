@@ -11,16 +11,12 @@ import com.team1.spreet.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @Api(tags = "user")
 @RestController
@@ -53,6 +49,12 @@ public class UserController {
     @GetMapping("/kakao/callback")
     public CustomResponseBody kakaoLogin(@RequestParam @ApiParam(value = "로그인 코드") String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
         return userService.kakaoLogin(code, httpServletResponse);
+    }
+
+    @ApiOperation(value = "회원 탈퇴 API")
+    @PostMapping("/quit")
+    public CustomResponseBody userQuit(@RequestParam @ApiParam(value = "유저 로그인 아이디") String loginId) {
+        return userService.userQuit(loginId);
     }
 
     @ApiOperation(value = "아이디 중복확인 API")

@@ -32,10 +32,6 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
-    /*
-    로그인아이디를 가져옵니다.
-    닉네임, userPk가 아니니 사용할 때 주의해주세요!
-     */
     @Override
     public String getUsername() {
         return this.loginId;
