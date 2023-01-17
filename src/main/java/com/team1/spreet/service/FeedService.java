@@ -8,6 +8,7 @@ import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.*;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,9 +81,11 @@ public class FeedService {
     }
     //feed 저장
     @Transactional
-    public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
-        Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티티 초기화
+    public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+//        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+        User user = userDetails.getUser(); //null
+        Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티
+        // 티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
         //구독자에게 알림 생성

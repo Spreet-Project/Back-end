@@ -56,6 +56,10 @@ dependencies {
     implementation 'org.redisson:redisson:3.16.8'
     // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
     implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
+
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation 'junit:junit:4.12'
+
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함

@@ -4,11 +4,13 @@ import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.FeedDto;
 import com.team1.spreet.dto.FeedLikeDto;
 import com.team1.spreet.exception.SuccessStatusCode;
+import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.FeedService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/feed")
+@Slf4j
 public class FeedController {
 
     private final FeedService feedService;
@@ -45,7 +48,7 @@ public class FeedController {
     @ApiOperation(value = "피드 등록 API")
     @PostMapping("")
     public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute @ApiParam(value = "피드 등록 정보") FeedDto.RequestDto requestDto,
-        @AuthenticationPrincipal UserDetails userDetails){
+        @AuthenticationPrincipal UserDetailsImpl userDetails){
         return new CustomResponseBody<>(feedService.saveFeed(requestDto, userDetails));
     }
     //feed 수정

@@ -13,12 +13,14 @@ import java.util.Collection;
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-    private User user;
-    private  String loginId;
+
+    private final User user;
 
     public User getUser() {
-        return user;
+        return this.user;
     }
+
+//    private final String loginId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -38,7 +40,7 @@ public class UserDetailsImpl implements UserDetails {
      */
     @Override
     public String getUsername() {
-        return this.loginId;
+        return getUser().getLoginId();
     }
 
     @Override

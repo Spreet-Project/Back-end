@@ -2,15 +2,14 @@ package com.team1.spreet.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.dto.ErrorResponseDto;
+import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -24,46 +23,41 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
 
         String token = jwtUtil.resolveToken(request);
 
-        if (StringUtils.hasText(token)) {
-            try {
-                jwtUtil.validateToken(token);
-                setAuthentication(token);
-                filterChain.doFilter(request, response);
-            } catch (InvalidCookieException e) {
-                sendErrorMsg(e, response);
+        if (token != null) {
+            if (!jwtUtil.validateToken(token)) {
+                jwtExceptionHandler(response, ErrorStatusCode.NOT_FOUND_AUTHENTICATION);
+                return;
             }
-        }else{
-            filterChain.doFilter(request, response);
+
+            Claims info = jwtUtil.getUserInfoFromToken(token);
+            setAuthentication(info.getSubject());
         }
     }
 
-    private void setAuthentication(String token) {
-        Authentication authentication = jwtUtil.getAuthentication(token);
+    private void setAuthentication(String loginId) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
+        Authentication authentication = jwtUtil.getAuthentication(loginId);
         securityContext.setAuthentication(authentication);
+
+        // >> 여기서 설정한 것을 @AuthenticationPrincipal 여기서 뽑아쓸 수 있음
+        SecurityContextHolder.setContext(securityContext);
     }
 
-    private void sendErrorMsg(Exception e, HttpServletResponse response) {
+    private void jwtExceptionHandler(HttpServletResponse response, ErrorStatusCode errorStatusCode) {
+        response.setStatus(errorStatusCode.getStatusCode());
         response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-
         try {
-            String result = objectMapper.writeValueAsString(errorResponseDto);
-            response.getWriter().write(result);
-        } catch (IOException exception) {
-            log.error(exception.getMessage(), exception);
+            String json = new ObjectMapper().writeValueAsString(new ErrorResponseDto(errorStatusCode.getMsg(), errorStatusCode.getStatusCode()));
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 }
