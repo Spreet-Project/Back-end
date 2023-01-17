@@ -17,7 +17,7 @@ public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Lo
     Optional<ShortsComment> findByIdAndIsDeletedFalse(Long shortsCommentId);
 
     @Modifying
-    @Query("update ShortsComment sc set sc.id = :shortsCommentId WHERE sc.isDeleted = true")
+    @Query("update ShortsComment sc set sc.isDeleted = true where sc.id = :shortsCommentId")
     void updateIsDeletedTrue(@Param("shortsCommentId") Long shortsCommentId);
 
     @Modifying
