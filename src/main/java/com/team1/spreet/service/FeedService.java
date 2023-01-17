@@ -39,7 +39,7 @@ public class FeedService {
         //pageable 속성값 설정
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        List<Feed> feedList = feedRepository.findAll(pageable).getContent();    //페이징한 feed 리스트
+        List<Feed> feedList = feedRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
         //반환할 feedList 생성
         List<FeedDto.ResponseDto> recentFeedList = new ArrayList<>();
         for (Feed feed : feedList) {
@@ -86,6 +86,7 @@ public class FeedService {
         User user = userDetails.getUser(); //null
         Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티
         // 티 초기화
+
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
         //구독자에게 알림 생성
@@ -104,24 +105,31 @@ public class FeedService {
     @Transactional
     public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetails userDetails) {
         User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
-        Feed feed = checkFeed(user.getId(), feedId);    //userId, feedId로 feed 찾기
-        feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
-        deleteImage(feedId);    //기존에 업로드된 이미지 제거
-        saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
-        return SuccessStatusCode.UPDATE_FEED;
+        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        if(checkOwner(feed, user)){
+//            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
+            feedRepository.updateTitleAndContentByIdAndUser(requestDto.getTitle(), requestDto.getContent(), feedId, user);
+            deleteImage(feedId);    //기존에 업로드된 이미지 제거
+            //이미지가 있다면 새로운 이미지 저장
+            if(requestDto.getFile() != null) {
+                saveImage(requestDto.getFile(), feed);
+            }
+            return SuccessStatusCode.UPDATE_FEED;
+        }else{
+            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
+        }
     }
     //feed 삭제
     @Transactional
     public SuccessStatusCode deleteFeed(Long feedId, UserDetails userDetails) {
         User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
-        Feed feed = checkFeed(user.getId(), feedId);    //userId, feedId로 feed 찾기
-        feed.setDeleted();  //feed delete
-        //comment delete
-        List<FeedComment> feedCommentList = feedCommentRepository.findAllByFeedId(feedId);
-        for (FeedComment feedComment : feedCommentList) {
-            feedComment.setDeleted();
+        Feed feed = checkFeed(feedId, user.getId());    //userId, feedId로 feed 찾기
+        if(checkOwner(feed, user)){
+            feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
+            feedLikeRepository.deleteByFeed(feed);    //좋아요 삭제
+            deleteImage(feedId);    //기존에 업로드된 이미지 제거
+            feedRepository.updateIsDeletedTrueById(feedId);    //feed 삭제
         }
-        deleteImage(feedId);    //기존에 업로드된 이미지 제거
         return SuccessStatusCode.DELETE_FEED;
     }
     //feed 좋아요
@@ -152,13 +160,16 @@ public class FeedService {
         for (Image image : imageList) {
             String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
             awsS3Service.deleteFile(fileName);
+            imageRepository.delete(image);
         }
     }
-    private Feed checkFeed(Long userId, Long feedId){
-        return feedRepository.findByUserIdAndId(userId, feedId).orElseThrow(
+    //해당 유저가 작성한 feed 찾기
+    private Feed checkFeed(Long feedId, Long userId){
+        return feedRepository.findByIdAndUserIdAndIsDeletedFalse(feedId, userId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
     }
+    //feed 찾기
     private Feed isFeed(Long feedId){
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
@@ -169,6 +180,13 @@ public class FeedService {
         return userRepository.findById(userId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
+    }
+    private boolean checkOwner(Feed feed, User user) {
+        if (user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().equals(user)) {
+            return true;
+        } else {
+            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
+        }
     }
 }
 
