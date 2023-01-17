@@ -14,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FeedCommentService {
@@ -55,5 +59,14 @@ public class FeedCommentService {
         return userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
+    }
+    //댓글 조회
+    public List<FeedCommentDto.ResponseDto> getFeedComment(Long feedId) {
+        List<FeedCommentDto.ResponseDto> commentList = new ArrayList<>();
+        List<FeedComment> feedCommentList= feedCommentRepository.findByFeedIdAndIsDeletedFalseOrderByCreatedAtDesc(feedId);
+        for (FeedComment feedComment : feedCommentList) {
+            commentList.add(new FeedCommentDto.ResponseDto(feedComment));
+        }
+        return commentList;
     }
 }
