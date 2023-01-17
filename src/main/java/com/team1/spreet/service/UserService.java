@@ -65,7 +65,7 @@ public class UserService {
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS);
+        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS, getNickname(requestDto));
     }
 
     //카카오 회원가입 및 로그인 서비스
@@ -80,11 +80,11 @@ public class UserService {
         User kakaoUser = registerKakaoUserIfNeeded(kakaoInfoDto);
 
         //4. JWT 토큰 반환
-        String createToken = jwtUtil.createToken(kakaoUser.getLoginId(), kakaoUser.getUserRole());
+        String createToken = jwtUtil.createToken(kakaoUser.getId(), kakaoUser.getUserRole());
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS);
+        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS, new UserDto.LoginResponseDto(kakaoUser.getNickname()));
     }
 
     private String getToken(String code) throws JsonProcessingException {
@@ -174,5 +174,12 @@ public class UserService {
         if(userRepository.findByNickname(nickname).isPresent())
             throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
         return new CustomResponseBody(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
+    }
+
+    public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
+        User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NOT_FOUND_USER)
+        );
+        return new UserDto.LoginResponseDto(user.getNickname());
     }
 }

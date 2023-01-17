@@ -36,7 +36,7 @@ public class JwtUtil {
     //Token 식별자
     private static final String BEARER_PREFIX = "Bearer ";
     //토큰 만료 시간
-    private static final long TOKEN_TIME = 15 * 60 * 1000L;
+    private static final long TOKEN_TIME = 180 * 60 * 1000L;
 
     private final Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -74,12 +74,12 @@ public class JwtUtil {
                         .compact();
     }
 
-    public String createToken(String loginId, UserRole userRole) {
+    public String createToken(Long userId, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(loginId)
+                        .setSubject(userId.toString())
                         .claim(AUTHORIZATION_KEY, userRole)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
