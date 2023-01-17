@@ -75,6 +75,22 @@ public class UserDto {
 
     @NoArgsConstructor
     @Getter
+    public static class NaverInfoDto{
+        private Long id;
+        private String nickname;
+        private String email;
+        private String profileImage;
+
+        public NaverInfoDto(Long id, String nickname, String email, String profileImage){
+            this.id = id;
+            this.nickname = nickname;
+            this.email = email;
+            this.profileImage = profileImage;
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
     public static class CrewResponseDto {
         @ApiModelProperty(value = "로그인 ID")
         private String loginId;
