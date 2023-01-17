@@ -38,7 +38,7 @@ public class FeedController {
     @GetMapping("/{feedId}")
     public CustomResponseBody<FeedDto.ResponseDto> getFeed(@PathVariable @ApiParam(value = "조회할 피드 ID") Long feedId,
         @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = userDetails.getUsername() == null ? 0L : Long.parseLong(userDetails.getUsername());
+        Long userId = userDetails == null ? 0L : Long.parseLong(userDetails.getUsername());
         return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getFeed(feedId, userId));
     }
     //feed 저장
