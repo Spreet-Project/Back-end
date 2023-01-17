@@ -3,8 +3,6 @@ package com.team1.spreet.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,8 +11,6 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE feed SET is_deleted = true WHERE feed_id = ?")
-@Where(clause = "is_deleted = false")
 public class Feed extends TimeStamped {
 
     @Id
@@ -53,8 +49,5 @@ public class Feed extends TimeStamped {
         this.title = title;
         this.content = content;
         this.user = user;
-    }
-    public void setDeleted(){
-        this.isDeleted = true;
     }
 }
