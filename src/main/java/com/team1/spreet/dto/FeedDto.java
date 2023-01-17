@@ -1,6 +1,7 @@
 package com.team1.spreet.dto;
 
 import com.team1.spreet.entity.Feed;
+import com.team1.spreet.entity.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,9 @@ public class FeedDto {
         @ApiModelProperty(value = "이미지 파일", required = false)
         private List<MultipartFile> file;
 
+        public Feed toEntity(User user){
+            return new Feed(this.title, this.content, user);
+        }
     }
 
     @NoArgsConstructor
