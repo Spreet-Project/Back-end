@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,7 +82,7 @@ public class FeedService {
     @Transactional
     public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
 //        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
-        User user = userDetails.getUser(); //null
+        User user = userDetails.getUser();
         Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티
         // 티 초기화
 
@@ -103,8 +102,8 @@ public class FeedService {
     }
     //feed 수정
     @Transactional
-    public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();    //userId로 user 찾기
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         if(checkOwner(feed, user)){
 //            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
@@ -121,8 +120,8 @@ public class FeedService {
     }
     //feed 삭제
     @Transactional
-    public SuccessStatusCode deleteFeed(Long feedId, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public SuccessStatusCode deleteFeed(Long feedId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();    //userId로 user 찾기
         Feed feed = checkFeed(feedId, user.getId());    //userId, feedId로 feed 찾기
         if(checkOwner(feed, user)){
             feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
@@ -134,8 +133,8 @@ public class FeedService {
     }
     //feed 좋아요
     @Transactional
-    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(Long feedId, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(Long feedId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         FeedLike feedLike = feedLikeRepository.findByUserAndFeed(user, feed).orElse(null);
         if (feedLike!=null) {
@@ -182,7 +181,8 @@ public class FeedService {
         );
     }
     private boolean checkOwner(Feed feed, User user) {
-        if (user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().equals(user)) {
+        Long feedUser = feed.getUser().getId();
+        if (user.getUserRole() == UserRole.ROLE_ADMIN || feedUser.equals(user.getId())) {
             return true;
         } else {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);

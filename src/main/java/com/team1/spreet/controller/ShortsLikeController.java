@@ -2,13 +2,13 @@ package com.team1.spreet.controller;
 
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.ShortsLikeDto;
+import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.ShortsLikeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ public class ShortsLikeController {
 	@ApiOperation(value = "쇼츠 좋아요 등록/취소 API")
 	@PostMapping("/{shortsId}")
 	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(@PathVariable @ApiParam(value = "좋아요 등록/취소 하기 위한 쇼츠 ID") Long shortsId,
-		@AuthenticationPrincipal UserDetails userDetails) {
-		return shortsLikeService.setShortsLike(shortsId, Long.parseLong(userDetails.getUsername()));
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		return shortsLikeService.setShortsLike(shortsId, userDetails);
 	}
 }

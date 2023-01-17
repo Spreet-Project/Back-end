@@ -3,12 +3,13 @@ package com.team1.spreet.dto;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 public class UserDto {
@@ -45,8 +46,8 @@ public class UserDto {
         @ApiModelProperty(value = "회원 구분")
         private UserRole userRole;
 
-        public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole);
+        public User toEntity(String encodePassword, UserRole userRole) {
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole = userRole);
         }
     }
 

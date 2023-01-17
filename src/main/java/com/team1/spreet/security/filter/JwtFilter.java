@@ -25,7 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = jwtUtil.resolveToken(request);
 
@@ -36,8 +36,11 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             Claims info = jwtUtil.getUserInfoFromToken(token);
+            log.info(info.getSubject());
             setAuthentication(info.getSubject());
         }
+        filterChain.doFilter(request, response);
+
     }
 
     private void setAuthentication(String loginId) {

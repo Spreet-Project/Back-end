@@ -11,23 +11,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class JwtUtil {
+
 
     // Header KEY값
     public static final String AUTHORIZATION_HEADER = "Authorization";
@@ -36,12 +33,15 @@ public class JwtUtil {
     //Token 식별자
     private static final String BEARER_PREFIX = "Bearer ";
     //토큰 만료 시간
-    private static final long TOKEN_TIME = 15 * 60 * 1000L;
+    private static final long TOKEN_TIME = 180 * 60 * 1000L;
 
     private final Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
-    public JwtUtil(@Value("${jwt.security.key}") String securityKey) {
+    private final UserDetailsService userDetailsService;
+
+    public JwtUtil(@Value("${jwt.security.key}") String securityKey, UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(securityKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -87,19 +87,9 @@ public class JwtUtil {
                         .compact();
     }
 
-    public Authentication getAuthentication(String token) {
-
-        Claims claims = getUserInfoFromToken(token);
-
-        if(claims.get(AUTHORIZATION_KEY) == null) throw new InvalidCookieException("로그인 정보가 잘못되었습니다. 다시 로그인해주세요.");
-
-        List<SimpleGrantedAuthority> authorities = Arrays.stream(claims.get(AUTHORIZATION_KEY).toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    public Authentication getAuthentication(String loginId) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     //JWT 토큰 검정
