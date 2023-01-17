@@ -149,7 +149,7 @@ public class UserService {
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
                 kakaoUser = sameEmailUser;
-                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
+                kakaoUser = kakaoUser.socialIdUpdate(kakaoId);
             } else {
                 String password = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(password);
