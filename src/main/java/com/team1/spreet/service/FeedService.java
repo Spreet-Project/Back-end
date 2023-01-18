@@ -45,8 +45,8 @@ public class FeedService {
             Long feedLike = feedLikeRepository.countByFeedId(feed.getId());    //좋아요 개수 조회
             //저장된 이미지 조회
             List<String> imageUrlList = new ArrayList<>();
-            List<Image> imageList = imageRepository.findAllByFeedId(feed.getId());
-            for (Image image : imageList) {
+            List<FeedImage> imageList = imageRepository.findAllByFeedId(feed.getId());
+            for (FeedImage image : imageList) {
                 imageUrlList.add(image.getImageUrl());
             }
             boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
@@ -66,8 +66,8 @@ public class FeedService {
         Long feedLike = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
         //저장된 이미지 조회
         List<String> imageUrlList = new ArrayList<>();
-        List<Image> imageList = imageRepository.findAllByFeedId(feedId);
-        for (Image image : imageList) {
+        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
+        for (FeedImage image : imageList) {
             imageUrlList.add(image.getImageUrl());
         }
         //로그인 여부 및 좋아요 여부 확인
@@ -149,14 +149,14 @@ public class FeedService {
     private void saveImage(List<MultipartFile> multipartFileList, Feed feed){
         for (MultipartFile multipartFile : multipartFileList) {
             String imageUrl = awsS3Service.uploadFile(multipartFile);
-            Image image = new Image(imageUrl, feed);
+            FeedImage image = new FeedImage(imageUrl, feed);
             imageRepository.save(image);
         }
     }
     //이미지 파일 삭제
     private void deleteImage(Long feedId){
-        List<Image> imageList = imageRepository.findAllByFeedId(feedId);
-        for (Image image : imageList) {
+        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
+        for (FeedImage image : imageList) {
             String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
             awsS3Service.deleteFile(fileName);
             imageRepository.delete(image);
