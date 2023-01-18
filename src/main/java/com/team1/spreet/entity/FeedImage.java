@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Image {
+public class FeedImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IMAGE_ID")
@@ -21,7 +21,7 @@ public class Image {
     @JoinColumn(name = "FEED_ID")
     private Feed feed;
 
-    public Image(String imageUrl, Feed feed) {
+    public FeedImage(String imageUrl, Feed feed) {
         this.imageUrl = imageUrl;
         this.feed = feed;
     }

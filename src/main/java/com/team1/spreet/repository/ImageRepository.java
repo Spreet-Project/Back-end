@@ -1,11 +1,11 @@
 package com.team1.spreet.repository;
 
-import com.team1.spreet.entity.Image;
+import com.team1.spreet.entity.FeedImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ImageRepository extends JpaRepository<Image, Long> {
-    List<Image> findAllByFeedId(Long feedId);
+public interface ImageRepository extends JpaRepository<FeedImage, Long> {
+    List<FeedImage> findAllByFeedId(Long feedId);
 
 }

@@ -1,6 +1,5 @@
 package com.team1.spreet.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.UserRole;
@@ -43,12 +42,6 @@ public class UserController {
             throw new RestApiException(ErrorStatusCode.WAITING_CREW_APPROVAL);
         }
         return userService.login(requestDto, httpServletResponse);
-    }
-
-    @ApiOperation(value = "카카오 로그인 API")
-    @PostMapping("/kakao/callback")
-    public CustomResponseBody kakaoLogin(@RequestParam @ApiParam(value = "로그인 코드") String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
-        return userService.kakaoLogin(code, httpServletResponse);
     }
 
     @ApiOperation(value = "아이디 중복확인 API")
