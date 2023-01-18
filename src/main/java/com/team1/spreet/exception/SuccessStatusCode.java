@@ -44,7 +44,9 @@ public enum SuccessStatusCode {
     NICKNAME_DUPLICATE_CHECK("닉네임 중복 확인 성공. 사용 가능한 닉네임입니다.", HttpStatus.OK.value()),
     SAVE_EVENT("행사 게시글 등록 성공", HttpStatus.OK.value()),
     UPDATE_EVENT("행사 게시글 수정 성공", HttpStatus.OK.value()),
-    DELETE_EVENT("행사 게시글 삭제 성공", HttpStatus.OK.value());
+    DELETE_EVENT("행사 게시글 삭제 성공", HttpStatus.OK.value()),
+    GET_EVENT("행사 게시글 상세조회 성공", HttpStatus.OK.value()),
+    GET_EVENT_LIST("행사 게시글 리스트 조회 성공", HttpStatus.OK.value());
 
     private final String msg;
     private final int statusCode;
