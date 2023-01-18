@@ -36,5 +36,8 @@ out/
 ### application-security.properties ###
 application-security.properties
 
+### test Code ###
+SpreetApplicationTest.java
+
 ### VS Code ###
 .vscode/

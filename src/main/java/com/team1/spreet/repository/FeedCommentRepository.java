@@ -19,7 +19,7 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
     @Transactional
     @Modifying
     @Query("update FeedComment f set f.isDeleted = true where f.feed = :feed")
-    void updateIsDeletedTrueByFeedId(@Param("feed") Feed feed);
+    void updateIsDeletedTrueByFeedId(@Param("feed")Feed feed);
 
 
     FeedComment findByUserIdAndId(Long userId, Long Id);

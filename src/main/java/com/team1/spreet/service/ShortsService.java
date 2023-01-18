@@ -1,11 +1,7 @@
 package com.team1.spreet.service;
 
 import com.team1.spreet.dto.ShortsDto;
-import com.team1.spreet.entity.Category;
-import com.team1.spreet.entity.Shorts;
-import com.team1.spreet.entity.ShortsLike;
-import com.team1.spreet.entity.User;
-import com.team1.spreet.entity.UserRole;
+import com.team1.spreet.entity.*;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
@@ -13,14 +9,16 @@ import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +32,8 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
-	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -45,8 +43,8 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		Shorts shorts = checkShorts(shortsId);
 		String videoUrl;
@@ -70,8 +68,8 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	public SuccessStatusCode deleteShorts(Long shortsId, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode deleteShorts(Long shortsId, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		Shorts shorts = checkShorts(shortsId);
 
@@ -83,9 +81,9 @@ public class ShortsService {
 
 	// shorts 상세조회
 	@Transactional(readOnly = true)
-	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
+	public ShortsDto.ResponseDto getShorts(Long shortsId, UserDetailsImpl userDetails) {
 		Shorts shorts = checkShorts(shortsId);
-
+		Long userId = userDetails.getUser().getId();
 		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
 			return new ShortsDto.ResponseDto(shorts, false);
 		} else {
@@ -95,19 +93,19 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, UserDetailsImpl userDetails) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
-		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
+		if (userDetails.getUser().getId() == 0L) {   //로그인 하지 않은 user 의 경우
 			for (Shorts shorts : shortsByCategory) {
 				shortsList.add(new ShortsDto.ResponseDto(shorts, false));
 			}
 		} else {
 			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userId)));
+				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userDetails.getUser().getId())));
 			}
 		}
 		return shortsList;

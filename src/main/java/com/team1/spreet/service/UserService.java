@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
@@ -52,11 +53,12 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
         }
 
-        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword())));
+        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()), UserRole.ROLE_USER));
         return new CustomResponseBody(SuccessStatusCode.SIGNUP_SUCCESS);
     }
 
     public CustomResponseBody login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
+
         UsernamePasswordAuthenticationToken beforeAuthentication = new UsernamePasswordAuthenticationToken(requestDto.getLoginId(), requestDto.getPassword());
 
         Authentication afterAuthentication = authenticationManagerBuilder.getObject().authenticate(beforeAuthentication);

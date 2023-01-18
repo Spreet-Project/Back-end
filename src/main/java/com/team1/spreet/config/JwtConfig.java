@@ -1,6 +1,5 @@
 package com.team1.spreet.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.security.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +12,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper;
 
     @Override
     public void configure(HttpSecurity httpSecurity) {
-        JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper);
+        JwtFilter jwtFilter = new JwtFilter(jwtUtil);
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

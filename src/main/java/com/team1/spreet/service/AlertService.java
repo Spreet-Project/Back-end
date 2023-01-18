@@ -9,6 +9,7 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.AlertRepository;
 import com.team1.spreet.repository.EmitterRepository;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,8 +89,8 @@ public class AlertService {
 //                .forEach(entry -> sendAlert(emitter, entry.getKey(), entry.getValue()));
 //    }
     @Transactional(readOnly = true)
-    public List<AlertDto.ResponseDto> getAllAlert(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public List<AlertDto.ResponseDto> getAllAlert(UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
         List<AlertDto.ResponseDto> alertList = new ArrayList<>();
@@ -100,11 +101,11 @@ public class AlertService {
         return alertList;
     }
     @Transactional
-    public SuccessStatusCode ReadAlert(Long alertId, long userId) {
+    public SuccessStatusCode ReadAlert(Long alertId, UserDetailsImpl userDetails) {
         Alert alert = alertRepository.findById(alertId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_ALERT)
         );
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
         if(!alert.getReceiver().equals(user.getNickname())){

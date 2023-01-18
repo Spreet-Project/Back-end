@@ -11,11 +11,13 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,8 @@ public class ShortsCommentService {
 	private final UserRepository userRepository;
 
 	// shortsComment 등록
-	public SuccessStatusCode saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, UserDetailsImpl userDetail) {
+		User user = userDetail.getUser();
 
 		Shorts shorts = checkShorts(shortsId);
 		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
@@ -37,8 +39,8 @@ public class ShortsCommentService {
 	}
 
 	// shortsComment 수정
-	public SuccessStatusCode updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
@@ -49,8 +51,8 @@ public class ShortsCommentService {
 	}
 
 	// shortsComment 삭제
-	public SuccessStatusCode deleteShortsComment(Long shortsCommentId, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode deleteShortsComment(Long shortsCommentId, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 

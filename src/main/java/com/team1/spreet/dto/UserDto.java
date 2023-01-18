@@ -46,8 +46,8 @@ public class UserDto {
         @ApiModelProperty(value = "회원 구분")
         private UserRole userRole;
 
-        public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole);
+        public User toEntity(String encodePassword, UserRole userRole) {
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole = userRole);
         }
     }
 
