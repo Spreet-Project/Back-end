@@ -3,7 +3,7 @@ name: Java CI with Gradle
 # pull request 생성시 수행
 on:
   pull_request:
-    branches: [ dev ]
+    branches: [ deploy ]
   
 env:
   AWS_REGION: ap-northeast-2
