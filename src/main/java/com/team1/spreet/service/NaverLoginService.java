@@ -42,7 +42,7 @@ public class NaverLoginService {
 
 
 	// 네이버 로그인 로직
-	public UserDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+	public UserDto.LoginResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
 		//1. 인가코드와 state 를 통해 access_token 발급받기
 		String accessToken = getToken(code, state);
 
@@ -56,8 +56,7 @@ public class NaverLoginService {
 		String token = jwtUtil.createToken(naverUser.getId(), naverUser.getUserRole());
 		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-//		return new UserDto.LoginResponseDto(naverUser.getNickname());
-		return null;
+		return new UserDto.LoginResponseDto(naverUser.getNickname());
 	}
 
 	// 토큰 발급
@@ -119,7 +118,7 @@ public class NaverLoginService {
 		// 네이버에서 이미지 가져오기
 		String profileImage = jsonNode.get("response").get("profile_image").asText();
 		String naverDefaultImage = "https://ssl.pstatic.net/static/pwe/address/img_profile.png";
-		String defaultImage = "";     // spreet 기본 이미지
+		String defaultImage = "https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/spreet+%E1%84%85%E1%85%A9%E1%84%80%E1%85%A92.png";
 		if (profileImage == null || profileImage.equals(naverDefaultImage)) {
 			profileImage = defaultImage;
 		}
