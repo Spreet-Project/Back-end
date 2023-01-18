@@ -53,7 +53,8 @@ public class ShortsController {
 	@GetMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> getShorts(@PathVariable @ApiParam(value = "조회할 쇼츠 ID") Long shortsId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId, userDetails));
+		Long userId = userDetails == null ? 0L : userDetails.getUser().getId();
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId, userId));
 	}
 
 	// shorts 카테고리별 조회
@@ -64,14 +65,7 @@ public class ShortsController {
 			@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
 			@RequestParam(defaultValue = "10") @ApiParam(value = "조회할 사이즈") int size, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long userId = userDetails == null ? 0L : userDetails.getUser().getId();
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, userDetails));
-	}
-
-	// 모든 카테고리 최신 shorts 10개씩 조회
-	@ApiOperation(value = "쇼츠 모든 카테고리 조회 API")
-	@GetMapping("/category")
-	public CustomResponseBody<ShortsDto.CategoryResponseDto> getAllCategory() {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_ALL_CATEGORY, shortsService.getAllCategory());
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, userId));
 	}
 
 }

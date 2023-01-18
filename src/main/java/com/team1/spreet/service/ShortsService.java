@@ -1,24 +1,26 @@
 package com.team1.spreet.service;
 
 import com.team1.spreet.dto.ShortsDto;
-import com.team1.spreet.entity.*;
+import com.team1.spreet.entity.Category;
+import com.team1.spreet.entity.Shorts;
+import com.team1.spreet.entity.ShortsLike;
+import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
-import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,6 @@ public class ShortsService {
 	private final ShortsRepository shortsRepository;
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
-	private final UserRepository userRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
@@ -81,9 +82,9 @@ public class ShortsService {
 
 	// shorts 상세조회
 	@Transactional(readOnly = true)
-	public ShortsDto.ResponseDto getShorts(Long shortsId, UserDetailsImpl userDetails) {
+	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
 		Shorts shorts = checkShorts(shortsId);
-		Long userId = userDetails.getUser().getId();
+
 		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
 			return new ShortsDto.ResponseDto(shorts, false);
 		} else {
@@ -93,38 +94,22 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, UserDetailsImpl userDetails) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
-		if (userDetails.getUser().getId() == 0L) {   //로그인 하지 않은 user 의 경우
+		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
 			for (Shorts shorts : shortsByCategory) {
 				shortsList.add(new ShortsDto.ResponseDto(shorts, false));
 			}
 		} else {
 			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userDetails.getUser().getId())));
+				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userId)));
 			}
 		}
 		return shortsList;
-	}
-
-	// 모든 카테고리 최신 shorts 10개씩 조회
-	@Transactional(readOnly = true)
-	public ShortsDto.CategoryResponseDto getAllCategory() {
-		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAFFITI, Category.ETC};
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-		List<ShortsDto.SimpleResponseDto> rap = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[1], pageable);
-		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[2], pageable);
-		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[3], pageable);
-		List<ShortsDto.SimpleResponseDto> graffiti = getShortsList(category[4], pageable);
-		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[5], pageable);
-
-		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, graffiti, etc);
 	}
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
@@ -147,24 +132,6 @@ public class ShortsService {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 		return true;
-	}
-
-	// user 객체 가져오기
-	private User getUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
-	}
-
-	// 각 카테고리별 최신 shorts 10개 가져오기
-	private List<ShortsDto.SimpleResponseDto> getShortsList(Category category, Pageable pageable) {
-		List<Shorts> shortsList	= shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
-
-		List<ShortsDto.SimpleResponseDto> dtoList = new ArrayList<>();
-		for (Shorts shorts : shortsList) {
-			dtoList.add(new ShortsDto.SimpleResponseDto(shorts));
-		}
-
-		return dtoList;
 	}
 
 	private void deleteShortsById(Long shortsId) {
