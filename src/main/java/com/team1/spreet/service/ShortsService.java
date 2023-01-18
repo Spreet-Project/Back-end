@@ -1,24 +1,26 @@
 package com.team1.spreet.service;
 
 import com.team1.spreet.dto.ShortsDto;
-import com.team1.spreet.entity.*;
+import com.team1.spreet.entity.Category;
+import com.team1.spreet.entity.Shorts;
+import com.team1.spreet.entity.ShortsLike;
+import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
-import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
