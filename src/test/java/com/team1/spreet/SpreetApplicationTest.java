@@ -12,7 +12,7 @@ public class SpreetApplicationTest {
     @Test
     public void asd() {
         User user = new User("123", "asd", "asd1", "d@d.com", UserRole.ROLE_USER);
-        UserDetailsImpl userDetails = new UserDetailsImpl(user, "123");
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
         System.out.println(userDetails.getUser());
         User user1 = userDetails.getUser();
         System.out.println(user);
