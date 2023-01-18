@@ -48,7 +48,7 @@ public class FeedCommentService {
         User user = checkUser(userDetails);    //userDetails로 user 찾기
         FeedComment feedComment = CheckFeedComment(user.getId(), commentId);    //userId, commentId로 comment 찾기
         feedComment.setDeleted();
-        return SuccessStatusCode.DELETE_FEED_COMMENT;
+        return SuccessStatusCode.DELETE_COMMENT;
     }
     //commentId로 comment 찾기
     private FeedComment CheckFeedComment(Long userId, Long commentId){

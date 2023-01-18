@@ -102,25 +102,22 @@ public class FeedService {
     public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetails userDetails) {
         User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        if(checkOwner(feed, user)){
-//            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
+        if(checkAuthority(feed, user)){
             feedRepository.updateTitleAndContentByIdAndUser(requestDto.getTitle(), requestDto.getContent(), feedId, user);
             deleteImage(feedId);    //기존에 업로드된 이미지 제거
             //이미지가 있다면 새로운 이미지 저장
             if(requestDto.getFile() != null) {
                 saveImage(requestDto.getFile(), feed);
             }
-            return SuccessStatusCode.UPDATE_FEED;
-        }else{
-            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
         }
+        return SuccessStatusCode.UPDATE_FEED;
     }
     //feed 삭제
     @Transactional
     public SuccessStatusCode deleteFeed(Long feedId, UserDetails userDetails) {
         User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
-        Feed feed = checkFeed(feedId, user.getId());    //userId, feedId로 feed 찾기
-        if(checkOwner(feed, user)){
+        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        if(checkAuthority(feed, user)){
             feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
             feedLikeRepository.deleteByFeed(feed);    //좋아요 삭제
             deleteImage(feedId);    //기존에 업로드된 이미지 제거
@@ -144,26 +141,24 @@ public class FeedService {
     }
     //새로운 이미지 저장
     private void saveImage(List<MultipartFile> multipartFileList, Feed feed){
-        for (MultipartFile multipartFile : multipartFileList) {
-            String imageUrl = awsS3Service.uploadFile(multipartFile);
-            Image image = new Image(imageUrl, feed);
-            imageRepository.save(image);
+        if(!multipartFileList.isEmpty()){
+            for (MultipartFile multipartFile : multipartFileList) {
+                String imageUrl = awsS3Service.uploadFile(multipartFile);
+                Image image = new Image(imageUrl, feed);
+                imageRepository.save(image);
+            }
         }
     }
     //이미지 파일 삭제
     private void deleteImage(Long feedId){
         List<Image> imageList = imageRepository.findAllByFeedId(feedId);
-        for (Image image : imageList) {
-            String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
-            awsS3Service.deleteFile(fileName);
-            imageRepository.delete(image);
+        if(!imageList.isEmpty()){
+            for (Image image : imageList) {
+                String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
+                awsS3Service.deleteFile(fileName);
+                imageRepository.delete(image);
+            }
         }
-    }
-    //해당 유저가 작성한 feed 찾기
-    private Feed checkFeed(Long feedId, Long userId){
-        return feedRepository.findByIdAndUserIdAndIsDeletedFalse(feedId, userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
-        );
     }
     //feed 찾기
     private Feed isFeed(Long feedId){
@@ -177,11 +172,11 @@ public class FeedService {
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
     }
-    private boolean checkOwner(Feed feed, User user) {
-        if (user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().equals(user)) {
-            return true;
-        } else {
+    private boolean checkAuthority(Feed feed, User user) {
+        if (!(user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().equals(user))) {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
+        } else {
+            return true;
         }
     }
 }

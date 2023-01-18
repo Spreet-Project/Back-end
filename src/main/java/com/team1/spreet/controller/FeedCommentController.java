@@ -26,14 +26,14 @@ public class FeedCommentController {
     @PostMapping("/{feedId}/comment")
     public CustomResponseBody<FeedCommentDto.ResponseDto> saveFeedComment(@PathVariable @ApiParam(value = "댓글 등록할 피드 ID") Long feedId,
         @RequestBody @ApiParam(value = "등록할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetails userDetails) {
-        return new CustomResponseBody<>(SuccessStatusCode.SAVE_FEED_COMMENT,feedCommentService.saveFeedComment(feedId, requestDto, userDetails));
+        return new CustomResponseBody<>(SuccessStatusCode.SAVE_COMMENT,feedCommentService.saveFeedComment(feedId, requestDto, userDetails));
     }
     //댓글 수정
     @ApiOperation(value = "피드 댓글 수정 API")
     @PutMapping("/comment/{commentId}")
     public CustomResponseBody<FeedCommentDto.ResponseDto> updateFeedComment(@PathVariable @ApiParam(value = "댓글 수정할 피드 ID") Long commentId,
         @RequestBody @ApiParam(value = "수정할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetails userDetails) {
-        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_FEED_COMMENT, feedCommentService.updateFeedComment(commentId, requestDto, userDetails));
+        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_COMMENT, feedCommentService.updateFeedComment(commentId, requestDto, userDetails));
     }
     //댓글 삭제
     @ApiOperation(value = "피드 댓글 삭제 API")
@@ -46,6 +46,6 @@ public class FeedCommentController {
     @ApiOperation(value = "피드 댓글 조회 API")
     @GetMapping("/{feedId}/comment")
     private CustomResponseBody<List<FeedCommentDto.ResponseDto>> getFeedComment(@PathVariable @ApiParam(value = "댓글 리스트를 조회할 피드 ID") Long feedId) {
-        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED_COMMENTS,feedCommentService.getFeedComment(feedId));
+        return new CustomResponseBody<>(SuccessStatusCode.GET_COMMENTS,feedCommentService.getFeedComment(feedId));
     }
 }
