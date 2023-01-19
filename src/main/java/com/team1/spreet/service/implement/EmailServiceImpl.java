@@ -106,7 +106,6 @@ public class EmailServiceImpl implements EmailService {
             e.printStackTrace();
             throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
         }
-//        return new CustomResponseBody(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 
     @Override
