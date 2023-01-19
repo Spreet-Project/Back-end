@@ -8,7 +8,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +28,7 @@ public class EmailController {
     }
 
     @ApiOperation(value = "이메일 인증 API")
-    @GetMapping("/api/user/confirm-email")
+    @PostMapping("/api/user/confirm-email")
     public CustomResponseBody emailConfirm(@RequestBody @ApiParam(value = "이메일 인증을 위한 정보") EmailDto emailDto) throws Exception{
         emailService.emailConfirm(emailDto);
         return new CustomResponseBody<>(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
