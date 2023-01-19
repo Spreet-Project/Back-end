@@ -1,11 +1,9 @@
 package com.team1.spreet.service.implement;
 
-import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.EmailDto;
 import com.team1.spreet.entity.EmailConfirm;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.EmailConfirmRepository;
 import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.service.EmailConfirmService;
@@ -40,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
         log.info("인증 번호 : " + ePw);
 
         message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
-        message.setSubject("이메일 인증 테스트");
+        message.setSubject("Spreet 이메일 인증");
 
         String msg = "";
         msg+= "<div style='margin:20px;'>";
@@ -95,7 +93,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public CustomResponseBody sendSimpleMessage(String email)throws Exception {
+    public void sendSimpleMessage(String email)throws Exception {
         if (userRepository.findByEmail(email).isPresent()){ throw new RestApiException(ErrorStatusCode.EMAIL_ALREADY_EXIST);}
 
 
@@ -108,17 +106,15 @@ public class EmailServiceImpl implements EmailService {
             e.printStackTrace();
             throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
         }
-        return new CustomResponseBody(SuccessStatusCode.EMAIL_SEND_SUCCESS);
+//        return new CustomResponseBody(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 
     @Override
-    public CustomResponseBody emailConfirm(EmailDto emailDto) {
+    public void emailConfirm(EmailDto emailDto) {
         if(emailConfirmService.findByEmail(emailDto.getEmail())==null)
             throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_NULL_EXCEPTION);
 
-        if(emailDto.getConfirmCode().equals(emailConfirmService.findByEmail(emailDto.getEmail()).getConfirmCode()))
-            return new CustomResponseBody(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
-        else
+        if(!emailDto.getConfirmCode().equals(emailConfirmService.findByEmail(emailDto.getEmail()).getConfirmCode()))
             throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_INCORRECT);
     }
 }
