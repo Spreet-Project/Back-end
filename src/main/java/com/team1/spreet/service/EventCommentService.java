@@ -73,9 +73,8 @@ public class EventCommentService {
     }
 
     private Event checkEvent(Long eventId) {
-        //eventRepository 메소드 반영하기, 에러코드 반영하기
-        return eventRepository.findById(eventId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
+        return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
+                ()-> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
         );
     }
 
