@@ -28,7 +28,7 @@ public class ShortsLikeService {
 	// shortsLike 등록
 	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, UserDetailsImpl userDetails) {
 		User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
 		);
 
 		Shorts shorts = checkShorts(shortsId);
@@ -37,12 +37,12 @@ public class ShortsLikeService {
 		if (findShortsLike != null) {
 			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);
-			return new CustomResponseBody<>(SuccessStatusCode.SHORTS_DISLIKE, new ShortsLikeDto.ResponseDto(false));
+			return new CustomResponseBody<>(SuccessStatusCode.DISLIKE, new ShortsLikeDto.ResponseDto(false));
 		} else {
 			ShortsLike shortsLike = new ShortsLike(shorts, user);
 			shorts.addLike();
 			shortsLikeRepository.save(shortsLike);
-			return new CustomResponseBody<>(SuccessStatusCode.SHORTS_LIKE, new ShortsLikeDto.ResponseDto(true));
+			return new CustomResponseBody<>(SuccessStatusCode.LIKE, new ShortsLikeDto.ResponseDto(true));
 		}
 
 	}
@@ -50,7 +50,7 @@ public class ShortsLikeService {
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
 		return shortsRepository.findById(shortsId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 }

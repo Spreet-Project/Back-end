@@ -52,10 +52,10 @@ public class AlertService {
     }
     public void send(Long senderId, String content, String url, Long receiverId) {
         User sender = userRepository.findById(senderId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         User receiver = userRepository.findById(receiverId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         Alert alert = alertRepository.save(new Alert(content, url, false, sender.getNickname(), receiver.getNickname()));
 //        String receiverId = String.valueOf(userId);
@@ -91,7 +91,7 @@ public class AlertService {
     @Transactional(readOnly = true)
     public List<AlertDto.ResponseDto> getAllAlert(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         List<AlertDto.ResponseDto> alertList = new ArrayList<>();
         List<Alert> alerts = alertRepository.findAllByReceiverAndIsReadFalse(user.getNickname());
@@ -106,7 +106,7 @@ public class AlertService {
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_ALERT)
         );
         User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         if(!alert.getReceiver().equals(user.getNickname())){
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);

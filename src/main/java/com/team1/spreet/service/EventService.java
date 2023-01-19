@@ -98,7 +98,7 @@ public class EventService {
 	// Event 게시글이 존재하는지 확인
 	private Event checkEvent(Long eventId) {
 		return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
 		);
 	}
 
@@ -113,7 +113,7 @@ public class EventService {
 	// User 객체 가져오기
 	private User getUser(Long userId) {
 		return userRepository.findById(userId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER));
 	}
 
 }

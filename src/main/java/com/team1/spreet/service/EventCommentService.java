@@ -75,13 +75,13 @@ public class EventCommentService {
 
     private Event checkEvent(Long eventId) {
         return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
         );
     }
 
     private User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
     }
 

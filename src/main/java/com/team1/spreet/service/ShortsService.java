@@ -117,7 +117,7 @@ public class ShortsService {
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
 		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
