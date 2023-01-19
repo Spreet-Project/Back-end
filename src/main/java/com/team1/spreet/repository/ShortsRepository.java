@@ -16,10 +16,10 @@ public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 
 	@Modifying
 	@Query("update Shorts s set s.isDeleted = true where s.id = :shortsId")
-	void updateIsDeletedTrue(@Param("shortsId") Long shortsId);
+	void updateIsDeletedTrueById(@Param("shortsId") Long shortsId);
 
 	//카테고리별 조회
-	@Query("select s from Shorts s where s.category = :category and s.isDeleted = false")
+	@Query("select distinct s from Shorts s where s.category = :category and s.isDeleted = false")
 	Page<Shorts> findShortsByCategoryAndIsDeletedFalse(@Param("category")Category category, Pageable pageable);
 
 }
