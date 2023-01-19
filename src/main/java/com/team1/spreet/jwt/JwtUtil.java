@@ -1,8 +1,6 @@
 package com.team1.spreet.jwt;
 
 import com.team1.spreet.entity.UserRole;
-import com.team1.spreet.exception.ErrorStatusCode;
-import com.team1.spreet.exception.RestApiException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -98,18 +96,15 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-            throw new RestApiException(ErrorStatusCode.INVALID_JWT_SIGNATURE_EXCEPTION);
+            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token, 만료된 JWT token 입니다.");
-            throw new RestApiException(ErrorStatusCode.EXPIRED_JWT_TOKEN_EXCEPTION);
+            log.error("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            throw new RestApiException(ErrorStatusCode.UNSUPPORTED_JWT_TOKEN);
+            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
-            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-            throw new RestApiException(ErrorStatusCode.TOKEN_ILLEGAL_ARGUMENT_EXCEPTION);
+            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
+        return false;
     }
 
     //토큰에서 사용자 정보 가져오기
