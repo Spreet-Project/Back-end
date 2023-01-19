@@ -51,6 +51,6 @@ public class ShortsCommentController {
 	@ApiOperation(value = "쇼츠 댓글 리스트 조회 API")
 	@GetMapping("/{shortsId}/comment")
 	public CustomResponseBody<List<ShortsCommentDto.ResponseDto>> getShortsCommentList(@PathVariable @ApiParam(value = "댓글 리스트를 조회할 쇼츠 ID") Long shortsId) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_COMMENTS, shortsCommentService.getCommentList(shortsId));
+		return new CustomResponseBody<>(SuccessStatusCode.GET_COMMENTS, shortsCommentService.getCommentList(shortsId));
 	}
 }

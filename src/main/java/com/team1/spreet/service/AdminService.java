@@ -36,7 +36,7 @@ public class AdminService {
 	// 크루 회원 승인
 	public SuccessStatusCode approveCrew(String nickname) {
 		User user = userRepository.findByNickname(nickname).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_USER));
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER));
 
 		user.approveCrew();
 
@@ -46,7 +46,7 @@ public class AdminService {
 	// 크루 회원 거절
 	public SuccessStatusCode rejectCrew(String nickname) {
 		User user = userRepository.findByNickname(nickname).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_USER));
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER));
 
 		user.rejectCrew();
 

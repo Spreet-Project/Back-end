@@ -163,7 +163,7 @@ public class NaverLoginService {
 	private void securityLogin(User user) {
 		UserDetails userDetails = new UserDetailsImpl(user);
 		if (user.isDeleted()) {
-			throw new RestApiException(ErrorStatusCode.NOT_FOUND_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
 		}
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
 			null, userDetails.getAuthorities());

@@ -23,7 +23,6 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @ApiOperation(value = "회원가입 API")
     @PostMapping("/signup")

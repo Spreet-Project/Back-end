@@ -27,7 +27,7 @@ public class SseController {
     public SseEmitter subscribe(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         /*
         sse 연결 요청에 대한 응답으로 emitter 를 만들어 반환한다

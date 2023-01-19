@@ -19,10 +19,10 @@ public class SubscribeService {
 
     public SuccessStatusCode subscribe(Long publisherId, UserDetailsImpl userDetails) {
         User publisher = userRepository.findById(publisherId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         User subscriber = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         Subscribe subscribe = new Subscribe(publisher, subscriber);
         subscribeRepository.save(subscribe);
@@ -30,10 +30,10 @@ public class SubscribeService {
     }
     public SuccessStatusCode cancelSubscribe(Long publisherId, UserDetailsImpl userDetails) {
         User publisher = userRepository.findById(publisherId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         User subscriber = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         Subscribe subscribe = subscribeRepository.findByPublisherAndSubscriber(publisher, subscriber);
         subscribeRepository.delete(subscribe);

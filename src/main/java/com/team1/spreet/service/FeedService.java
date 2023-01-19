@@ -134,10 +134,10 @@ public class FeedService {
         FeedLike feedLike = feedLikeRepository.findByUserAndFeed(user, feed).orElse(null);
         if (feedLike!=null) {
             feedLikeRepository.delete(feedLike);
-            return new CustomResponseBody<>(SuccessStatusCode.CANCEL_LIKE_FEED, new FeedLikeDto.ResponseDto(false));
+            return new CustomResponseBody<>(SuccessStatusCode.DISLIKE, new FeedLikeDto.ResponseDto(false));
         }else{
             feedLikeRepository.save(new FeedLike(user, feed));
-            return new CustomResponseBody<>(SuccessStatusCode.LIKE_FEED, new FeedLikeDto.ResponseDto(true));
+            return new CustomResponseBody<>(SuccessStatusCode.LIKE, new FeedLikeDto.ResponseDto(true));
         }
     }
     //새로운 이미지 저장
@@ -176,7 +176,7 @@ public class FeedService {
     //user 정보 가져오기
     private User checkUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
     }
     private boolean checkAuthority(Feed feed, User user) {
