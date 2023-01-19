@@ -15,7 +15,7 @@ public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Lo
         + "where sc.shorts.id = :shortsId and sc.isDeleted = false order by sc.createdAt desc")
     List<ShortsComment> findByShortsIdAndIsDeletedFalseWithUserOrderByCreatedAtDesc(@Param("shortsId") Long shortsId);
 
-    @Query("select distinct sc from ShortsComment sc where sc.id = :shortsCommentId and sc.isDeleted = false")
+    @Query("select sc from ShortsComment sc where sc.id = :shortsCommentId and sc.isDeleted = false")
     Optional<ShortsComment> findByIdAndIsDeletedFalse(@Param("shortsCommentId") Long shortsCommentId);
 
     @Modifying
