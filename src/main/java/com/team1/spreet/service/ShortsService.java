@@ -12,7 +12,7 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
-import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +30,11 @@ public class ShortsService {
 	private final ShortsRepository shortsRepository;
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
-	private final UserRepository userRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
-	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -45,8 +44,8 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		Shorts shorts = checkShorts(shortsId);
 		String videoUrl;
@@ -70,8 +69,8 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	public SuccessStatusCode deleteShorts(Long shortsId, Long userId) {
-		User user = getUser(userId);
+	public SuccessStatusCode deleteShorts(Long shortsId, UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
 
 		Shorts shorts = checkShorts(shortsId);
 
@@ -113,22 +112,6 @@ public class ShortsService {
 		return shortsList;
 	}
 
-	// 모든 카테고리 최신 shorts 10개씩 조회
-	@Transactional(readOnly = true)
-	public ShortsDto.CategoryResponseDto getAllCategory() {
-		Category[] category = {Category.RAP, Category.DJ, Category.BEAT_BOX, Category.STREET_DANCE, Category.GRAFFITI, Category.ETC};
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-		List<ShortsDto.SimpleResponseDto> rap = getShortsList(category[0], pageable);
-		List<ShortsDto.SimpleResponseDto> dj = getShortsList(category[1], pageable);
-		List<ShortsDto.SimpleResponseDto> beatBox = getShortsList(category[2], pageable);
-		List<ShortsDto.SimpleResponseDto> streetDance = getShortsList(category[3], pageable);
-		List<ShortsDto.SimpleResponseDto> graffiti = getShortsList(category[4], pageable);
-		List<ShortsDto.SimpleResponseDto> etc = getShortsList(category[5], pageable);
-
-		return new ShortsDto.CategoryResponseDto(rap, dj, beatBox, streetDance, graffiti, etc);
-	}
-
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	public boolean checkLike(Long shortsId, Long userId) {
 		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
@@ -149,24 +132,6 @@ public class ShortsService {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 		return true;
-	}
-
-	// user 객체 가져오기
-	private User getUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
-	}
-
-	// 각 카테고리별 최신 shorts 10개 가져오기
-	private List<ShortsDto.SimpleResponseDto> getShortsList(Category category, Pageable pageable) {
-		List<Shorts> shortsList	= shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
-
-		List<ShortsDto.SimpleResponseDto> dtoList = new ArrayList<>();
-		for (Shorts shorts : shortsList) {
-			dtoList.add(new ShortsDto.SimpleResponseDto(shorts));
-		}
-
-		return dtoList;
 	}
 
 	private void deleteShortsById(Long shortsId) {

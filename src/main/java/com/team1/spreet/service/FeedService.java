@@ -8,11 +8,11 @@ import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.*;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,8 +45,8 @@ public class FeedService {
             Long feedLike = feedLikeRepository.countByFeedId(feed.getId());    //좋아요 개수 조회
             //저장된 이미지 조회
             List<String> imageUrlList = new ArrayList<>();
-            List<Image> imageList = imageRepository.findAllByFeedId(feed.getId());
-            for (Image image : imageList) {
+            List<FeedImage> imageList = imageRepository.findAllByFeedId(feed.getId());
+            for (FeedImage image : imageList) {
                 imageUrlList.add(image.getImageUrl());
             }
             boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
@@ -66,8 +66,8 @@ public class FeedService {
         Long feedLike = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
         //저장된 이미지 조회
         List<String> imageUrlList = new ArrayList<>();
-        List<Image> imageList = imageRepository.findAllByFeedId(feedId);
-        for (Image image : imageList) {
+        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
+        for (FeedImage image : imageList) {
             imageUrlList.add(image.getImageUrl());
         }
         //로그인 여부 및 좋아요 여부 확인
@@ -80,8 +80,8 @@ public class FeedService {
     }
     //feed 저장
     @Transactional
-    public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Feed feed = requestDto.toEntity(user);    //feed 엔티티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
@@ -99,10 +99,11 @@ public class FeedService {
     }
     //feed 수정
     @Transactional
-    public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();    //userId로 user 찾기
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         if(checkAuthority(feed, user)){
+//            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
             feedRepository.updateTitleAndContentByIdAndUser(requestDto.getTitle(), requestDto.getContent(), feedId, user);
             deleteImage(feedId);    //기존에 업로드된 이미지 제거
             //이미지가 있다면 새로운 이미지 저장
@@ -114,8 +115,8 @@ public class FeedService {
     }
     //feed 삭제
     @Transactional
-    public SuccessStatusCode deleteFeed(Long feedId, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public SuccessStatusCode deleteFeed(Long feedId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();    //userId로 user 찾기
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         if(checkAuthority(feed, user)){
             feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
@@ -127,8 +128,8 @@ public class FeedService {
     }
     //feed 좋아요
     @Transactional
-    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(Long feedId, UserDetails userDetails) {
-        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
+    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(Long feedId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         FeedLike feedLike = feedLikeRepository.findByUserAndFeed(user, feed).orElse(null);
         if (feedLike!=null) {
@@ -141,24 +142,30 @@ public class FeedService {
     }
     //새로운 이미지 저장
     private void saveImage(List<MultipartFile> multipartFileList, Feed feed){
-        if(!multipartFileList.isEmpty()){
-            for (MultipartFile multipartFile : multipartFileList) {
+        if(!multipartFileList.isEmpty()) {
+                for (MultipartFile multipartFile : multipartFileList) {
                 String imageUrl = awsS3Service.uploadFile(multipartFile);
-                Image image = new Image(imageUrl, feed);
+                FeedImage image = new FeedImage(imageUrl, feed);
                 imageRepository.save(image);
             }
         }
     }
     //이미지 파일 삭제
     private void deleteImage(Long feedId){
-        List<Image> imageList = imageRepository.findAllByFeedId(feedId);
+        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
         if(!imageList.isEmpty()){
-            for (Image image : imageList) {
-                String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
-                awsS3Service.deleteFile(fileName);
-                imageRepository.delete(image);
+            for (FeedImage image : imageList) {
+            String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
+            awsS3Service.deleteFile(fileName);
+            imageRepository.delete(image);
             }
         }
+    }
+    //해당 유저가 작성한 feed 찾기
+    private Feed checkFeed(Long feedId, Long userId){
+        return feedRepository.findByIdAndUserIdAndIsDeletedFalse(feedId, userId).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
+        );
     }
     //feed 찾기
     private Feed isFeed(Long feedId){
@@ -173,7 +180,7 @@ public class FeedService {
         );
     }
     private boolean checkAuthority(Feed feed, User user) {
-        if (!(user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().equals(user))) {
+        if (!(user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().getId().equals(user.getId()))) {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
         } else {
             return true;
