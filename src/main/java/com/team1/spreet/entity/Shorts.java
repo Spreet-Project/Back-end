@@ -66,12 +66,11 @@ public class Shorts extends TimeStamped {
         this.user = user;
     }
 
-    public void update(String title, String content, String videoUrl, Category category, User user) {
+    public void update(String title, String content, String videoUrl, Category category) {
         this.title = title;
         this.content = content;
         this.videoUrl = videoUrl;
         this.category = category;
-        this.user = user;
     }
 
     public void addLike() {

@@ -12,7 +12,6 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
-import com.team1.spreet.security.UserDetailsImpl;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +32,7 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
-	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, UserDetailsImpl userDetails) {
-		User user = userDetails.getUser();
-
+	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
 		shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
@@ -44,13 +41,11 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, UserDetailsImpl userDetails) {
-		User user = userDetails.getUser();
-
+	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		String videoUrl;
 
-		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
+		if (checkOwner(shorts, user.getId())) {
 			if (!requestDto.getFile().isEmpty()) {
 				//첨부파일 수정시 기존 첨부파일 삭제
 				String fileName = shorts.getVideoUrl().split(".com/")[1];
@@ -62,19 +57,19 @@ public class ShortsService {
 				//첨부파일 수정 안함
 				videoUrl = shorts.getVideoUrl();
 			}
-			shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory(), user);
+			shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory());
 		}
 		return SuccessStatusCode.UPDATE_SHORTS;
 	}
 
 
 	// shorts 삭제
-	public SuccessStatusCode deleteShorts(Long shortsId, UserDetailsImpl userDetails) {
-		User user = userDetails.getUser();
-
+	public SuccessStatusCode deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
+			String fileName = shorts.getVideoUrl().split(".com/")[1];
+			awsS3Service.deleteFile(fileName);
 			deleteShortsById(shortsId);
 		}
 		return SuccessStatusCode.DELETE_SHORTS;
@@ -113,7 +108,7 @@ public class ShortsService {
 	}
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
-	public boolean checkLike(Long shortsId, Long userId) {
+	private boolean checkLike(Long shortsId, Long userId) {
 		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
 			.orElse(null);
 		return shortsLike != null;
@@ -135,10 +130,9 @@ public class ShortsService {
 	}
 
 	private void deleteShortsById(Long shortsId) {
-		List<Long> commentIds = shortsCommentRepository.findIdsByShortId(shortsId);
-		shortsCommentRepository.updateIsDeletedTrueByIds(commentIds);
+		shortsCommentRepository.updateIsDeletedTrueByShortsId(shortsId);
 		shortsLikeRepository.deleteByShortsId(shortsId);
-		shortsRepository.updateIsDeletedTrue(shortsId);
+		shortsRepository.updateIsDeletedTrueById(shortsId);
 	}
 
 }
