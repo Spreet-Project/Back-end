@@ -86,7 +86,7 @@ public class EventService {
 	// Event 게시글이 존재하는지 확인
 	private Event checkEvent(Long eventId) {
 		return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
 		);
 	}
 

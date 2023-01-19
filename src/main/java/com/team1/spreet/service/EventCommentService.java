@@ -67,7 +67,7 @@ public class EventCommentService {
 
     private Event checkEvent(Long eventId) {
         return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
-                ()-> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
+                ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
         );
     }
 
