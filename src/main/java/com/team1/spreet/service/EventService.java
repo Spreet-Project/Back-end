@@ -57,8 +57,9 @@ public class EventService {
 		Event event = checkEvent(eventId);
 
 		if (user.getUserRole() == UserRole.ROLE_ADMIN ||checkOwner(event, user.getId())) {
-			eventCommentRepository.updateIsDeletedTrueByEventId(eventId);
-			eventRepository.updateIsDeletedTrue(eventId);
+			String fileName = event.getEventImageUrl().split(".com/")[1];
+			awsS3Service.deleteFile(fileName);
+			deleteEventById(eventId);
 		}
 	}
 
@@ -98,4 +99,8 @@ public class EventService {
 		return true;
 	}
 
+	private void deleteEventById(Long eventId) {
+		eventCommentRepository.updateIsDeletedTrueByEventId(eventId);
+		eventRepository.updateIsDeletedTrue(eventId);
+	}
 }
