@@ -165,7 +165,8 @@ public class NaverLoginService {
 		if (user.isDeleted()) {
 			throw new RestApiException(ErrorStatusCode.NOT_FOUND_USER);
 		}
-		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+			null, userDetails.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 }
