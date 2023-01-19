@@ -114,7 +114,7 @@ public class KakaoLoginService {
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
                 kakaoUser = sameEmailUser;
-                kakaoUser = kakaoUser.socialIdUpdate(kakaoId);
+                kakaoUser = kakaoUser.socialIdUpdate(kakaoId.toString());
             } else {
                 String password = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(password);

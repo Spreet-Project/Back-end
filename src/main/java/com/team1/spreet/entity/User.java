@@ -72,8 +72,8 @@ public class User extends TimeStamped{
         this.isCrew = Boolean.FALSE;
     }
 
-    public User(Long socialId, String nickname, String password, String email, String profileImage) {
-        this.loginId = socialId.toString();
+    public User(String socialId, String nickname, String password, String email, String profileImage) {
+        this.loginId = socialId;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
@@ -83,8 +83,8 @@ public class User extends TimeStamped{
         this.profileImage = profileImage;
     }
 
-    public User socialIdUpdate(Long socialId) {
-        this.loginId = socialId.toString();
+    public User socialIdUpdate(String socialId) {
+        this.loginId = socialId;
         return this;
     }
 
