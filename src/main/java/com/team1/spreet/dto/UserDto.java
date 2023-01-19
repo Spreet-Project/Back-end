@@ -3,13 +3,12 @@ package com.team1.spreet.dto;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 public class UserDto {
@@ -76,12 +75,12 @@ public class UserDto {
     @NoArgsConstructor
     @Getter
     public static class NaverInfoDto{
-        private Long id;
+        private String id;
         private String nickname;
         private String email;
         private String profileImage;
 
-        public NaverInfoDto(Long id, String nickname, String email, String profileImage){
+        public NaverInfoDto(String id, String nickname, String email, String profileImage){
             this.id = id;
             this.nickname = nickname;
             this.email = email;
