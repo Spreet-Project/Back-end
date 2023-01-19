@@ -5,6 +5,7 @@ import com.team1.spreet.dto.EventCommentDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.EventCommentService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

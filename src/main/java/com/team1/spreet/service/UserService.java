@@ -34,9 +34,9 @@ public class UserService {
         User user = userRepository.findByNickname(requestDto.getNickname()).orElse(null);
 
         if (userRepository.findByLoginId(requestDto.getLoginId()).isPresent()) {
-            throw new RestApiException(ErrorStatusCode.ID_ALREADY_EXISTS_EXCEPTION);
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
         } else if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
-            throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
         }
 
         userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()), UserRole.ROLE_USER));
@@ -58,19 +58,19 @@ public class UserService {
 
     public CustomResponseBody idCheck(String loginId) {
         if(userRepository.findByLoginId(loginId).isPresent())
-            throw new RestApiException(ErrorStatusCode.ID_ALREADY_EXISTS_EXCEPTION);
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
         return new CustomResponseBody(SuccessStatusCode.ID_DUPLICATE_CHECK);
     }
 
     public CustomResponseBody nicknameCheck(String nickname) {
         if(userRepository.findByNickname(nickname).isPresent())
-            throw new RestApiException(ErrorStatusCode.NICKNAME_ALREADY_EXISTS_EXCEPTION);
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
         return new CustomResponseBody(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
     }
 
     public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
         User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_FOUND_USER)
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
         return new UserDto.LoginResponseDto(user.getNickname());
     }

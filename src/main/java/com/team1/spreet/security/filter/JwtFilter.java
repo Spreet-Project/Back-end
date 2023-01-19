@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null) {
             if (!jwtUtil.validateToken(token)) {
-                jwtExceptionHandler(response, ErrorStatusCode.NOT_FOUND_AUTHENTICATION);
+                jwtExceptionHandler(response, ErrorStatusCode.INVALID_JWT);
                 return;
             }
 
