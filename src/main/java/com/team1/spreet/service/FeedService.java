@@ -81,11 +81,8 @@ public class FeedService {
     //feed 저장
     @Transactional
     public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
-//        User user = checkUser(Long.parseLong(userDetails.getUsername()));    //userId로 user 찾기
         User user = userDetails.getUser();
-        Feed feed = new Feed(requestDto.getTitle(), requestDto.getContent(), user);    //feed 엔티
-        // 티 초기화
-
+        Feed feed = requestDto.toEntity(user);    //feed 엔티티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
         //구독자에게 알림 생성
@@ -105,7 +102,7 @@ public class FeedService {
     public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();    //userId로 user 찾기
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        if(checkOwner(feed, user)){
+        if(checkAuthority(feed, user)){
 //            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
             feedRepository.updateTitleAndContentByIdAndUser(requestDto.getTitle(), requestDto.getContent(), feedId, user);
             deleteImage(feedId);    //기존에 업로드된 이미지 제거
@@ -113,17 +110,15 @@ public class FeedService {
             if(requestDto.getFile() != null) {
                 saveImage(requestDto.getFile(), feed);
             }
-            return SuccessStatusCode.UPDATE_FEED;
-        }else{
-            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
         }
+        return SuccessStatusCode.UPDATE_FEED;
     }
     //feed 삭제
     @Transactional
     public SuccessStatusCode deleteFeed(Long feedId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();    //userId로 user 찾기
-        Feed feed = checkFeed(feedId, user.getId());    //userId, feedId로 feed 찾기
-        if(checkOwner(feed, user)){
+        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        if(checkAuthority(feed, user)){
             feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
             feedLikeRepository.deleteByFeed(feed);    //좋아요 삭제
             deleteImage(feedId);    //기존에 업로드된 이미지 제거
@@ -147,19 +142,23 @@ public class FeedService {
     }
     //새로운 이미지 저장
     private void saveImage(List<MultipartFile> multipartFileList, Feed feed){
-        for (MultipartFile multipartFile : multipartFileList) {
-            String imageUrl = awsS3Service.uploadFile(multipartFile);
-            FeedImage image = new FeedImage(imageUrl, feed);
-            imageRepository.save(image);
+        if(!multipartFileList.isEmpty()) {
+                for (MultipartFile multipartFile : multipartFileList) {
+                String imageUrl = awsS3Service.uploadFile(multipartFile);
+                FeedImage image = new FeedImage(imageUrl, feed);
+                imageRepository.save(image);
+            }
         }
     }
     //이미지 파일 삭제
     private void deleteImage(Long feedId){
         List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
-        for (FeedImage image : imageList) {
+        if(!imageList.isEmpty()){
+            for (FeedImage image : imageList) {
             String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
             awsS3Service.deleteFile(fileName);
             imageRepository.delete(image);
+            }
         }
     }
     //해당 유저가 작성한 feed 찾기
@@ -180,12 +179,11 @@ public class FeedService {
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
     }
-    private boolean checkOwner(Feed feed, User user) {
-        Long feedUser = feed.getUser().getId();
-        if (user.getUserRole() == UserRole.ROLE_ADMIN || feedUser.equals(user.getId())) {
-            return true;
-        } else {
+    private boolean checkAuthority(Feed feed, User user) {
+        if (!(user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().getId().equals(user.getId()))) {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
+        } else {
+            return true;
         }
     }
 }

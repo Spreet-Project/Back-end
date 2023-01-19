@@ -29,7 +29,7 @@ public class ShortsController {
 	@PostMapping
 	public CustomResponseBody<ShortsDto.ResponseDto> saveShorts(@ModelAttribute @Valid @ApiParam(value = "쇼츠 등록 정보") ShortsDto.RequestDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsService.saveShorts(requestDto, userDetails));
+		return new CustomResponseBody<>(shortsService.saveShorts(requestDto, userDetails.getUser()));
 	}
 
 	// shorts 수정
@@ -37,7 +37,7 @@ public class ShortsController {
 	@PutMapping("/{shortsId}")
 	public CustomResponseBody<ShortsDto.ResponseDto> updateShorts(@ModelAttribute @Valid @ApiParam(value = "쇼츠 수정 정보") ShortsDto.UpdateRequestDto requestDto,
 		@PathVariable @ApiParam(value = "수정할 쇼츠 ID") Long shortsId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsService.updateShorts(requestDto, shortsId, userDetails));
+		return new CustomResponseBody<>(shortsService.updateShorts(requestDto, shortsId, userDetails.getUser()));
 	}
 
 	// shorts 삭제
@@ -45,7 +45,7 @@ public class ShortsController {
 	@DeleteMapping("/{shortsId}")
 	public CustomResponseBody<SuccessStatusCode> deleteShorts(@PathVariable @ApiParam(value = "삭제할 쇼츠 ID") Long shortsId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsService.deleteShorts(shortsId, userDetails));
+		return new CustomResponseBody<>(shortsService.deleteShorts(shortsId, userDetails.getUser()));
 	}
 
 	// shorts 상세조회

@@ -28,7 +28,7 @@ public class ShortsCommentController {
 	@PostMapping("/{shortsId}/comment")
 	public CustomResponseBody<SuccessStatusCode> saveShortsComment(@PathVariable @ApiParam(value = "댓글 등록할 쇼츠 ID") Long shortsId,
 		@RequestBody @Valid @ApiParam(value = "등록할 댓글 내용") ShortsCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsCommentService.saveShortsComment(shortsId, requestDto, userDetails));
+		return new CustomResponseBody<>(shortsCommentService.saveShortsComment(shortsId, requestDto, userDetails.getUser()));
 	}
 
 	// shortsComment 수정
@@ -36,7 +36,7 @@ public class ShortsCommentController {
 	@PutMapping("/comment/{shortsCommentId}")
 	public CustomResponseBody<SuccessStatusCode> updateShortsComment(@PathVariable @ApiParam(value = "댓글 수정할 쇼츠 ID") Long shortsCommentId,
 		@RequestBody @Valid @ApiParam(value = "수정할 댓글 정보") ShortsCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsCommentService.updateShortsComment(shortsCommentId, requestDto, userDetails));
+		return new CustomResponseBody<>(shortsCommentService.updateShortsComment(shortsCommentId, requestDto, userDetails.getUser()));
 	}
 
 	// shortsComment 삭제
@@ -44,7 +44,7 @@ public class ShortsCommentController {
 	@DeleteMapping("/comment/{shortsCommentId}")
 	public CustomResponseBody<SuccessStatusCode> deleteShortsComment(@PathVariable @ApiParam(value = "댓글 삭제할 쇼츠 ID") Long shortsCommentId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(shortsCommentService.deleteShortsComment(shortsCommentId, userDetails));
+		return new CustomResponseBody<>(shortsCommentService.deleteShortsComment(shortsCommentId, userDetails.getUser()));
 	}
 
 	// shortsComment 조회

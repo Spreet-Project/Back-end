@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
+import com.team1.spreet.exception.ErrorStatusCode;
+import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +59,10 @@ public class NaverLoginService {
 		//3. 사용자정보를 토대로 가입진행
 		User naverUser = registerNaverUserIfNeeded(naverInfoDto);
 
-		//4. 토큰발급후 response
+		//4. 강제 로그인
+		securityLogin(naverUser);
+
+		//5. 토큰발급후 response
 		String token = jwtUtil.createToken(naverUser.getId(), naverUser.getUserRole());
 		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
@@ -65,9 +75,9 @@ public class NaverLoginService {
 		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-		body.add("grant_type", "authorization_code");
 		body.add("client_id", clientId);
 		body.add("client_secret", clientSecret);
+		body.add("grant_type", "authorization_code");
 		body.add("redirect_uri", redirectUri);
 		body.add("code", code);
 		body.add("state", state);
@@ -111,7 +121,7 @@ public class NaverLoginService {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-		Long id = jsonNode.get("response").get("id").asLong();
+		String id = jsonNode.get("response").get("id").asText();
 		String email = jsonNode.get("response").get("email").asText();
 		String nickname = jsonNode.get("response").get("nickname").asText();
 
@@ -127,8 +137,8 @@ public class NaverLoginService {
 
 	// 필요한 경우 회원가입
 	public User registerNaverUserIfNeeded(UserDto.NaverInfoDto naverInfoDto) {
-		Long naverId = naverInfoDto.getId();
-		User naverUser = userRepository.findByLoginId(naverId.toString()).orElse(null);
+		String naverId = naverInfoDto.getId();
+		User naverUser = userRepository.findByLoginId(naverId).orElse(null);
 
 		if (naverUser == null) {
 			String naverEmail = naverInfoDto.getEmail();
@@ -147,5 +157,16 @@ public class NaverLoginService {
 			userRepository.save(naverUser);
 		}
 		return naverUser;
+	}
+
+	// 시큐리티 강제 로그인
+	private void securityLogin(User user) {
+		UserDetails userDetails = new UserDetailsImpl(user);
+		if (user.isDeleted()) {
+			throw new RestApiException(ErrorStatusCode.NOT_FOUND_USER);
+		}
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+			null, userDetails.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 }

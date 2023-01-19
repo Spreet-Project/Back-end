@@ -8,13 +8,10 @@ import com.team1.spreet.service.KakaoLoginService;
 import com.team1.spreet.service.NaverLoginService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class SocialLoginController {
 	@ApiOperation(value = "카카오 로그인 API")
 	@PostMapping("/kakao/callback")
 	public CustomResponseBody kakaoLogin(@RequestParam @ApiParam(value = "로그인 코드") String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
-		return kakaoLoginService.kakaoLogin(code, httpServletResponse);
+		return new CustomResponseBody<>(SuccessStatusCode.LOGIN_SUCCESS, kakaoLoginService.kakaoLogin(code, httpServletResponse));
 	}
 
 }
