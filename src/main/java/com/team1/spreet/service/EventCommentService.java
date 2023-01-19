@@ -11,6 +11,7 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.EventCommentRepository;
 import com.team1.spreet.repository.EventRepository;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,23 +27,23 @@ public class EventCommentService {
     private final EventRepository eventRepository;
     private final EventCommentRepository eventCommentRepository;
 
-    public SuccessStatusCode saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto, long userId) {
-        User user = getUser(userId);
+    public SuccessStatusCode saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Event event = checkEvent(eventId);
         eventCommentRepository.saveAndFlush(requestDto.toEntity(requestDto.getContent(), event, user));
         return SuccessStatusCode.SAVE_COMMENT;
     }
 
-    public SuccessStatusCode updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto, Long userId){
-        User user = getUser(userId);
+    public SuccessStatusCode updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto, UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
         EventComment eventComment = checkEventComment(commentId);
         if(checkOwner(user, eventComment)){
             eventCommentRepository.updateContentByIdAndIsDeletedFalse(requestDto.getContent(), commentId);
         }
         return SuccessStatusCode.UPDATE_COMMENT;
     }
-    public SuccessStatusCode deleteEventComment(Long commentId, long userId) {
-        User user = getUser(userId);
+    public SuccessStatusCode deleteEventComment(Long commentId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         EventComment eventComment = checkEventComment(commentId);
         if (checkOwner(user, eventComment)) {
             eventCommentRepository.updateIsDeletedById(commentId);
