@@ -1,12 +1,10 @@
 package com.team1.spreet.service;
 
-import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +28,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public CustomResponseBody signup(final UserDto.SignupRequestDto requestDto) {
-        User user = userRepository.findByNickname(requestDto.getNickname()).orElse(null);
-
+    public void signup(final UserDto.SignupRequestDto requestDto) {
         if (userRepository.findByLoginId(requestDto.getLoginId()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
         } else if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
@@ -40,10 +36,14 @@ public class UserService {
         }
 
         userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()), UserRole.ROLE_USER));
-        return new CustomResponseBody(SuccessStatusCode.SIGNUP_SUCCESS);
     }
 
-    public CustomResponseBody login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
+    public UserDto.LoginResponseDto login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
+
+        // 크루 승인 대기 중인 유저는 로그인 불가
+        if (userRepository.existsByLoginIdAndUserRoleAndIsCrew(requestDto.getLoginId(), UserRole.ROLE_CREW, false)) {
+            throw new RestApiException(ErrorStatusCode.WAITING_CREW_APPROVAL);
+        }
 
         UsernamePasswordAuthenticationToken beforeAuthentication = new UsernamePasswordAuthenticationToken(requestDto.getLoginId(), requestDto.getPassword());
 
@@ -53,19 +53,17 @@ public class UserService {
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS, getNickname(requestDto));
+        return getNickname(requestDto);
     }
 
-    public CustomResponseBody idCheck(String loginId) {
-        if(userRepository.findByLoginId(loginId).isPresent())
+    public void idCheck(String loginId) {
+        if (userRepository.findByLoginId(loginId).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
-        return new CustomResponseBody(SuccessStatusCode.ID_DUPLICATE_CHECK);
     }
 
-    public CustomResponseBody nicknameCheck(String nickname) {
-        if(userRepository.findByNickname(nickname).isPresent())
+    public void nicknameCheck(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
-        return new CustomResponseBody(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
     }
 
     public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
