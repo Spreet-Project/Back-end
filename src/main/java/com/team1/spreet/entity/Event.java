@@ -1,20 +1,12 @@
 package com.team1.spreet.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,6 +31,9 @@ public class Event extends TimeStamped {
 	private String date;
 
 	@Column(nullable = false)
+	private String time;
+
+	@Column(nullable = false)
 	private String eventImageUrl;
 
 	@Column(nullable = false)
@@ -51,20 +46,24 @@ public class Event extends TimeStamped {
 	@OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EventComment> eventCommentList = new ArrayList<>();
 
-	public Event(String title, String content, String location, String date, String eventImageUrl, User user) {
+	public Event(String title, String content, String location, String date, String time,
+		String eventImageUrl, User user) {
 		this.title = title;
 		this.content = content;
 		this.location = location;
 		this.date = date;
+		this.time = time;
 		this.eventImageUrl = eventImageUrl;
 		this.user = user;
 	}
 
-	public void update(String title, String content, String location, String date, String eventImageUrl) {
+	public void update(String title, String content, String location, String date,
+		String time, String eventImageUrl) {
 		this.title = title;
 		this.content = content;
 		this.location = location;
 		this.date = date;
+		this.time = time;
 		this.eventImageUrl = eventImageUrl;
 	}
 }
