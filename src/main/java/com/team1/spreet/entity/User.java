@@ -41,6 +41,9 @@ public class User extends TimeStamped{
     @Column(nullable = false)
     private boolean isCrew;    //크루회원 여부
 
+    @Column(nullable = true)       // 카카오 로그인에서 프로필 사진 구현이 끝나면 nullable = false 로 변경
+    private String profileImage;   //프로필 사진
+
     public User(String loginId, String nickname, String password, String email, UserRole userRole) {
         this.loginId = loginId;
         this.nickname = nickname;
@@ -51,6 +54,10 @@ public class User extends TimeStamped{
         this.isCrew = Boolean.FALSE;
     }
 
+    /*
+      프로필 사진 추가, 네이버 로그인 구현으로 인해 이 생성자는 불필요.
+      카카오 로그인 코드 변경 후 삭제 필요!
+     */
     public User(Long kakaoId, String nickname, String password, String email) {
         this.loginId = kakaoId.toString();
         this.nickname = nickname;
@@ -61,8 +68,19 @@ public class User extends TimeStamped{
         this.isCrew = Boolean.FALSE;
     }
 
-    public User kakaoIdUpdate(Long kakaoId) {
-        this.loginId = kakaoId.toString();
+    public User(String socialId, String nickname, String password, String email, String profileImage) {
+        this.loginId = socialId;
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.userRole = UserRole.ROLE_USER;
+        this.isDeleted = Boolean.FALSE;
+        this.isCrew = Boolean.FALSE;
+        this.profileImage = profileImage;
+    }
+
+    public User socialIdUpdate(String socialId) {
+        this.loginId = socialId;
         return this;
     }
 

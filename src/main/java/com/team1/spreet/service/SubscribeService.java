@@ -7,6 +7,7 @@ import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.SubscribeRepository;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,22 +17,22 @@ public class SubscribeService {
     private final SubscribeRepository subscribeRepository;
     private final UserRepository userRepository;
 
-    public SuccessStatusCode subscribe(Long publisherId, long subscriberId) {
+    public SuccessStatusCode subscribe(Long publisherId, UserDetailsImpl userDetails) {
         User publisher = userRepository.findById(publisherId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
-        User subscriber = userRepository.findById(subscriberId).orElseThrow(
+        User subscriber = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
         Subscribe subscribe = new Subscribe(publisher, subscriber);
         subscribeRepository.save(subscribe);
         return SuccessStatusCode.SUBSCRIBE;
     }
-    public SuccessStatusCode cancelSubscribe(Long publisherId, long subscriberId) {
+    public SuccessStatusCode cancelSubscribe(Long publisherId, UserDetailsImpl userDetails) {
         User publisher = userRepository.findById(publisherId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
-        User subscriber = userRepository.findById(subscriberId).orElseThrow(
+        User subscriber = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );
         Subscribe subscribe = subscribeRepository.findByPublisherAndSubscriber(publisher, subscriber);

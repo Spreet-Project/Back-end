@@ -11,14 +11,10 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE shorts_comment SET is_deleted = true WHERE shorts_comment_id = ?")
-@Where(clause = "is_deleted = false")
 public class ShortsComment extends TimeStamped {
 
     @Id

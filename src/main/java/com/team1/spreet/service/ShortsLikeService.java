@@ -11,6 +11,7 @@ import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +26,14 @@ public class ShortsLikeService {
 
 
 	// shortsLike 등록
-	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, Long userId) {
-		User user = userRepository.findById(userId).orElseThrow(
+	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, UserDetailsImpl userDetails) {
+		User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
 		);
 
 		Shorts shorts = checkShorts(shortsId);
 
-		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, user.getId()).orElse(null);
+		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, user.getId()).orElse(null);
 		if (findShortsLike != null) {
 			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);

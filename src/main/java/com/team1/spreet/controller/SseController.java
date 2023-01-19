@@ -5,10 +5,10 @@ import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.repository.EmitterRepository;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.AlertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -24,8 +24,8 @@ public class SseController {
     private final AlertService alertService;
     //로그인 시 프론트에서 /sub 로 Get 요청 보냄(자바스크립트 EventSource 이용)
     @GetMapping(value = "/sub", produces = "text/event-stream")
-    public SseEmitter subscribe(@AuthenticationPrincipal UserDetails userDetails){
-        Long userId = Long.parseLong(userDetails.getUsername());
+    public SseEmitter subscribe(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        Long userId = userDetails.getUser().getId();
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION)
         );

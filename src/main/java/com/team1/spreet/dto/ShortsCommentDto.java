@@ -3,6 +3,7 @@ package com.team1.spreet.dto;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.ShortsComment;
 import com.team1.spreet.entity.User;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
@@ -34,6 +35,9 @@ public class ShortsCommentDto {
 		@ApiParam(value = "댓글 내용")
 		private String content;
 
+		@ApiModelProperty(value = "프로필 이미지")
+		private String profileImageUrl;
+
 		@ApiParam(value = "작성 일자")
 		private LocalDateTime createdAt;
 
@@ -44,6 +48,7 @@ public class ShortsCommentDto {
 			this.shortsCommentId = shortsComment.getId();
 			this.nickname = shortsComment.getUser().getNickname();
 			this.content = shortsComment.getContent();
+			this.profileImageUrl = shortsComment.getUser().getProfileImage();
 			this.createdAt = shortsComment.getCreatedAt();
 			this.modifiedAt = shortsComment.getModifiedAt();
 		}

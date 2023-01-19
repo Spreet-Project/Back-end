@@ -48,6 +48,12 @@ dependencies {
     implementation 'io.sentry:sentry-spring-boot-starter:6.11.0'
     implementation 'io.sentry:sentry-logback:6.6.0'
 
+    // social login
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.3'
+
+    // slack webhook logging
+    implementation("com.github.maricn:logback-slack-appender:1.6.1")
+
     //이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
@@ -56,6 +62,10 @@ dependencies {
     implementation 'org.redisson:redisson:3.16.8'
     // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
     implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
+
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation 'junit:junit:4.12'
+
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함

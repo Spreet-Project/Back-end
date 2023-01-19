@@ -45,8 +45,8 @@ public class UserDto {
         @ApiModelProperty(value = "회원 구분")
         private UserRole userRole;
 
-        public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole);
+        public User toEntity(String encodePassword, UserRole userRole) {
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole = userRole);
         }
     }
 
@@ -74,6 +74,22 @@ public class UserDto {
 
     @NoArgsConstructor
     @Getter
+    public static class NaverInfoDto{
+        private String id;
+        private String nickname;
+        private String email;
+        private String profileImage;
+
+        public NaverInfoDto(String id, String nickname, String email, String profileImage){
+            this.id = id;
+            this.nickname = nickname;
+            this.email = email;
+            this.profileImage = profileImage;
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
     public static class CrewResponseDto {
         @ApiModelProperty(value = "로그인 ID")
         private String loginId;
@@ -88,6 +104,17 @@ public class UserDto {
             this.loginId = user.getLoginId();
             this.nickname = user.getNickname();
             this.isCrew = user.isCrew();
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
+    public static class LoginResponseDto{
+        @ApiModelProperty(value = "닉네임")
+        private String nickname;
+
+        public LoginResponseDto(String nickname) {
+            this.nickname = nickname;
         }
     }
 }

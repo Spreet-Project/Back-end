@@ -4,8 +4,6 @@ import com.team1.spreet.entity.Category;
 import com.team1.spreet.entity.Shorts;
 import com.team1.spreet.entity.User;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
@@ -82,6 +80,9 @@ public class ShortsDto {
 		@ApiModelProperty(value = "카테고리")
 		private String category;
 
+		@ApiModelProperty(value = "프로필 이미지")
+		private String profileImageUrl;
+
 		@ApiModelProperty(value = "좋아요 개수")
 		private Long likeCount = 0L;       //좋아요 갯수
 
@@ -95,64 +96,10 @@ public class ShortsDto {
 			this.content = shorts.getContent();
 			this.videoUrl = shorts.getVideoUrl();
 			this.category = shorts.getCategory().value();
+			this.profileImageUrl = shorts.getUser().getProfileImage();
 			this.likeCount = shorts.getLikeCount();
 			this.isLike = isLike;
 		}
 	}
 
-	@NoArgsConstructor
-	@Getter
-	public static class SimpleResponseDto {
-		@ApiModelProperty(value = "쇼츠 ID")
-		private Long shortsId;
-
-		@ApiModelProperty(value = "제목")
-		private String title;
-
-		@ApiModelProperty(value = "영상 url")
-		private String videoUrl;
-
-		@ApiModelProperty(value = "카테고리")
-		private String category;
-
-		public SimpleResponseDto(Shorts shorts) {
-			this.shortsId = shorts.getId();
-			this.category = shorts.getCategory().value();
-			this.title = shorts.getTitle();
-			this.videoUrl = shorts.getVideoUrl();
-		}
-	}
-
-	@NoArgsConstructor
-	@Getter
-	public static class CategoryResponseDto {
-		@ApiModelProperty(value = "랩 리스트")
-		private List<ShortsDto.SimpleResponseDto> rap = new ArrayList<>();
-
-		@ApiModelProperty(value = "디제이 리스트")
-		private List<ShortsDto.SimpleResponseDto> dj = new ArrayList<>();
-
-		@ApiModelProperty(value = "비트박스 리스트")
-		private List<ShortsDto.SimpleResponseDto> beatBox = new ArrayList<>();
-
-		@ApiModelProperty(value = "스트릿댄스 리스트")
-		private List<ShortsDto.SimpleResponseDto> streetDance = new ArrayList<>();
-
-		@ApiModelProperty(value = "그래피티 리스트")
-		private List<ShortsDto.SimpleResponseDto> graffiti = new ArrayList<>();
-
-		@ApiModelProperty(value = "기타 리스트")
-		private List<ShortsDto.SimpleResponseDto> etc = new ArrayList<>();
-
-		public CategoryResponseDto(List<SimpleResponseDto> rap, List<SimpleResponseDto> dj,
-			List<SimpleResponseDto> beatBox, List<SimpleResponseDto> streetDance,
-			List<SimpleResponseDto> graffiti, List<SimpleResponseDto> etc) {
-			this.rap = rap;
-			this.dj = dj;
-			this.beatBox = beatBox;
-			this.streetDance = streetDance;
-			this.graffiti = graffiti;
-			this.etc = etc;
-		}
-	}
 }

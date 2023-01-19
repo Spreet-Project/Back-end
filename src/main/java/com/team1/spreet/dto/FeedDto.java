@@ -1,13 +1,14 @@
 package com.team1.spreet.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.entity.Feed;
+import com.team1.spreet.entity.User;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Getter
 public class FeedDto {
@@ -24,6 +25,9 @@ public class FeedDto {
         @ApiModelProperty(value = "이미지 파일", required = false)
         private List<MultipartFile> file;
 
+        public Feed toEntity(User user){
+            return new Feed(this.title, this.content, user);
+        }
     }
 
     @NoArgsConstructor
@@ -50,11 +54,7 @@ public class FeedDto {
         @ApiModelProperty(value = "좋아요 상태")
         private boolean isLike;
 
-        @ApiModelProperty(value = "피드 댓글 리스트")
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private List<FeedCommentDto.ResponseDto> commentList;
-
-        public ResponseDto(Feed feed, List<String> imageUrlList, Long feedLike, boolean isLike, List<FeedCommentDto.ResponseDto> commentList) {
+        public ResponseDto(Feed feed, List<String> imageUrlList, Long feedLike, boolean isLike) {
             this.feedId = feed.getId();
             this.nickname = feed.getUser().getNickname();
             this.title = feed.getTitle();
@@ -62,25 +62,6 @@ public class FeedDto {
             this.imageUrlList = imageUrlList;
             this.feedLike = feedLike;
             this.isLike = isLike;
-            this.commentList = commentList;
-        }
-    }
-
-    @NoArgsConstructor
-    @Getter
-    public static class RecentFeedDto{
-        @ApiModelProperty(value = "피드 ID")
-        private Long feedId;
-
-        @ApiModelProperty(value = "제목")
-        private String title;
-
-        public RecentFeedDto(Feed feed) {
-            this.feedId = feed.getId();
-            this.title = feed.getTitle();
-        }
-        public static RecentFeedDto entityToDto(Feed feed) {
-            return new RecentFeedDto(feed);
         }
     }
 }
