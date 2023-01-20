@@ -28,7 +28,7 @@ public class SocialLoginController {
 	}
 
 	@ApiOperation(value = "카카오 로그인 API")
-	@PostMapping("/kakao/callback")
+	@GetMapping("/kakao/callback")
 	public CustomResponseBody kakaoLogin(@RequestParam @ApiParam(value = "로그인 코드") String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
 		return new CustomResponseBody<>(SuccessStatusCode.LOGIN_SUCCESS, kakaoLoginService.kakaoLogin(code, httpServletResponse));
 	}

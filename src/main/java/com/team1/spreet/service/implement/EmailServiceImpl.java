@@ -94,7 +94,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendSimpleMessage(String email)throws Exception {
-        if (userRepository.findByEmail(email).isPresent()){ throw new RestApiException(ErrorStatusCode.EMAIL_ALREADY_EXIST);}
+        if (userRepository.findByEmail(email).isPresent()){ throw new RestApiException(ErrorStatusCode.OVERLAPPED_EMAIL);}
 
 
         ePw = createKey();
@@ -104,7 +104,7 @@ public class EmailServiceImpl implements EmailService {
             emailSender.send(message);
         } catch (MailException e) {
             e.printStackTrace();
-            throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT_EXCEPTION);
+            throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT);
         }
     }
 

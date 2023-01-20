@@ -6,16 +6,13 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.EventCommentRepository;
 import com.team1.spreet.repository.EventRepository;
-import com.team1.spreet.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,26 +21,21 @@ public class EventService {
 
 	private final AwsS3Service awsS3Service;
 	private final EventRepository eventRepository;
-	private final UserRepository userRepository;
 	private final EventCommentRepository eventCommentRepository;
 
 	// Event 게시글 등록
-	public SuccessStatusCode saveEvent(EventDto.RequestDto requestDto, Long userId) {
-		User user = getUser(userId);
-
+	public void saveEvent(EventDto.RequestDto requestDto, User user) {
 		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
 
 		eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
-
-		return SuccessStatusCode.SAVE_EVENT;
 	}
 
 	// Event 게시글 수정
-	public SuccessStatusCode updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId, Long userId) {
+	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId, User user) {
 		Event event = checkEvent(eventId);
 		String eventImageUrl;
 
-		if (checkOwner(event, userId)) {
+		if (checkOwner(event, user.getId())) {
 			if (!requestDto.getFile().isEmpty()) {
 				//첨부파일 수정시 기존 첨부파일 삭제
 				String fileName = event.getEventImageUrl().split(".com/")[1];
@@ -58,20 +50,17 @@ public class EventService {
 			event.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getLocation(),
 				requestDto.getDate(), requestDto.getTime(), eventImageUrl);
 		}
-		return SuccessStatusCode.UPDATE_EVENT;
 	}
 
 	// Event 게시글 삭제
-	public SuccessStatusCode deleteEvent(Long eventId, Long userId) {
-		User user = getUser(userId);
-
+	public void deleteEvent(Long eventId, User user) {
 		Event event = checkEvent(eventId);
 
-		if (user.getUserRole() == UserRole.ROLE_ADMIN ||checkOwner(event, userId)) {
-			eventCommentRepository.updateIsDeletedTrueByEventId(eventId);
-			eventRepository.updateIsDeletedTrue(eventId);
+		if (user.getUserRole() == UserRole.ROLE_ADMIN ||checkOwner(event, user.getId())) {
+			String fileName = event.getEventImageUrl().split(".com/")[1];
+			awsS3Service.deleteFile(fileName);
+			deleteEventById(eventId);
 		}
-		return SuccessStatusCode.DELETE_EVENT;
 	}
 
 	// Event 게시글 상세조회
@@ -98,7 +87,7 @@ public class EventService {
 	// Event 게시글이 존재하는지 확인
 	private Event checkEvent(Long eventId) {
 		return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_EVENT)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
 		);
 	}
 
@@ -110,10 +99,8 @@ public class EventService {
 		return true;
 	}
 
-	// User 객체 가져오기
-	private User getUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NULL_USER_ID_DATA_EXCEPTION));
+	private void deleteEventById(Long eventId) {
+		eventCommentRepository.updateIsDeletedTrueByEventId(eventId);
+		eventRepository.updateIsDeletedTrue(eventId);
 	}
-
 }

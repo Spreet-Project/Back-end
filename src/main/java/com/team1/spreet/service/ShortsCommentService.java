@@ -10,11 +10,12 @@ import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class ShortsCommentService {
 		Shorts shorts = checkShorts(shortsId);
 		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
 
-		return SuccessStatusCode.SAVE_SHORTS_COMMENT;
+		return SuccessStatusCode.SAVE_COMMENT;
 	}
 
 	// shortsComment 수정
@@ -39,7 +40,7 @@ public class ShortsCommentService {
 		if (checkOwner(shortsComment, user.getId())) {
 			shortsComment.updateShortsComment(requestDto.getContent());
 		}
-		return SuccessStatusCode.UPDATE_SHORTS_COMMENT;
+		return SuccessStatusCode.UPDATE_COMMENT;
 	}
 
 	// shortsComment 삭제
@@ -49,7 +50,7 @@ public class ShortsCommentService {
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shortsComment, user.getId())) {
 			shortsCommentRepository.updateIsDeletedTrueById(shortsCommentId);
 		}
-		return SuccessStatusCode.DELETE_SHORTS_COMMENT;
+		return SuccessStatusCode.DELETE_COMMENT;
 	}
 
 	// shortsComment 조회
@@ -70,14 +71,14 @@ public class ShortsCommentService {
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
 		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
 	// shortsComment 가 존재하는지 확인
 	private ShortsComment checkShortsComment(Long shortsCommentId) {
 		return shortsCommentRepository.findByIdAndIsDeletedFalse(shortsCommentId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_FOUND_SHORTS_COMMENT)
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_COMMENT)
 		);
 	}
 
