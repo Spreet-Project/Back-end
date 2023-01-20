@@ -102,12 +102,13 @@ public class KakaoLoginService {
         Long id = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
+        String profileImage = jsonNode.get("properties").get("profile_image").asText();
 
-        return new UserDto.KakaoInfoDto(id, nickname, email);
+        return new UserDto.KakaoInfoDto(id, nickname, email, profileImage);
     }
 
     private User registerKakaoUserIfNeeded(UserDto.KakaoInfoDto kakaoInfoDto) {
-        Long kakaoId = kakaoInfoDto.getId();
+        String kakaoId = kakaoInfoDto.getId().toString();
         User kakaoUser = userRepository.findByLoginId(kakaoId.toString()).orElse(null);
         if (kakaoUser == null) {
             String kakaoEmail = kakaoInfoDto.getEmail();
@@ -120,8 +121,8 @@ public class KakaoLoginService {
                 String encodedPassword = passwordEncoder.encode(password);
 
                 String email = kakaoInfoDto.getEmail();
-
-                kakaoUser = new User(kakaoId, kakaoInfoDto.getNickname(), encodedPassword, email);
+                String profileImage = kakaoInfoDto.getProfileImage();
+                kakaoUser = new User(kakaoId, kakaoInfoDto.getNickname(), encodedPassword, email, profileImage);
             }
 
             userRepository.save(kakaoUser);
