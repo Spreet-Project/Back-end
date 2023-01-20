@@ -9,12 +9,16 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
+import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -44,8 +48,10 @@ public class KakaoLoginService {
         //3. 필요시에 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoInfoDto);
 
-        //4. JWT 토큰 반환
-        String createToken = jwtUtil.createToken(kakaoUser.getId(), kakaoUser.getUserRole());
+        UserDetails kakaoUserDetails = new UserDetailsImpl(kakaoUser);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(kakaoUserDetails, null, kakaoUserDetails.getAuthorities());
+
+        String createToken = jwtUtil.createToken(authentication);
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
