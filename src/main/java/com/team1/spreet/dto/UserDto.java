@@ -3,12 +3,13 @@ package com.team1.spreet.dto;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 public class UserDto {
@@ -65,10 +66,13 @@ public class UserDto {
         private String nickname;
         private String email;
 
-        public KakaoInfoDto(Long id, String nickname, String email) {
+        private String profileImage;
+
+        public KakaoInfoDto(Long id, String nickname, String email, String profileImage) {
             this.id = id;
             this.nickname = nickname;
             this.email = email;
+            this.profileImage = profileImage;
         }
     }
 

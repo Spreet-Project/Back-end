@@ -62,7 +62,7 @@ public class User extends TimeStamped{
       프로필 사진 추가, 네이버 로그인 구현으로 인해 이 생성자는 불필요.
       카카오 로그인 코드 변경 후 삭제 필요!
      */
-    public User(Long kakaoId, String nickname, String password, String email) {
+/*    public User(Long kakaoId, String nickname, String password, String email) {
         this.loginId = kakaoId.toString();
         this.nickname = nickname;
         this.password = password;
@@ -70,7 +70,7 @@ public class User extends TimeStamped{
         this.userRole = UserRole.ROLE_USER;
         this.isDeleted = Boolean.FALSE;
         this.isCrew = Boolean.FALSE;
-    }
+    }*/
 
     public User(String socialId, String nickname, String password, String email, String profileImage) {
         this.loginId = socialId;
