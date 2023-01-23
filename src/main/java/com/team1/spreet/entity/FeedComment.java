@@ -34,9 +34,6 @@ public class FeedComment extends TimeStamped {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    public void setDeleted(){
-        this.isDeleted = true;
-    }
     public void update(String content){
         this.content = content;
     }
@@ -46,5 +43,4 @@ public class FeedComment extends TimeStamped {
         this.feed = feed;
         this.user = user;
     }
-
 }

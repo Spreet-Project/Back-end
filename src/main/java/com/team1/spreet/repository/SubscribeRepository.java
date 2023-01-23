@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubscribeRepository extends JpaRepository<Subscribe, Long> {
-    Optional<List<Subscribe>> findAllByPublisher(User publisher);
+    Optional<List<Subscribe>> findByPublisher(User publisher);
 
     Subscribe findByPublisherAndSubscriber(User publisher, User subscriber);
 }

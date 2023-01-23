@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ImageRepository extends JpaRepository<FeedImage, Long> {
-    List<FeedImage> findAllByFeedId(Long feedId);
+    List<FeedImage> findByFeedId(Long feedId);
 
 }
