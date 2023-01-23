@@ -61,6 +61,37 @@ public class ShortsDto {
 
 	@NoArgsConstructor
 	@Getter
+	public static class SimpleResponseDto {
+		@ApiModelProperty(value = "쇼츠 ID")
+		private Long shortsId;
+
+		@ApiModelProperty(value = "닉네임")
+		private String nickname;
+
+		@ApiModelProperty(value = "제목")
+		private String title;
+
+		@ApiModelProperty(value = "영상 url")
+		private String videoUrl;
+
+		@ApiModelProperty(value = "카테고리")
+		private String category;
+
+		@ApiModelProperty(value = "프로필 이미지")
+		private String profileImageUrl;
+
+		public SimpleResponseDto(Shorts shorts) {
+			this.shortsId = shorts.getId();
+			this.nickname = shorts.getUser().getNickname();
+			this.title = shorts.getTitle();
+			this.videoUrl = shorts.getVideoUrl();
+			this.category = shorts.getCategory().value();
+			this.profileImageUrl = shorts.getUser().getProfileImage();
+		}
+	}
+
+	@NoArgsConstructor
+	@Getter
 	public static class ResponseDto {
 		@ApiModelProperty(value = "쇼츠 ID")
 		private Long shortsId;
