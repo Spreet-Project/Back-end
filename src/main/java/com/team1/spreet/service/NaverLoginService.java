@@ -20,7 +20,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,8 +38,6 @@ public class NaverLoginService {
 	private String clientSecret;
 	@Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
 	private String userInfoUri;
-	@Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
-	private String redirectUri;
 	@Value("${spring.security.oauth2.client.provider.naver.token-uri}")
 	private String tokenUri;
 	private final UserRepository userRepository;
@@ -60,10 +57,10 @@ public class NaverLoginService {
 		User naverUser = registerNaverUserIfNeeded(naverInfoDto);
 
 		//4. 강제 로그인
-		securityLogin(naverUser);
+		Authentication authentication = securityLogin(naverUser);
 
 		//5. 토큰발급후 response
-		String token = jwtUtil.createToken(naverUser.getId(), naverUser.getUserRole());
+		String token = jwtUtil.createToken(authentication);
 		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
 		return new UserDto.LoginResponseDto(naverUser.getNickname());
@@ -78,7 +75,6 @@ public class NaverLoginService {
 		body.add("client_id", clientId);
 		body.add("client_secret", clientSecret);
 		body.add("grant_type", "authorization_code");
-		body.add("redirect_uri", redirectUri);
 		body.add("code", code);
 		body.add("state", state);
 
@@ -160,13 +156,13 @@ public class NaverLoginService {
 	}
 
 	// 시큐리티 강제 로그인
-	private void securityLogin(User user) {
-		UserDetails userDetails = new UserDetailsImpl(user);
+	private Authentication securityLogin(User user) {
 		if (user.isDeleted()) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
 		}
-		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+		UserDetails userDetails = new UserDetailsImpl(user);
+
+		return new UsernamePasswordAuthenticationToken(userDetails,
 			null, userDetails.getAuthorities());
-		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 }

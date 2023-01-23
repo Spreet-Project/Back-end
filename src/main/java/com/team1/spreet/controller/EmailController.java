@@ -25,7 +25,7 @@ public class EmailController {
     }
 
     @ApiOperation(value = "이메일 인증 API")
-    @GetMapping("/api/user/confirm-email")
+    @PostMapping("/api/user/confirm-email")
     public CustomResponseBody emailConfirm(@RequestBody @ApiParam(value = "이메일 인증을 위한 정보") EmailDto emailDto) throws Exception{
         emailService.emailConfirm(emailDto);
         return new CustomResponseBody<>(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
