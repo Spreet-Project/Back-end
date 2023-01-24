@@ -76,7 +76,7 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
     }
 
-    public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
+    private UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
         User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
