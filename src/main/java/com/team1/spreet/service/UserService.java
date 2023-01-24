@@ -28,7 +28,6 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    //회원가입
     public void signup(final UserDto.SignupRequestDto requestDto) {
         if (userRepository.findByLoginId(requestDto.getLoginId()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
@@ -36,7 +35,7 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
         }
 
-        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()), UserRole.ROLE_USER));
+        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword())));
     }
 
     public void userWithdraw( String password, User user) {
@@ -47,7 +46,6 @@ public class UserService {
         }
     }
 
-    //로그인
     public UserDto.LoginResponseDto login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
 
         // 크루 승인 대기 중인 유저는 로그인 불가
@@ -66,20 +64,17 @@ public class UserService {
         return getNickname(requestDto);
     }
 
-    //아이디 중복 확인
     public void idCheck(String loginId) {
         if (userRepository.findByLoginId(loginId).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
     }
 
-    //닉네임 중복 확인
     public void nicknameCheck(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
     }
 
-    //로그인 아이디로 닉네임 받아오기
-    private UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
+    public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
         User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );

@@ -1,7 +1,6 @@
 package com.team1.spreet.dto;
 
 import com.team1.spreet.entity.User;
-import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,17 +36,20 @@ public class UserDto {
         @ApiModelProperty(value = "비밀번호", required = true)
         private String password;
 
+        @ApiModelProperty(value = "이메일 인증 여부", required = true)
+        private boolean emailConfirm;
+
         //이메일 형식
         @Email
         @NotNull(message = "이메일은 필수 입력 항목입니다.")
         @ApiModelProperty(value = "이메일", required = true)
         private String email;
 
-        @ApiModelProperty(value = "회원 구분")
-        private UserRole userRole;
+        @ApiModelProperty(value = "프로필 이미지", required = true)
+        private String profileImage;
 
-        public User toEntity(String encodePassword, UserRole userRole) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.userRole = userRole);
+        public User toEntity(String encodePassword) {
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.profileImage);
         }
     }
 

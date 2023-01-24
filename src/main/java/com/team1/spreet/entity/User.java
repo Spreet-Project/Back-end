@@ -41,35 +41,11 @@ public class User extends TimeStamped{
     @Column(nullable = false)
     private boolean isCrew;    //크루회원 여부
 
-    @Column(nullable = true)       // 카카오 로그인에서 프로필 사진 구현이 끝나면 nullable = false 로 변경
+    @Column(nullable = false)       // 카카오 로그인에서 프로필 사진 구현이 끝나면 nullable = false 로 변경
     private String profileImage;   //프로필 사진
 
-    public User(String loginId, String nickname, String password, String email, UserRole userRole) {
+    public User(String loginId, String nickname, String password, String email, String profileImage) {
         this.loginId = loginId;
-        this.nickname = nickname;
-        this.password = password;
-        this.email = email;
-        this.userRole = userRole;
-        this.isDeleted = Boolean.FALSE;
-        this.isCrew = Boolean.FALSE;
-    }
-
-    /*
-      프로필 사진 추가, 네이버 로그인 구현으로 인해 이 생성자는 불필요.
-      카카오 로그인 코드 변경 후 삭제 필요!
-     */
-/*    public User(Long kakaoId, String nickname, String password, String email) {
-        this.loginId = kakaoId.toString();
-        this.nickname = nickname;
-        this.password = password;
-        this.email = email;
-        this.userRole = UserRole.ROLE_USER;
-        this.isDeleted = Boolean.FALSE;
-        this.isCrew = Boolean.FALSE;
-    }*/
-
-    public User(String socialId, String nickname, String password, String email, String profileImage) {
-        this.loginId = socialId;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
@@ -92,7 +68,14 @@ public class User extends TimeStamped{
         this.userRole = UserRole.ROLE_USER;
     }
 
-    public void userQuit(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    //프로필 이미지 디폴트값
+    @PrePersist
+    public void prePersist(){
+        this.profileImage =
+                this.profileImage == null ||
+                this.profileImage.equals("https://ssl.pstatic.net/static/pwe/address/img_profile.png") ||
+                this.profileImage.equals("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg")
+                ? "https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/spreet+%E1%84%85%E1%85%A9%E1%84%80%E1%85%A92.png"
+                : this.profileImage;
     }
 }
