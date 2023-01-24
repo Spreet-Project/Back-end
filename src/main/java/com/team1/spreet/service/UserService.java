@@ -33,6 +33,8 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
         } else if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
+        } else if (!requestDto.isEmailConfirm()) {
+            throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_EXCEPTION);
         }
 
         userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword())));

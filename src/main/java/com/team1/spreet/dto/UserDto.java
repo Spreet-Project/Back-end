@@ -16,11 +16,7 @@ public class UserDto {
     @Getter
     public static class SignupRequestDto {
 
-        //5자 이상 20자 이하, (알파벳(필수), 특수문자, 숫자)가능
-        //2~10자, 알파벳 또는 한글 중 하나는 필수, 숫자 가능
-
         @Size(min = 5, max = 20, message = "아이디는 5~20자 이내의 길이로만 이루어질 수 있습니다.")
-//        @Pattern(regexp = "^*[a-zA-Z][0-9][\\{\\}\\[\\]\\/?.,;:|\\)*~`!^\\-_+<>@\\#$%&\\\\\\=\\(\\'\\\"]")
         @NotBlank(message = "아이디는 필수 입력 항목입니다.")
         @ApiModelProperty(value = "로그인 ID", required = true)
         private String loginId;
@@ -36,14 +32,15 @@ public class UserDto {
         @ApiModelProperty(value = "비밀번호", required = true)
         private String password;
 
-        @ApiModelProperty(value = "이메일 인증 여부", required = true)
-        private boolean emailConfirm;
-
         //이메일 형식
         @Email
-        @NotNull(message = "이메일은 필수 입력 항목입니다.")
+        @NotBlank(message = "이메일은 필수 입력 항목입니다.")
         @ApiModelProperty(value = "이메일", required = true)
         private String email;
+
+        @ApiModelProperty(value = "이메일 인증 여부", required = true)
+        @NotNull(message = "이메일 인증 확인 여부가 필요합니다.")
+        private boolean emailConfirm;
 
         @ApiModelProperty(value = "프로필 이미지", required = true)
         private String profileImage;
