@@ -17,10 +17,12 @@ import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@DynamicUpdate
 public class Shorts extends TimeStamped {
 
     @Id
@@ -54,8 +56,7 @@ public class Shorts extends TimeStamped {
     @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShortsComment> shortsCommentList = new ArrayList<>();  //쇼츠 코맨트 양방향
 
-    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL
-            , orphanRemoval = true)
+    @OneToMany(mappedBy = "shorts", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShortsLike> shortsLikeList = new ArrayList<>();        //쇼츠 좋아요 양방향
 
     public Shorts(String title, String content, String videoUrl, Category category, User user) {
@@ -71,6 +72,10 @@ public class Shorts extends TimeStamped {
         this.content = content;
         this.videoUrl = videoUrl;
         this.category = category;
+    }
+
+    public void isDeleted() {
+        this.isDeleted = true;
     }
 
     public void addLike() {
