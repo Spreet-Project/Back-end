@@ -26,6 +26,6 @@ public class ShortsLikeController {
 	@PostMapping("/{shortsId}")
 	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(@PathVariable @ApiParam(value = "좋아요 등록/취소 하기 위한 쇼츠 ID") Long shortsId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return shortsLikeService.setShortsLike(shortsId, userDetails);
+		return shortsLikeService.setShortsLike(shortsId, userDetails.getUser());
 	}
 }

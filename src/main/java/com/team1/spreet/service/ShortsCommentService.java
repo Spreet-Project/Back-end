@@ -7,15 +7,13 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,31 +24,29 @@ public class ShortsCommentService {
 	private final ShortsRepository shortsRepository;
 
 	// shortsComment 등록
-	public SuccessStatusCode saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, User user) {
+	public void saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
-
-		return SuccessStatusCode.SAVE_COMMENT;
 	}
 
 	// shortsComment 수정
-	public SuccessStatusCode updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, User user) {
+	public void updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, User user) {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
-		if (checkOwner(shortsComment, user.getId())) {
-			shortsComment.updateShortsComment(requestDto.getContent());
+		if (!user.getId().equals(shortsComment.getUser().getId())) {
+			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		return SuccessStatusCode.UPDATE_COMMENT;
+		shortsComment.updateShortsComment(requestDto.getContent());
 	}
 
 	// shortsComment 삭제
-	public SuccessStatusCode deleteShortsComment(Long shortsCommentId, User user) {
+	public void deleteShortsComment(Long shortsCommentId, User user) {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
-		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shortsComment, user.getId())) {
-			shortsCommentRepository.updateIsDeletedTrueById(shortsCommentId);
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shortsComment.getUser().getId()) ) {
+			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		return SuccessStatusCode.DELETE_COMMENT;
+		shortsComment.idDeleted();
 	}
 
 	// shortsComment 조회
@@ -77,17 +73,8 @@ public class ShortsCommentService {
 
 	// shortsComment 가 존재하는지 확인
 	private ShortsComment checkShortsComment(Long shortsCommentId) {
-		return shortsCommentRepository.findByIdAndIsDeletedFalse(shortsCommentId).orElseThrow(
+		return shortsCommentRepository.findByIdAndIsDeletedFalseWithUser(shortsCommentId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_COMMENT)
 		);
 	}
-
-	// shortsComment 작성자가 user 와 일치하는지 확인
-	private boolean checkOwner(ShortsComment shortsComment, Long userId) {
-		if (!userId.equals(shortsComment.getUser().getId())) {
-			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
-		}
-		return true;
-	}
-
 }

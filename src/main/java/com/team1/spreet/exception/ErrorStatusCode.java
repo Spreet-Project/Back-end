@@ -9,6 +9,7 @@ public enum ErrorStatusCode {
     OVERLAPPED_ID("이미 존재하는 아이디입니다.", HttpStatus.BAD_REQUEST.value()),
     OVERLAPPED_NICKNAME("이미 존재하는 닉네임입니다.", HttpStatus.BAD_REQUEST.value()),
     DELETED_ACCOUNT("최근에 회원탈퇴한 계정입니다.", HttpStatus.BAD_REQUEST.value()),
+    PASSWORD_CONFIRM_INCORRECT("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
     INVALID_FILE("잘못된 형식의 파일 입니다.", HttpStatus.BAD_REQUEST.value()),
     FAIL_FILE_UPLOAD("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value()),
     NOT_EXIST_SHORTS("존재하지 않는 쇼츠입니다.", HttpStatus.BAD_REQUEST.value()),
@@ -23,6 +24,7 @@ public enum ErrorStatusCode {
             "이유1: 인증 요청을 하지 않았거나 정상적으로 전송이 되지 않았을 수 있습니다. / " +
             "이유2: 인증 만료기간인 3분이 지났습니다.", HttpStatus.BAD_REQUEST.value()),
     OVERLAPPED_EMAIL("중복된 이메일입니다.", HttpStatus.BAD_REQUEST.value()),
+    EMAIL_CONFIRM_EXCEPTION("이메일 인증이 되지 않았습니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_EVENT("존재하지 않는 행사 게시글 입니다.", HttpStatus.BAD_REQUEST.value());
 
     private final String msg;
