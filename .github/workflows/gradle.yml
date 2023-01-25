@@ -107,7 +107,7 @@ jobs:
         with:
           status: ${{ job.status }}
           fields: workflow,job,commit,repo,author,took,ref
-          author_name: Sora
+          author_name: Github Action Bot
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          if: always()
+        if: always()
