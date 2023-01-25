@@ -6,10 +6,13 @@ on:
     branches: [ deploy ]
   
 env:
+  AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: spreet-github-actions-bucket
   CODE_DEPLOY_APPLICATION_NAME: spreet-deploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: spreet-deploy-deployment-group 
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: spreet-deploy-deployment-group
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   
 permissions:
   contents: read  
@@ -62,9 +65,9 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        AWS-ACCESS-KEY-ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS-SECRET-ACCESS-KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ env.AWS_REGION }}
 
     # (5) 빌드 결과물을 S3 버킷에 업로드
     - name: Upload to AWS S3
@@ -100,3 +103,14 @@ jobs:
       run: chmod +x ./gradlew      
     - name: Build with Gradle
       run: ./gradlew build
+
+      # 빌드 결과를 Slack 으로 알려주기
+    - name: Send Msg to Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: workflow,job,commit,repo,author,took,ref
+        author_name: Sora
+      env:
+        SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+      if: always()
