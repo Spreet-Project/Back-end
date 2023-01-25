@@ -2,7 +2,6 @@ package com.team1.spreet.controller;
 
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.FeedDto;
-import com.team1.spreet.dto.FeedLikeDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.FeedService;
@@ -47,8 +46,9 @@ public class FeedController {
     @ApiOperation(value = "피드 등록 API")
     @PostMapping("")
     public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute @ApiParam(value = "피드 등록 정보") FeedDto.RequestDto requestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return new CustomResponseBody<>(feedService.saveFeed(requestDto, userDetails));
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+        feedService.saveFeed(requestDto, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.SAVE_FEED);
     }
     //feed 수정
     @ApiOperation(value = "피드 수정 API")
@@ -56,20 +56,16 @@ public class FeedController {
     public CustomResponseBody<SuccessStatusCode> updateFeed(@PathVariable @ApiParam(value = "수정할 피드 ID") Long feedId,
         @ModelAttribute @ApiParam(value = "피드 수정 정보") FeedDto.RequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return new CustomResponseBody<>(feedService.updateFeed(feedId, requestDto, userDetails));
+        feedService.updateFeed(feedId, requestDto, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_FEED);
     }
     //feed 삭제
     @DeleteMapping("/{feedId}")
     @ApiOperation(value = "피드 삭제 API")
     public CustomResponseBody<SuccessStatusCode> deleteFeed(@PathVariable @ApiParam(value = "삭제할 피드 ID") Long feedId,
         @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return new CustomResponseBody<>(feedService.deleteFeed(feedId, userDetails));
+        feedService.deleteFeed(feedId, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.DELETE_FEED);
     }
-    //feed 좋아요
-    @PostMapping("/like/{feedId}")
-    @ApiOperation(value = "피드 좋아요 등록/취소 API")
-    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(@PathVariable @ApiParam(value = "좋아요 등록/취소 할 피드 ID") Long feedId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return feedService.likeFeed(feedId, userDetails);
-    }
+
 }
