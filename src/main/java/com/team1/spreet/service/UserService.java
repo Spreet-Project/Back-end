@@ -33,9 +33,19 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
         } else if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
+        } else if (!requestDto.isEmailConfirm()) {
+            throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_EXCEPTION);
         }
 
-        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()), UserRole.ROLE_USER));
+        userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword())));
+    }
+
+    public void userWithdraw( String password, User user) {
+        if (passwordEncoder.encode(password).equals(user.getPassword())) {
+            userRepository.updateIsDeletedTrueByLoginId(user.getLoginId());
+        } else {
+            throw new RestApiException(ErrorStatusCode.PASSWORD_CONFIRM_INCORRECT);
+        }
     }
 
     public UserDto.LoginResponseDto login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
@@ -66,7 +76,7 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
     }
 
-    public UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
+    private UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {
         User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );

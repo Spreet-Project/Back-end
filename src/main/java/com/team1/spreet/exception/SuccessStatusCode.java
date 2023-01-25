@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum SuccessStatusCode {
 
     SIGNUP_SUCCESS("회원가입 성공", HttpStatus.OK.value()),
+    WITHDRAW_SUCCESS("회원탈퇴 성공", HttpStatus.OK.value()),
     LOGIN_SUCCESS("로그인 성공", HttpStatus.OK.value()),
     SAVE_SHORTS("Shorts 등록 성공", HttpStatus.OK.value()),
     UPDATE_SHORTS("Shorts 수정 성공", HttpStatus.OK.value()),

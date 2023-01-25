@@ -10,8 +10,6 @@ import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
-import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -123,11 +124,6 @@ public class NaverLoginService {
 
 		// 네이버에서 이미지 가져오기
 		String profileImage = jsonNode.get("response").get("profile_image").asText();
-		String naverDefaultImage = "https://ssl.pstatic.net/static/pwe/address/img_profile.png";
-		String defaultImage = "https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/spreet+%E1%84%85%E1%85%A9%E1%84%80%E1%85%A92.png";
-		if (profileImage == null || profileImage.equals(naverDefaultImage)) {
-			profileImage = defaultImage;
-		}
 		return new UserDto.NaverInfoDto(id, nickname, email, profileImage);
 	}
 
