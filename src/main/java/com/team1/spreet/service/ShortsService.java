@@ -8,7 +8,6 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.ShortsCommentRepository;
 import com.team1.spreet.repository.ShortsLikeRepository;
 import com.team1.spreet.repository.ShortsRepository;
@@ -32,47 +31,45 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
-	public SuccessStatusCode saveShorts(ShortsDto.RequestDto requestDto, User user) {
+	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
 		shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
-
-		return SuccessStatusCode.SAVE_SHORTS;
 	}
 
 	// shorts 수정
-	public SuccessStatusCode updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
+	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-		String videoUrl;
-
-		if (checkOwner(shorts, user.getId())) {
-			if (!requestDto.getFile().isEmpty()) {
-				//첨부파일 수정시 기존 첨부파일 삭제
-				String fileName = shorts.getVideoUrl().split(".com/")[1];
-				awsS3Service.deleteFile(fileName);
-
-				//새로운 파일 업로드
-				videoUrl = awsS3Service.uploadFile(requestDto.getFile());
-			} else {
-				//첨부파일 수정 안함
-				videoUrl = shorts.getVideoUrl();
-			}
-			shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory());
+		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
+			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		return SuccessStatusCode.UPDATE_SHORTS;
+
+		String videoUrl;
+		if (!requestDto.getFile().isEmpty()) {
+			//첨부파일 수정시 기존 첨부파일 삭제
+			String fileName = shorts.getVideoUrl().split(".com/")[1];
+			awsS3Service.deleteFile(fileName);
+
+			//새로운 파일 업로드
+			videoUrl = awsS3Service.uploadFile(requestDto.getFile());
+		} else {
+			//첨부파일 수정 안함
+			videoUrl = shorts.getVideoUrl();
+		}
+		shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory());
 	}
 
 
 	// shorts 삭제
-	public SuccessStatusCode deleteShorts(Long shortsId, User user) {
+	public void deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-
-		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(shorts, user.getId())) {
-			String fileName = shorts.getVideoUrl().split(".com/")[1];
-			awsS3Service.deleteFile(fileName);
-			deleteShortsById(shortsId);
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
+			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		return SuccessStatusCode.DELETE_SHORTS;
+
+		String fileName = shorts.getVideoUrl().split(".com/")[1];
+		awsS3Service.deleteFile(fileName);
+		deleteShortsById(shorts);
 	}
 
 	// shorts 상세조회
@@ -89,9 +86,9 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByCategoryAndIsDeletedFalse(category, pageable).getContent();
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, Long userId) {
+		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
@@ -107,6 +104,20 @@ public class ShortsService {
 		return shortsList;
 	}
 
+	// 메인화면에서 shorts 조회(페이징)
+	@Transactional(readOnly = true)
+	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
+
+		List<ShortsDto.SimpleResponseDto> shortsList = new ArrayList<>();
+
+		for (Shorts shorts : shortsByCategory) {
+			shortsList.add(new ShortsDto.SimpleResponseDto(shorts));
+		}
+		return shortsList;
+	}
+
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	private boolean checkLike(Long shortsId, Long userId) {
 		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
@@ -116,23 +127,14 @@ public class ShortsService {
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
+		return shortsRepository.findByIdAndIsDeletedFalseWithUser(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
-	// shorts 작성자와 user 가 같은지 확인
-	private boolean checkOwner(Shorts shorts, Long userId) {
-		if (!shorts.getUser().getId().equals(userId)) {
-			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
-		}
-		return true;
+	private void deleteShortsById(Shorts shorts) {
+		shortsCommentRepository.updateIsDeletedTrueByShortsId(shorts.getId());
+		shortsLikeRepository.deleteByShortsId(shorts.getId());
+		shorts.isDeleted();
 	}
-
-	private void deleteShortsById(Long shortsId) {
-		shortsCommentRepository.updateIsDeletedTrueByShortsId(shortsId);
-		shortsLikeRepository.deleteByShortsId(shortsId);
-		shortsRepository.updateIsDeletedTrueById(shortsId);
-	}
-
 }

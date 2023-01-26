@@ -11,10 +11,12 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@DynamicUpdate
 public class ShortsComment extends TimeStamped {
 
     @Id
@@ -44,5 +46,9 @@ public class ShortsComment extends TimeStamped {
 
     public void updateShortsComment(String content) {
         this.content = content;
+    }
+
+    public void idDeleted() {
+        this.isDeleted = true;
     }
 }

@@ -4,16 +4,16 @@ name: Java CI with Gradle
 on:
   pull_request:
     branches: [ deploy ]
-  
+
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: spreet-github-actions-bucket
   CODE_DEPLOY_APPLICATION_NAME: spreet-deploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: spreet-deploy-deployment-group 
-  
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: spreet-deploy-deployment-group
+
 permissions:
-  contents: read  
-  
+  contents: read
+
 jobs:
   deploy:
     name: Deploy
@@ -21,82 +21,93 @@ jobs:
     environment: production
 
     steps:
-    # (1) 기본 체크아웃
-    - name: Checkout
-      uses: actions/checkout@v2
+      # (1) 기본 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    # (2) JDK 11 세팅
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-        
-    - name: make application.properties
-      run: |
-        echo ">> mkdir & touch"
-        mkdir -p ./src/main/resources
-        cd ./src/main/resources
-        touch ./application-security.properties
-        echo ">> copy application-security.properties"
-        echo "${{ secrets.APPLICATION_SECURITY_PROPERTIES }}" >> ./application-security.properties
-        echo "server.port=8080" >> ./application-security.properties
-        
-      shell: bash    
-        
-    - name: Run chmod to make gradlew executable
-      run: chmod +x ./gradlew    
+      # (2) JDK 11 세팅
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          distribution: 'temurin'
+          java-version: '11'
 
-    # (3) Gradle build (Test 제외)
-    - name: Build with Gradle
-      run: ./gradlew clean build
-#       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-#       with:
-#         arguments: clean build -x test
-       
-    - name: Make zip file
-      run: zip -r ./$GITHUB_SHA.zip .
-      shell: bash  
-    
-    # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: make application.properties
+        run: |
+          echo ">> mkdir & touch"
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application-security.properties
+          echo ">> copy application-security.properties"
+          echo "${{ secrets.APPLICATION_SECURITY_PROPERTIES }}" >> ./application-security.properties
+          echo "server.port=8080" >> ./application-security.properties
 
-    # (5) 빌드 결과물을 S3 버킷에 업로드
-    - name: Upload to AWS S3
-      run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
-#       run: |
-#         aws deploy push \
-#           --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-#           --ignore-hidden-files \
-#           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-#           --source .
-          
-    # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
-    - name: Deploy to AWS EC2 from S3
-      run: |
-        aws deploy create-deployment \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
-  
+        shell: bash
+
+      - name: Run chmod to make gradlew executable
+        run: chmod +x ./gradlew
+
+      # (3) Gradle build (Test 제외)
+      - name: Build with Gradle
+        run: ./gradlew clean build
+          #       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+          #       with:
+          #         arguments: clean build -x test
+
+      - name: Make zip file
+        run: zip -r ./$GITHUB_SHA.zip .
+        shell: bash
+
+      # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # (5) 빌드 결과물을 S3 버킷에 업로드
+      - name: Upload to AWS S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+          #       run: |
+          #         aws deploy push \
+          #           --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          #           --ignore-hidden-files \
+          #           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          #           --source .
+
+      # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
+      - name: Deploy to AWS EC2 from S3
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew      
-    - name: Build with Gradle
-      run: ./gradlew build
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+
+        # 빌드 결과를 Slack 으로 알려주기
+      - name: Send Msg to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: workflow,job,commit,repo,author,took,ref
+          author_name: Github Action Bot
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()

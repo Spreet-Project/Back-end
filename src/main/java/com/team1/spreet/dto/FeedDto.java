@@ -48,6 +48,9 @@ public class FeedDto {
         @ApiModelProperty(value = "이미지 url 리스트")
         private List<String> imageUrlList;
 
+        @ApiModelProperty(value = "프로필 이미지")
+        private String profileImageUrl;
+
         @ApiModelProperty(value = "좋아요 개수")
         private Long feedLike;
 
@@ -60,6 +63,7 @@ public class FeedDto {
             this.title = feed.getTitle();
             this.content = feed.getContent();
             this.imageUrlList = imageUrlList;
+            this.profileImageUrl = feed.getUser().getProfileImage();
             this.feedLike = feedLike;
             this.isLike = isLike;
         }

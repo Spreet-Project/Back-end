@@ -24,22 +24,26 @@ public class FeedCommentController {
     //댓글 생성
     @ApiOperation(value = "피드 댓글 등록 API")
     @PostMapping("/{feedId}/comment")
-    public CustomResponseBody<FeedCommentDto.ResponseDto> saveFeedComment(@PathVariable @ApiParam(value = "댓글 등록할 피드 ID") Long feedId,
+    public CustomResponseBody<SuccessStatusCode> saveFeedComment(@PathVariable @ApiParam(value = "댓글 등록할 피드 ID") Long feedId,
         @RequestBody @ApiParam(value = "등록할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(SuccessStatusCode.SAVE_COMMENT,feedCommentService.saveFeedComment(feedId, requestDto, userDetails));
+        feedCommentService.saveFeedComment(feedId, requestDto, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.SAVE_COMMENT);
     }
     //댓글 수정
     @ApiOperation(value = "피드 댓글 수정 API")
     @PutMapping("/comment/{commentId}")
-    public CustomResponseBody<FeedCommentDto.ResponseDto> updateFeedComment(@PathVariable @ApiParam(value = "댓글 수정할 피드 ID") Long commentId,
+    public CustomResponseBody<SuccessStatusCode> updateFeedComment(@PathVariable @ApiParam(value = "댓글 수정할 피드 ID") Long commentId,
         @RequestBody @ApiParam(value = "수정할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_COMMENT, feedCommentService.updateFeedComment(commentId, requestDto, userDetails));
+        feedCommentService.updateFeedComment(commentId, requestDto, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_COMMENT);
     }
     //댓글 삭제
     @ApiOperation(value = "피드 댓글 삭제 API")
     @DeleteMapping("/comment/{commentId}")
-    private CustomResponseBody<SuccessStatusCode> deleteFeedComment(@PathVariable @ApiParam(value = "댓글 삭제할 피드 ID") Long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(feedCommentService.deleteFeedComment(commentId, userDetails));
+    private CustomResponseBody<SuccessStatusCode> deleteFeedComment(@PathVariable @ApiParam(value = "댓글 삭제할 피드 ID") Long commentId,
+                                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        feedCommentService.deleteFeedComment(commentId, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.DELETE_COMMENT);
     }
 
     //댓글 조회

@@ -2,10 +2,11 @@ package com.team1.spreet.dto;
 
 import com.team1.spreet.entity.FeedComment;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
 
 public class FeedCommentDto {
     @Getter
@@ -25,6 +26,9 @@ public class FeedCommentDto {
         @ApiModelProperty(value = "피드 댓글 내용")
         private String content;
 
+        @ApiModelProperty(value = "프로필 이미지")
+        private String profileImageUrl;
+
         @ApiModelProperty(value = "작성 일자")
         private LocalDateTime createdAt;
 
@@ -35,6 +39,7 @@ public class FeedCommentDto {
             this.commentId = feedComment.getId();
             this.nickname = feedComment.getUser().getNickname();
             this.content = feedComment.getContent();
+            this.profileImageUrl = feedComment.getUser().getProfileImage();
             this.createdAt = feedComment.getCreatedAt();
             this.modifiedAt = feedComment.getModifiedAt();
         }

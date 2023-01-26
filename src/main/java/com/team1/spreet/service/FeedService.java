@@ -1,14 +1,10 @@
 package com.team1.spreet.service;
 
-import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.FeedDto;
-import com.team1.spreet.dto.FeedLikeDto;
 import com.team1.spreet.entity.*;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.*;
-import com.team1.spreet.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +24,6 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final ImageRepository imageRepository;
-    private final UserRepository userRepository;
     private final AlertService alertService;
     private final SubscribeRepository subscribeRepository;
 
@@ -44,14 +39,10 @@ public class FeedService {
         for (Feed feed : feedList) {
             Long feedLike = feedLikeRepository.countByFeedId(feed.getId());    //좋아요 개수 조회
             //저장된 이미지 조회
-            List<String> imageUrlList = new ArrayList<>();
-            List<FeedImage> imageList = imageRepository.findAllByFeedId(feed.getId());
-            for (FeedImage image : imageList) {
-                imageUrlList.add(image.getImageUrl());
-            }
-            boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
+            List<String> imageUrlList = getFeedImageUrlList(feed.getId());
             //로그인 여부에 따라 좋아요 추가
             if (userId != 0L) {
+                boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
                 recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, isLike));
             }else{
                 recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, false));
@@ -62,84 +53,47 @@ public class FeedService {
     //feed 조회
     @Transactional(readOnly = true)
     public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        Long feedLike = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
-        //저장된 이미지 조회
-        List<String> imageUrlList = new ArrayList<>();
-        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
-        for (FeedImage image : imageList) {
-            imageUrlList.add(image.getImageUrl());
-        }
+        Feed feed = isFeedWithUser(feedId);
+        Long feedLikeCount = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
+        List<String> imageUrlList = getFeedImageUrlList(feedId);
         //로그인 여부 및 좋아요 여부 확인
         if (userId != 0L) {
             boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
-            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, isLike);
+            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, isLike);
         }else{
-            return new FeedDto.ResponseDto(feed, imageUrlList,feedLike, false);
+            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, false);
         }
     }
     //feed 저장
     @Transactional
-    public SuccessStatusCode saveFeed(FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
+    public void saveFeed(FeedDto.RequestDto requestDto, User user) {
         Feed feed = requestDto.toEntity(user);    //feed 엔티티 초기화
         feedRepository.save(feed);    //feed 저장
         saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
-        //구독자에게 알림 생성
-        List<Subscribe> subscribes = subscribeRepository.findAllByPublisher(user).orElse(null);
-        if(subscribes!=null){
-            for (Subscribe subscribe : subscribes) {
-                alertService.send(user.getId(),
-                        "새로운 feed가 생성되었습니다"+System.lineSeparator()+user.getNickname()+": "+feed.getTitle(),
-                        "localhost:8080/api/feed/"+feed.getId(),
-                        subscribe.getSubscriber().getId());
-            }
-        }
-        return SuccessStatusCode.SAVE_FEED;
+        alarmToSubscriber(user, feed);
     }
     //feed 수정
     @Transactional
-    public SuccessStatusCode updateFeed(Long feedId, FeedDto.RequestDto requestDto, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();    //userId로 user 찾기
+    public void updateFeed(Long feedId, FeedDto.RequestDto requestDto, User user) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        if(checkAuthority(feed, user)){
-//            feed.update(requestDto.getTitle(), requestDto.getContent(), user);    //feed 내용 수정
-            feedRepository.updateTitleAndContentByIdAndUser(requestDto.getTitle(), requestDto.getContent(), feedId, user);
-            deleteImage(feedId);    //기존에 업로드된 이미지 제거
+        if(checkOwner(feed, user)){
+            feedRepository.updateFeedByIdAndUserId(requestDto.getTitle(), requestDto.getContent(), feedId, user.getId());
             //이미지가 있다면 새로운 이미지 저장
-            if(requestDto.getFile() != null) {
+            if(!requestDto.getFile().isEmpty()) {
+                deleteImage(feedId);    //기존에 업로드된 이미지 제거
                 saveImage(requestDto.getFile(), feed);
             }
         }
-        return SuccessStatusCode.UPDATE_FEED;
     }
     //feed 삭제
     @Transactional
-    public SuccessStatusCode deleteFeed(Long feedId, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();    //userId로 user 찾기
+    public void deleteFeed(Long feedId, User user) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        if(checkAuthority(feed, user)){
-            feedCommentRepository.updateIsDeletedTrueByFeedId(feed);
-            feedLikeRepository.deleteByFeed(feed);    //좋아요 삭제
-            deleteImage(feedId);    //기존에 업로드된 이미지 제거
-            feedRepository.updateIsDeletedTrueById(feedId);    //feed 삭제
-        }
-        return SuccessStatusCode.DELETE_FEED;
-    }
-    //feed 좋아요
-    @Transactional
-    public CustomResponseBody<FeedLikeDto.ResponseDto> likeFeed(Long feedId, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
-        FeedLike feedLike = feedLikeRepository.findByUserAndFeed(user, feed).orElse(null);
-        if (feedLike!=null) {
-            feedLikeRepository.delete(feedLike);
-            return new CustomResponseBody<>(SuccessStatusCode.DISLIKE, new FeedLikeDto.ResponseDto(false));
-        }else{
-            feedLikeRepository.save(new FeedLike(user, feed));
-            return new CustomResponseBody<>(SuccessStatusCode.LIKE, new FeedLikeDto.ResponseDto(true));
+        if(user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(feed, user)){
+            deleteFeedById(feedId);
         }
     }
+
     //새로운 이미지 저장
     private void saveImage(List<MultipartFile> multipartFileList, Feed feed){
         if(!multipartFileList.isEmpty()) {
@@ -152,7 +106,7 @@ public class FeedService {
     }
     //이미지 파일 삭제
     private void deleteImage(Long feedId){
-        List<FeedImage> imageList = imageRepository.findAllByFeedId(feedId);
+        List<FeedImage> imageList = imageRepository.findByFeedId(feedId);
         if(!imageList.isEmpty()){
             for (FeedImage image : imageList) {
             String fileName = image.getImageUrl().replace("https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/", "");
@@ -161,29 +115,48 @@ public class FeedService {
             }
         }
     }
-    //해당 유저가 작성한 feed 찾기
-    private Feed checkFeed(Long feedId, Long userId){
-        return feedRepository.findByIdAndUserIdAndIsDeletedFalse(feedId, userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
-        );
-    }
     //feed 찾기
     private Feed isFeed(Long feedId){
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
     }
-    //user 정보 가져오기
-    private User checkUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
+    private Feed isFeedWithUser(Long feedId){
+        return feedRepository.findByIdWithUser(feedId).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
     }
-    private boolean checkAuthority(Feed feed, User user) {
-        if (!(user.getUserRole() == UserRole.ROLE_ADMIN || feed.getUser().getId().equals(user.getId()))) {
+
+    private boolean checkOwner(Feed feed, User user) {
+        if (!feed.getUser().getId().equals(user.getId())) {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
         } else {
             return true;
+        }
+    }
+    private void deleteFeedById(Long feedId) {
+        feedCommentRepository.updateIsDeletedTrueByFeedId(feedId);
+        feedLikeRepository.deleteByFeed(feedId);    //좋아요 삭제
+        deleteImage(feedId);    //기존에 업로드된 이미지 제거
+        feedRepository.updateIsDeletedTrueById(feedId);    //feed 삭제
+    }
+    private List<String> getFeedImageUrlList(Long feedId) {
+        List<String> imageUrlList = new ArrayList<>();
+        List<FeedImage> imageList = imageRepository.findByFeedId(feedId);
+        for (FeedImage image : imageList) {
+            imageUrlList.add(image.getImageUrl());
+        }
+        return imageUrlList;
+    }
+    private void alarmToSubscriber(User user, Feed feed) {
+        List<Subscribe> subscribes = subscribeRepository.findByPublisher(user).orElse(null);
+        if(subscribes!=null){
+            for (Subscribe subscribe : subscribes) {
+                alertService.send(user.getId(),
+                        "새로운 feed가 생성되었습니다"+System.lineSeparator()+user.getNickname()+": "+feed.getTitle(),
+                        "localhost:8080/api/feed/"+feed.getId(),
+                        subscribe.getSubscriber().getId());
+            }
         }
     }
 }

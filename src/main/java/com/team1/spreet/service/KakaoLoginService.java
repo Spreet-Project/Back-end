@@ -3,10 +3,8 @@ package com.team1.spreet.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
@@ -38,7 +36,7 @@ public class KakaoLoginService {
     private final PasswordEncoder passwordEncoder;
 
     //카카오 회원가입 및 로그인 서비스
-    public CustomResponseBody kakaoLogin(String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
+    public UserDto.LoginResponseDto kakaoLogin(String code, HttpServletResponse httpServletResponse) throws JsonProcessingException {
         //1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -55,7 +53,7 @@ public class KakaoLoginService {
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return new CustomResponseBody(SuccessStatusCode.LOGIN_SUCCESS, new UserDto.LoginResponseDto(kakaoUser.getNickname()));
+        return new UserDto.LoginResponseDto(kakaoUser.getNickname());
     }
 
     private String getToken(String code) throws JsonProcessingException {

@@ -2,9 +2,14 @@ package com.team1.spreet.repository;
 
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByLoginId(String loginId);
@@ -13,9 +18,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-//    boolean existsByLoginIdAndIsDeleted(String loginId, boolean isDeleted);
-
     List<User> findByUserRoleAndIsCrew(UserRole userRole, boolean isCrew);
 
     boolean existsByLoginIdAndUserRoleAndIsCrew(String loginId, UserRole userRole, boolean isCrew);
+
+    @Transactional
+    @Modifying
+    @Query("update User u set u.isDeleted = true where u.loginId = :loginId")
+    void updateIsDeletedTrueByLoginId(@Param("loginId") String loginId);
+
+    Optional<User> findByIdAndIsDeletedFalse(Long userId);
 }
