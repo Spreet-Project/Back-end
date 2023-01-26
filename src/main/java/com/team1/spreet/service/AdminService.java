@@ -27,7 +27,7 @@ public class AdminService {
 
 		List<UserDto.CrewResponseDto> crewList = new ArrayList<>();
 		for (User user : userList) {
-			crewList.add(new UserDto.CrewResponseDto(user));
+			crewList.add(new UserDto.CrewResponseDto(user.getLoginId(), user.getNickname(), user.isCrew()));
 		}
 
 		return crewList;
