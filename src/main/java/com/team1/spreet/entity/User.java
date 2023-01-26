@@ -78,4 +78,13 @@ public class User extends TimeStamped{
                 ? "https://spreet-bucket.s3.ap-northeast-2.amazonaws.com/spreet+%E1%84%85%E1%85%A9%E1%84%80%E1%85%A92.png"
                 : this.profileImage;
     }
+
+    public void updateUserInfo(String nickname, String profileImage) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+    }
+
+    public void resetPassword(String password) {
+        this.password = password;
+    }
 }
