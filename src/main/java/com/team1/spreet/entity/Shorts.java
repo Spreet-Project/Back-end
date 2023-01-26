@@ -33,7 +33,7 @@ public class Shorts extends TimeStamped {
     @Column(nullable = false)
     private String title;       //쇼츠 제목
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;     //쇼츠 내용
 
     @Column(nullable = false)

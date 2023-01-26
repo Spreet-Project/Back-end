@@ -21,7 +21,7 @@ public class Feed extends TimeStamped {
     @Column(nullable = false)
     private String title;       //피드 제목
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;     //피드 내용
 
     @Column(nullable = false)
