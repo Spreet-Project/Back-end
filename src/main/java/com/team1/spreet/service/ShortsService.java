@@ -40,7 +40,7 @@ public class ShortsService {
 	// shorts 수정
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-		if (!user.equals(shorts.getUser())) {   // 수정하려는 유저가 작성자가 아닌 경우
+		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 
@@ -63,7 +63,7 @@ public class ShortsService {
 	// shorts 삭제
 	public void deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.equals(shorts.getUser())) {
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 
