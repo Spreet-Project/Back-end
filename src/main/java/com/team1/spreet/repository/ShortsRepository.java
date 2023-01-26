@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ShortsRepository extends JpaRepository<Shorts, Long>, ShortsCustomRepository {
+public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 	@Query("select s from Shorts s where s.id = :shortsId and s.isDeleted = false")
 	Optional<Shorts> findByIdAndIsDeletedFalse(@Param("shortsId")Long shortsId);
 
