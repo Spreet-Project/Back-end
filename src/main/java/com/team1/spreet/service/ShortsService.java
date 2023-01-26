@@ -40,7 +40,7 @@ public class ShortsService {
 	// shorts 수정
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
+		if (!user.equals(shorts.getUser())) {   // 수정하려는 유저가 작성자가 아닌 경우
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 
@@ -63,7 +63,7 @@ public class ShortsService {
 	// shorts 삭제
 	public void deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
-		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.equals(shorts.getUser())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 
@@ -86,8 +86,8 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, int size, Long userId) {
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, Long userId) {
+		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
@@ -106,8 +106,8 @@ public class ShortsService {
 
 	// 메인화면에서 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category, int page, int size) {
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
 
 		List<ShortsDto.SimpleResponseDto> shortsList = new ArrayList<>();
