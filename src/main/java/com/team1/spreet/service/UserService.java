@@ -7,6 +7,7 @@ import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,19 +15,20 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final AwsS3Service awsS3Service;
 
     public void signup(final UserDto.SignupRequestDto requestDto) {
         if (userRepository.findByLoginId(requestDto.getLoginId()).isPresent()) {
@@ -64,6 +66,55 @@ public class UserService {
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
         return getNickname(requestDto);
+    }
+
+    // 회원 정보 조회
+    @Transactional(readOnly = true)
+    public UserDto.UserInfoResponseDto getUserInfo(User user) {
+        checkUser(user.getId());
+
+        return new UserDto.UserInfoResponseDto(user.getLoginId(), user.getNickname(),
+            user.getEmail(), user.getProfileImage());
+    }
+
+    // 회원 정보 수정
+    public void updateUserInfo(UserDto.UpdateRequestDto requestDto, User user) {
+        checkUser(user.getId());
+
+        String nickname = requestDto.getNickname().isEmpty()? user.getNickname() : requestDto.getNickname();
+
+        String profileImage;
+        if (!requestDto.getProfileImage().isEmpty()) {
+            //첨부파일 수정시 기존 첨부파일 삭제
+            String fileName = user.getProfileImage().split(".com/")[1];
+            awsS3Service.deleteFile(fileName);
+
+            //새로운 파일 업로드
+            profileImage = awsS3Service.uploadFile(requestDto.getProfileImage());
+        } else {
+            //첨부파일 수정 안함
+            profileImage = user.getProfileImage();
+        }
+        user.updateUserInfo(nickname, profileImage);
+        userRepository.saveAndFlush(user);
+    }
+
+    // 비밀번호 초기화(변경)
+    public void resetPassword(UserDto.ResetPwRequestDto requestDto, User user) {
+        checkUser(user.getId());
+
+        // 기존과 동일한 비밀번호의 경우 에러처리
+        if (user.getPassword().equals(passwordEncoder.encode(requestDto.getPassword()))) {
+            throw new RestApiException(ErrorStatusCode.INVALID_PASSWORD);
+        }
+        user.resetPassword(passwordEncoder.encode(requestDto.getPassword()));
+        userRepository.saveAndFlush(user);
+    }
+
+    private void checkUser(Long userId) {
+        if (userRepository.findByIdAndIsDeletedFalse(userId).isEmpty()) {
+            throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+        }
     }
 
     public void idCheck(String loginId) {
