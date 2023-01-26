@@ -66,20 +66,17 @@ public class ShortsController {
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory(
 			@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category,
 			@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
-			@RequestParam(defaultValue = "10") @ApiParam(value = "조회할 사이즈") int size,
 		    @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long userId = userDetails == null ? 0L : userDetails.getUser().getId();
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, size, userId));
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page, userId));
 	}
 
 	// 메인화면에서 카테고리별 조회
 	@ApiOperation(value = "메인 화면에서 카테고리별 조회 API")
 	@GetMapping("/main")
 	public CustomResponseBody<List<ShortsDto.SimpleResponseDto>> getSimpleShortsByCategory(
-		@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category,
-		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
-		@RequestParam(defaultValue = "10") @ApiParam(value = "조회할 사이즈") int size) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getSimpleShortsByCategory(category, page, size));
+		@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getSimpleShortsByCategory(category));
 	}
 
 }

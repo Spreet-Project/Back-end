@@ -33,7 +33,7 @@ public class ShortsCommentService {
 	public void updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, User user) {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
-		if (!user.getId().equals(shortsComment.getUser().getId())) {
+		if (!user.equals(shortsComment.getUser())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 		shortsComment.updateShortsComment(requestDto.getContent());
@@ -43,7 +43,7 @@ public class ShortsCommentService {
 	public void deleteShortsComment(Long shortsCommentId, User user) {
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
-		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shortsComment.getUser().getId()) ) {
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.equals(shortsComment.getUser())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 		shortsComment.idDeleted();
