@@ -2,6 +2,7 @@ package com.team1.spreet.service;
 
 import com.team1.spreet.dto.EmailDto;
 import com.team1.spreet.entity.EmailConfirm;
+import com.team1.spreet.entity.User;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.repository.EmailConfirmRepository;
@@ -64,11 +65,11 @@ public class EmailService {
 
             switch (index) {
                 case 0:
-                    key.append((char) ((int) (random.nextInt(26)) + 97));
+                    key.append((char) ((random.nextInt(26)) + 97));
                     //  a~z  (ex. 1+97=98 => (char)98 = 'b')
                     break;
                 case 1:
-                    key.append((char) ((int) (random.nextInt(26)) + 65));
+                    key.append((char) ((random.nextInt(26)) + 65));
                     //  A~Z
                     break;
                 case 2:
@@ -98,6 +99,23 @@ public class EmailService {
         ePw = createKey();
         MimeMessage message = createMessage(email);
         upsert(new EmailConfirm(email,ePw));
+
+        try {   //예외 처리
+            emailSender.send(message);
+        } catch (MailException e) {
+            e.printStackTrace();
+            throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT);
+        }
+    }
+
+    // 마이페이지에서 비밀번호 변경을 위해 이메일 전송
+    public void sendConfirmEmail(String email, User user)throws Exception {
+        if (!email.equals(user.getEmail())){
+            throw new RestApiException(ErrorStatusCode.MISMATCH_EMAIL);
+        }
+
+        MimeMessage message = createMessage(email);
+        upsert(new EmailConfirm(email,createKey()));
 
         try {   //예외 처리
             emailSender.send(message);
