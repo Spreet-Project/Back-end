@@ -2,7 +2,6 @@ package com.team1.spreet.controller;
 
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
-import com.team1.spreet.dto.UserDto.PostResponseDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.UserService;
@@ -86,8 +85,8 @@ public class UserController {
 
     // 회원이 작성한 게시글 목록 조회
     @ApiOperation(value = "회원이 작성한 게시글 조회 API")
-    @PutMapping("/mypage/post")
-    public CustomResponseBody<List<PostResponseDto>> getPostList (
+    @GetMapping("/mypage/post")
+    public CustomResponseBody<List<UserDto.PostResponseDto>> getPostList (
         @RequestParam(value = "classification") @ApiParam(value = "게시글 분류") String classification,
         @RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
