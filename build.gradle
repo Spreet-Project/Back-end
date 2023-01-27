@@ -61,12 +61,14 @@ dependencies {
     // slack webhook logging
     implementation("com.github.maricn:logback-slack-appender:1.6.1")
 
-    //이메일 인증
+    //이메일
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //redis
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.5.RELEASE'
-    // https://mvnrepository.com/artifact/org.redisson/redisson
-    implementation 'org.redisson:redisson:3.16.8'
+    // https://mvnrepository.com/artifact/redis.clients/jedis
+    implementation 'redis.clients:jedis:3.6.0'
     // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
     implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
 
@@ -77,6 +79,7 @@ dependencies {
     // https://mvnrepository.com/artifact/junit/junit
     testImplementation 'junit:junit:4.12'
 
+    implementation 'org.springframework.boot:spring-boot-starter'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함

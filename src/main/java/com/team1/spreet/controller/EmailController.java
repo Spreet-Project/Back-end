@@ -3,31 +3,50 @@ package com.team1.spreet.controller;
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.EmailDto;
 import com.team1.spreet.exception.SuccessStatusCode;
+import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.EmailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "email")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class EmailController {
 
-    private final EmailService emailService;
+	private final EmailService emailService;
 
-    @ApiOperation(value = "이메일 전송 API")
-    @PostMapping("/api/user/send-email")
-    public CustomResponseBody sendEmail(@RequestParam @ApiParam(value = "이메일 주소") String email) throws Exception {
-        emailService.sendSimpleMessage(email);
-        return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
-    }
+	@ApiOperation(value = "회원가입시 인증을 위해 이메일 전송하는 API")
+	@PostMapping("/send-email")
+	public CustomResponseBody<SuccessStatusCode> sendEmail(
+		@RequestParam @ApiParam(value = "이메일 주소") String email) throws Exception {
+		emailService.sendSimpleMessage(email);
+		return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
+	}
 
-    @ApiOperation(value = "이메일 인증 API")
-    @PostMapping("/api/user/confirm-email")
-    public CustomResponseBody emailConfirm(@RequestBody @ApiParam(value = "이메일 인증을 위한 정보") EmailDto emailDto) throws Exception{
-        emailService.emailConfirm(emailDto);
-        return new CustomResponseBody<>(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
-    }
+	@ApiOperation(value = "이메일 인증 API")
+	@PostMapping("/confirm-email")
+	public CustomResponseBody<SuccessStatusCode> emailConfirm(
+		@RequestBody @ApiParam(value = "이메일 인증을 위한 정보") EmailDto emailDto) {
+		emailService.emailConfirm(emailDto);
+		return new CustomResponseBody<>(SuccessStatusCode.EMAIL_CONFIRM_SUCCESS);
+	}
+
+	// 마이페이지에서 비밀번호 변경을 위해 이메일 인증
+	@ApiOperation(value = "비밀번호 변경시 인증을 위해 이메일 전송하는 API")
+	@PostMapping("/mypage/send-email")
+	public CustomResponseBody<SuccessStatusCode> sendConfirmEmail(
+		@RequestParam @ApiParam(value = "이메일 주소") String email,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+		emailService.sendConfirmEmail(email, userDetails.getUser());
+		return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
+	}
 }

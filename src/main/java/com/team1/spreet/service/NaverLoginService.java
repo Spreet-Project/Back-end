@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
 import com.team1.spreet.jwt.JwtUtil;
@@ -144,7 +145,8 @@ public class NaverLoginService {
 				String email = naverInfoDto.getEmail();
 				String profileImage = naverInfoDto.getProfileImage();
 
-				naverUser = new User(naverId, naverInfoDto.getNickname(), encodedPassword, email, profileImage);
+				naverUser = new User(naverId, naverInfoDto.getNickname(), encodedPassword, email,
+					profileImage, UserRole.ROLE_USER);
 			}
 			userRepository.save(naverUser);
 		}

@@ -3,7 +3,8 @@ package com.team1.spreet.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.security.exceptionhandler.CustomAccessDeniedHandler;
-import com.team1.spreet.security.exceptionhandler.CustomAuthenticaionEntryPoint;
+import com.team1.spreet.security.exceptionhandler.CustomAuthenticationEntryPoint;
+import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import javax.servlet.http.HttpSession;
 
 @Configuration  //Bean을 등록하기 위함이거나 설정파일을 만들기 위한 어노테이션
 @RequiredArgsConstructor
@@ -40,6 +39,8 @@ public class WebSecurityConfig {
             .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
+
             .antMatchers("/api/doc").permitAll()
             .antMatchers("/swagger-ui/**").permitAll()
             .antMatchers("/swagger-resources/**").permitAll()
@@ -47,6 +48,7 @@ public class WebSecurityConfig {
             .antMatchers("/v2/api-docs").permitAll()
             .antMatchers("/v3/api-docs").permitAll()
             .antMatchers("/webjars/**").permitAll()
+
             .anyRequest().authenticated();
 
         http
@@ -63,7 +65,7 @@ public class WebSecurityConfig {
 
         http
                 .exceptionHandling()
-                .authenticationEntryPoint(customAuthenticaionEntryPoint())
+                .authenticationEntryPoint(customAuthenticationEntryPoint())
                 .accessDeniedHandler(customAccessDeniedHandler())
 
                 .and()
@@ -112,8 +114,8 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticaionEntryPoint customAuthenticaionEntryPoint() {
-        return new CustomAuthenticaionEntryPoint(om);
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint(om);
     }
 
     @Bean

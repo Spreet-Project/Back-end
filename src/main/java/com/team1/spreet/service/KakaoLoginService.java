@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.jwt.JwtUtil;
 import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
@@ -113,20 +114,21 @@ public class KakaoLoginService {
 
     private User registerKakaoUserIfNeeded(UserDto.KakaoInfoDto kakaoInfoDto) {
         String kakaoId = kakaoInfoDto.getId().toString();
-        User kakaoUser = userRepository.findByLoginId(kakaoId.toString()).orElse(null);
+        User kakaoUser = userRepository.findByLoginId(kakaoId).orElse(null);
         if (kakaoUser == null) {
             String kakaoEmail = kakaoInfoDto.getEmail();
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
                 kakaoUser = sameEmailUser;
-                kakaoUser = kakaoUser.socialIdUpdate(kakaoId.toString());
+                kakaoUser = kakaoUser.socialIdUpdate(kakaoId);
             } else {
                 String password = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(password);
 
                 String email = kakaoInfoDto.getEmail();
                 String profileImage = kakaoInfoDto.getProfileImage();
-                kakaoUser = new User(kakaoId, kakaoInfoDto.getNickname(), encodedPassword, email, profileImage);
+                kakaoUser = new User(kakaoId, kakaoInfoDto.getNickname(), encodedPassword, email,
+                    profileImage, UserRole.ROLE_USER);
             }
 
             userRepository.save(kakaoUser);

@@ -88,7 +88,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable);
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
@@ -108,7 +108,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable).getContent();
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable);
 
 		List<ShortsDto.SimpleResponseDto> shortsList = new ArrayList<>();
 
