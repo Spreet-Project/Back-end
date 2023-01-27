@@ -40,6 +40,8 @@ public class WebSecurityConfig {
             .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/event/").hasRole("ACCEPTED_CREW")
+
             .antMatchers("/api/doc").permitAll()
             .antMatchers("/swagger-ui/**").permitAll()
             .antMatchers("/swagger-resources/**").permitAll()
@@ -47,6 +49,7 @@ public class WebSecurityConfig {
             .antMatchers("/v2/api-docs").permitAll()
             .antMatchers("/v3/api-docs").permitAll()
             .antMatchers("/webjars/**").permitAll()
+
             .anyRequest().authenticated();
 
         http
