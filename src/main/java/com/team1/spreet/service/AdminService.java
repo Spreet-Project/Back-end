@@ -23,11 +23,11 @@ public class AdminService {
 	// 크루회원 승인 대기 리스트 조회
 	@Transactional(readOnly = true)
 	public List<UserDto.CrewResponseDto> getCrewList() {
-		List<User> userList = userRepository.findByUserRoleAndIsCrew(UserRole.ROLE_CREW, false);
+		List<User> userList = userRepository.findByUserRoleAndIsDeletedFalse(UserRole.ROLE_UNACCEPTED_CREW);
 
 		List<UserDto.CrewResponseDto> crewList = new ArrayList<>();
 		for (User user : userList) {
-			crewList.add(new UserDto.CrewResponseDto(user.getLoginId(), user.getNickname(), user.isCrew()));
+			crewList.add(new UserDto.CrewResponseDto(user.getLoginId(), user.getNickname()));
 		}
 
 		return crewList;
