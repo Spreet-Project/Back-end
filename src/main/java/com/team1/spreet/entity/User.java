@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

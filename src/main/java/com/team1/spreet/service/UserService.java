@@ -81,7 +81,11 @@ public class UserService {
     public void updateUserInfo(UserDto.UpdateRequestDto requestDto, User user) {
         checkUser(user.getId());
 
-        String nickname = requestDto.getNickname().isEmpty()? user.getNickname() : requestDto.getNickname();
+        // 새로 변경을 원하는 닉네임이 중복인 경우
+        if (!requestDto.getNickname().equals(user.getNickname()) &&
+            userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
+        }
 
         String profileImage;
         if (!requestDto.getProfileImage().isEmpty()) {
@@ -95,7 +99,7 @@ public class UserService {
             //첨부파일 수정 안함
             profileImage = user.getProfileImage();
         }
-        user.updateUserInfo(nickname, profileImage);
+        user.updateUserInfo(requestDto.getNickname(), profileImage);
         userRepository.saveAndFlush(user);
     }
 
@@ -111,12 +115,6 @@ public class UserService {
         userRepository.saveAndFlush(user);
     }
 
-    private void checkUser(Long userId) {
-        if (userRepository.findByIdAndIsDeletedFalse(userId).isEmpty()) {
-            throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
-        }
-    }
-
     public void idCheck(String loginId) {
         if (userRepository.findByLoginId(loginId).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_ID);
@@ -125,6 +123,12 @@ public class UserService {
     public void nicknameCheck(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent())
             throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
+    }
+
+    private void checkUser(Long userId) {
+        if (userRepository.findByIdAndIsDeletedFalse(userId).isEmpty()) {
+            throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+        }
     }
 
     private UserDto.LoginResponseDto getNickname(UserDto.LoginRequestDto requestDto) {

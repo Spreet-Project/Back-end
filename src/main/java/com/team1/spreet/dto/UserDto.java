@@ -48,7 +48,7 @@ public class UserDto {
         @ApiModelProperty(value = "프로필 이미지", required = true)
         private String profileImage;
 
-        @ApiModelProperty(value = "프로필 이미지", required = true)
+        @ApiModelProperty(value = "회원 권한", required = true)
         private UserRole userRole;
 
         public User toEntity(String encodePassword) {
@@ -119,13 +119,17 @@ public class UserDto {
     @NoArgsConstructor
     @Getter
     public static class CrewResponseDto {
+        @ApiModelProperty(value = "회원 고유 ID")
+        private Long userId;
+
         @ApiModelProperty(value = "로그인 ID")
         private String loginId;
 
         @ApiModelProperty(value = "닉네임")
         private String nickname;
 
-        public CrewResponseDto(String loginId, String nickname) {
+        public CrewResponseDto(Long userId, String loginId, String nickname) {
+            this.userId = userId;
             this.loginId = loginId;
             this.nickname = nickname;
         }
@@ -165,6 +169,7 @@ public class UserDto {
         }
     }
 
+    // 회원이 작성한 게시글을 반환하기 위한 Dto
     @NoArgsConstructor
     @Getter
     public static class PostResponseDto {

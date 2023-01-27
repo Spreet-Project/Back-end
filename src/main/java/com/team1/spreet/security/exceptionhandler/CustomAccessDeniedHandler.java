@@ -16,9 +16,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
-    private static final String CUSTOM_DEFAULT_ERROR_MSG = "권한이 없습니다.";
+    private static final String DEFAULT_ERROR_MSG = "Access is denied";
 
-    private static final String DEFAULT_ERROR_MSG = "접근이 거부되었습니다.";
+    private static final String CUSTOM_DEFAULT_ERROR_MSG = "접근 권한이 없습니다.";
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
@@ -30,7 +30,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 ? CUSTOM_DEFAULT_ERROR_MSG
                 : accessDeniedException.getMessage();
 
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMsg, HttpStatus.BAD_REQUEST.value());
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMsg, HttpStatus.FORBIDDEN.value());
 
         String result = objectMapper.writeValueAsString(errorResponseDto);
 
