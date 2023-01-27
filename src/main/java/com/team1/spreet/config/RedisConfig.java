@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 public class RedisConfig {
+
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
 
@@ -25,4 +26,18 @@ public class RedisConfig {
         template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }
+
+//    @Bean
+//    public CacheManager redisCacheManager() {
+//        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+//                .entryTtl(Duration.ofSeconds(60))
+//                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+//                .serializeValuesWith(
+//                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+//
+//        return RedisCacheManager.RedisCacheManagerBuilder
+//                .fromConnectionFactory(redisConnectionFactory())
+//                .cacheDefaults(redisCacheConfiguration)
+//                .build();
+//    }
 }

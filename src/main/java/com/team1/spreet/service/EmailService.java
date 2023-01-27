@@ -1,5 +1,6 @@
 package com.team1.spreet.service;
 
+import com.team1.spreet.dto.EmailDto;
 import com.team1.spreet.entity.EmailConfirm;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
@@ -79,16 +80,16 @@ public class EmailService {
         return key.toString();
     }
 
-//    private void upsert(EmailConfirm emailConfirm) {
-//        EmailConfirm emailConfirm1 = emailConfirmRepository.findByEmail(emailConfirm.getEmail()).orElse(null);
-//        if(emailConfirmRepository.findByEmail(emailConfirm.getEmail()).isPresent()){
-//            //update
-//            emailConfirm1.setEmail(emailConfirm.getEmail());
-//            emailConfirmRepository.save(emailConfirm1);
-//        }
-//        else
-//            emailConfirmRepository.save(emailConfirm);
-//    }
+    private void upsert(EmailConfirm emailConfirm) {
+        EmailConfirm emailConfirm1 = emailConfirmRepository.findByEmail(emailConfirm.getEmail()).orElse(null);
+        if(emailConfirmRepository.findByEmail(emailConfirm.getEmail()).isPresent()){
+            //update
+            emailConfirm1.setEmail(emailConfirm.getEmail());
+            emailConfirmRepository.save(emailConfirm1);
+        }
+        else
+            emailConfirmRepository.save(emailConfirm);
+    }
 
     public void sendSimpleMessage(String email)throws Exception {
         if (userRepository.findByEmail(email).isPresent()){ throw new RestApiException(ErrorStatusCode.OVERLAPPED_EMAIL);}
@@ -96,13 +97,22 @@ public class EmailService {
 
         ePw = createKey();
         MimeMessage message = createMessage(email);
-//        upsert(new EmailConfirm(email,ePw));
-        emailConfirmRepository.save(new EmailConfirm(email, ePw));
+        upsert(new EmailConfirm(email,ePw));
+
         try {   //예외 처리
             emailSender.send(message);
         } catch (MailException e) {
             e.printStackTrace();
             throw new RestApiException(ErrorStatusCode.DELETED_ACCOUNT);
+        }
+    }
+
+    public void emailConfirm(EmailDto emailDto) {
+        EmailConfirm emailConfirm = emailConfirmRepository.findByEmail(emailDto.getEmail()).orElseThrow(
+                () -> new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_NULL_EXCEPTION)
+        );
+        if (!emailConfirm.getConfirmNumber().equals(emailDto.getConfirmCode())) {
+            throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_INCORRECT);
         }
     }
 }

@@ -3,18 +3,18 @@ package com.team1.spreet.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 
-@RedisHash("EmailConfirm")
+@RedisHash(value = "EmailConfirm", timeToLive = 180)
 @AllArgsConstructor
-@ToString
 @Getter
 @Setter
 public class EmailConfirm {
     @Id
+    @Indexed
     private String email;
     private String confirmNumber;
 }
