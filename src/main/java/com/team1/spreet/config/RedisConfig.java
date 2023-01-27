@@ -1,5 +1,6 @@
 package com.team1.spreet.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -9,12 +10,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Configuration
 public class RedisConfig {
 
+    @Value("${spring.redis.host}")
+    private String host;
+
+    @Value("${spring.redis.port}")
+    private int port;
+
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
 
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-        redisConfig.setHostName("127.0.0.1");
-        redisConfig.setPort(6379);
+        redisConfig.setHostName(host);
+        redisConfig.setPort(port);
 
         return new JedisConnectionFactory(redisConfig);
 
@@ -26,18 +33,4 @@ public class RedisConfig {
         template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }
-
-//    @Bean
-//    public CacheManager redisCacheManager() {
-//        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-//                .entryTtl(Duration.ofSeconds(60))
-//                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-//                .serializeValuesWith(
-//                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
-//
-//        return RedisCacheManager.RedisCacheManagerBuilder
-//                .fromConnectionFactory(redisConnectionFactory())
-//                .cacheDefaults(redisCacheConfiguration)
-//                .build();
-//    }
 }
