@@ -6,6 +6,7 @@ import com.team1.spreet.dto.UserDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.service.KakaoLoginService;
 import com.team1.spreet.service.NaverLoginService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Api(tags = "socialLogin")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")

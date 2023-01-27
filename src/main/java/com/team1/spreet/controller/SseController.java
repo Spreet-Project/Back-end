@@ -7,6 +7,7 @@ import com.team1.spreet.repository.EmitterRepository;
 import com.team1.spreet.repository.UserRepository;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.AlertService;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 
+@Api(tags = "sse")
 @RequiredArgsConstructor
 @RestController
 public class SseController {
