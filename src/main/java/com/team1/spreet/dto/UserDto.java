@@ -2,6 +2,7 @@ package com.team1.spreet.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.entity.User;
+import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -47,8 +48,11 @@ public class UserDto {
         @ApiModelProperty(value = "프로필 이미지", required = true)
         private String profileImage;
 
+        @ApiModelProperty(value = "회원 권한", required = true)
+        private UserRole userRole;
+
         public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.profileImage);
+            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.profileImage, this.userRole);
         }
     }
 
@@ -66,7 +70,6 @@ public class UserDto {
     @Setter
     public static class UpdateRequestDto {
         @ApiModelProperty(value = "닉네임", required = true)
-        @NotBlank(message = "닉네임을 입력해주세요.")
         private String nickname;
 
         @ApiModelProperty(value = "프로필 이미지")
@@ -116,19 +119,19 @@ public class UserDto {
     @NoArgsConstructor
     @Getter
     public static class CrewResponseDto {
+        @ApiModelProperty(value = "회원 고유 ID")
+        private Long userId;
+
         @ApiModelProperty(value = "로그인 ID")
         private String loginId;
 
         @ApiModelProperty(value = "닉네임")
         private String nickname;
 
-        @ApiModelProperty(value = "크루회원 여부")
-        private boolean isCrew;
-
-        public CrewResponseDto(String loginId, String nickname, boolean isCrew) {
+        public CrewResponseDto(Long userId, String loginId, String nickname) {
+            this.userId = userId;
             this.loginId = loginId;
             this.nickname = nickname;
-            this.isCrew = isCrew;
         }
     }
 
@@ -166,6 +169,7 @@ public class UserDto {
         }
     }
 
+    // 회원이 작성한 게시글을 반환하기 위한 Dto
     @NoArgsConstructor
     @Getter
     public static class PostResponseDto {

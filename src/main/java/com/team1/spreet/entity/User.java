@@ -33,25 +33,21 @@ public class User extends TimeStamped{
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;  //유저 역할
+    private UserRole userRole;  //유저 권한
 
     @Column(nullable = false)
     private boolean isDeleted;  //유저 탈퇴 여부, 기본값=FALSE
 
     @Column(nullable = false)
-    private boolean isCrew;    //크루회원 여부
-
-    @Column(nullable = false)       // 카카오 로그인에서 프로필 사진 구현이 끝나면 nullable = false 로 변경
     private String profileImage;   //프로필 사진
 
-    public User(String loginId, String nickname, String password, String email, String profileImage) {
+    public User(String loginId, String nickname, String password, String email, String profileImage, UserRole userRole) {
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
-        this.userRole = UserRole.ROLE_USER;
+        this.userRole = userRole;
         this.isDeleted = Boolean.FALSE;
-        this.isCrew = Boolean.FALSE;
         this.profileImage = profileImage;
     }
 
@@ -61,7 +57,7 @@ public class User extends TimeStamped{
     }
 
     public void approveCrew() {
-        this.isCrew = true;
+        this.userRole = UserRole.ROLE_ACCEPTED_CREW;
     }
 
     public void rejectCrew() {

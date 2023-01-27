@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class CustomAuthenticaionEntryPoint implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
-    private static final String DEFAULT_ERROR_MSG = "Full acthentication is required to access this resource";
+    private static final String DEFAULT_ERROR_MSG = "Full authentication is required to access this resource";
     private static final String CUSTOM_DEFAULT_ERROR_MSG = "로그인이 필요합니다.";
 
     @Override
@@ -23,18 +23,15 @@ public class CustomAuthenticaionEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        String errorMsg = authException.getMessage();
+        String errorMsg = authException.getMessage().equals(DEFAULT_ERROR_MSG)
+            ? CUSTOM_DEFAULT_ERROR_MSG
+            : authException.getMessage();
 
-        if (errorMsg.equals(DEFAULT_ERROR_MSG)) {
-            errorMsg = CUSTOM_DEFAULT_ERROR_MSG;
-        }
-
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMsg, HttpStatus.BAD_REQUEST.value());
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMsg, HttpStatus.UNAUTHORIZED.value());
 
         String result = objectMapper.writeValueAsString(errorResponseDto);
 
         response.getWriter().write(result);
-
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
     }
