@@ -1,14 +1,14 @@
 package com.team1.spreet.repository;
 
 import com.team1.spreet.entity.Event;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -24,4 +24,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("select distinct e from Event e join fetch e.user where e.isDeleted = false order by e.createdAt desc")
 	List<Event> findAllByIsDeletedFalseWithUserOrderByCreatedAtDesc();
 
+	List<Event> findAllByUserIdAndIsDeletedFalse(Long userId, Pageable pageable);
 }

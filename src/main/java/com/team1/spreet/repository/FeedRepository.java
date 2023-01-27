@@ -2,14 +2,14 @@ package com.team1.spreet.repository;
 
 import com.team1.spreet.entity.Feed;
 import io.lettuce.core.dynamic.annotation.Param;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
@@ -31,4 +31,5 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @Query("select distinct f from Feed f join fetch f.user where f.id = :feedId")
     Optional<Feed> findByIdWithUser(Long feedId);
 
+    List<Feed> findAllByUserIdAndIsDeletedFalse(Long userId, Pageable pageable);
 }
