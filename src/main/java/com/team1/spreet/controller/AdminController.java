@@ -33,7 +33,7 @@ public class AdminController {
 	// 크루 회원 승인
 	@ApiOperation(value = "크루 회원 승인 API")
 	@PutMapping("/approve/{userId}")
-	public CustomResponseBody<SuccessStatusCode> approveCrew(@PathVariable @ApiParam(value = "크루 회원 승인을 위한 닉네임") Long userId) {
+	public CustomResponseBody<SuccessStatusCode> approveCrew(@PathVariable @ApiParam(value = "크루 회원 승인을 위한 회원 ID") Long userId) {
 		adminService.approveCrew(userId);
 		return new CustomResponseBody<>(SuccessStatusCode.APPROVE_ROLE_CREW);
 	}
@@ -41,7 +41,7 @@ public class AdminController {
 	// 크루 회원 거절
 	@ApiOperation(value = "크루 회원 거절 API")
 	@PutMapping("/reject/{userId}")
-	public CustomResponseBody<SuccessStatusCode> rejectCrew(@PathVariable @ApiParam(value = "크루 회원 거절을 위한 닉네임") Long userId) {
+	public CustomResponseBody<SuccessStatusCode> rejectCrew(@PathVariable @ApiParam(value = "크루 회원 거절을 위한 회원 ID") Long userId) {
 		adminService.rejectCrew(userId);
 		return new CustomResponseBody<>(SuccessStatusCode.REJECT_ROLE_CREW);
 	}
