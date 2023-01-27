@@ -1,17 +1,17 @@
 package com.team1.spreet.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDateTime;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class UserDto {
@@ -67,13 +67,10 @@ public class UserDto {
 
     @NoArgsConstructor
     @Getter
-    @Setter
-    public static class UpdateRequestDto {
+    public static class NicknameRequestDto {
         @ApiModelProperty(value = "닉네임", required = true)
+        @NotBlank(message = "닉네임을 입력해주세요")
         private String nickname;
-
-        @ApiModelProperty(value = "프로필 이미지")
-        private MultipartFile profileImage;
     }
 
     @NoArgsConstructor
@@ -187,13 +184,21 @@ public class UserDto {
         private String category;
 
         @ApiModelProperty(value = "등록 일자")
-        private String createdAt;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'hh:mm", timezone = "Asia/Seoul")
+        private LocalDateTime createdAt;
 
-        public PostResponseDto(String classification, Long id, String title, String category, String createdAt) {
+        public PostResponseDto(String classification, Long id, String title, String category, LocalDateTime createdAt) {
             this.classification = classification;
             this.id = id;
             this.title = title;
             this.category = category;
+            this.createdAt = createdAt;
+        }
+
+        public PostResponseDto(String classification, Long id, String title, LocalDateTime createdAt) {
+            this.classification = classification;
+            this.id = id;
+            this.title = title;
             this.createdAt = createdAt;
         }
     }

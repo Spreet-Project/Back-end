@@ -2,25 +2,27 @@ package com.team1.spreet.controller;
 
 import com.team1.spreet.dto.CustomResponseBody;
 import com.team1.spreet.dto.UserDto;
+import com.team1.spreet.dto.UserDto.PostResponseDto;
 import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.security.UserDetailsImpl;
 import com.team1.spreet.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = "user")
 @RestController
@@ -64,13 +66,32 @@ public class UserController {
         return new CustomResponseBody<>(SuccessStatusCode.GET_USER_INFO, userService.getUserInfo(userDetails.getUser()));
     }
 
-    @ApiOperation(value = "회원정보 수정 API")
-    @PutMapping("/mypage/edit")
-    public CustomResponseBody<SuccessStatusCode> updateUserInfo(
-        @ModelAttribute @ApiParam(value = "수정할 회원 정보") UserDto.UpdateRequestDto requestDto,
+    @ApiOperation(value = "프로필 이미지 수정 API")
+    @PutMapping("/mypage/edit/profile-image")
+    public CustomResponseBody<SuccessStatusCode> updateProfileImage(
+        @RequestParam(value = "file") @Valid @ApiParam(value = "새로운 프로필 이미지") MultipartFile file,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        userService.updateUserInfo(requestDto, userDetails.getUser());
+        userService.updateProfileImage(file, userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.UPDATE_USER_INFO);
+    }
+
+    @ApiOperation(value = "회원정보 수정 API")
+    @PutMapping("/mypage/edit/nickname")
+    public CustomResponseBody<SuccessStatusCode> updateNickname(
+        @RequestBody @Valid @ApiParam(value = "새로운 닉네임") UserDto.NicknameRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.updateNickname(requestDto, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.UPDATE_USER_INFO);
+    }
+
+    // 회원이 작성한 게시글 목록 조회
+    @ApiOperation(value = "회원이 작성한 게시글 조회 API")
+    @PutMapping("/mypage/post")
+    public CustomResponseBody<List<PostResponseDto>> getPostList (
+        @RequestParam(value = "classification") @ApiParam(value = "게시글 분류") String classification,
+        @RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return new CustomResponseBody<>(SuccessStatusCode.GET_POST_LIST, userService.getPostList(classification, page, userDetails.getUser()));
     }
 
     @ApiOperation(value = "회원 비밀번호 수정 API")
