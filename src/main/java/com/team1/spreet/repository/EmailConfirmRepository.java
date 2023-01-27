@@ -9,6 +9,4 @@ import java.util.Optional;
 @Repository
 public interface EmailConfirmRepository extends CrudRepository<EmailConfirm, String> {
     Optional<EmailConfirm> findByEmail(String email);
-
-    void deleteByEmail(String email);
 }
