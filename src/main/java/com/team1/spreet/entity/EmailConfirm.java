@@ -2,21 +2,19 @@ package com.team1.spreet.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.io.Serializable;
 
-@Entity
-@NoArgsConstructor
+@RedisHash("EmailConfirm")
 @AllArgsConstructor
-@Getter @Setter
-public class EmailConfirm implements Serializable {
-
+@ToString
+@Getter
+@Setter
+public class EmailConfirm {
     @Id
     private String email;
-
-    private String confirmCode;
+    private String confirmNumber;
 }
