@@ -5,7 +5,6 @@ import com.team1.spreet.entity.User;
 import com.team1.spreet.entity.UserRole;
 import com.team1.spreet.exception.ErrorStatusCode;
 import com.team1.spreet.exception.RestApiException;
-import com.team1.spreet.exception.SuccessStatusCode;
 import com.team1.spreet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,29 +26,25 @@ public class AdminService {
 
 		List<UserDto.CrewResponseDto> crewList = new ArrayList<>();
 		for (User user : userList) {
-			crewList.add(new UserDto.CrewResponseDto(user.getLoginId(), user.getNickname()));
+			crewList.add(new UserDto.CrewResponseDto(user.getId(), user.getLoginId(), user.getNickname()));
 		}
 
 		return crewList;
 	}
 
 	// 크루 회원 승인
-	public SuccessStatusCode approveCrew(String nickname) {
-		User user = userRepository.findByNickname(nickname).orElseThrow(
+	public void approveCrew(Long userId) {
+		User user = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER));
 
 		user.approveCrew();
-
-		return SuccessStatusCode.APPROVE_ROLE_CREW;
 	}
 
 	// 크루 회원 거절
-	public SuccessStatusCode rejectCrew(String nickname) {
-		User user = userRepository.findByNickname(nickname).orElseThrow(
+	public void rejectCrew(Long userId) {
+		User user = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER));
 
 		user.rejectCrew();
-
-		return SuccessStatusCode.REJECT_ROLE_CREW;
 	}
 }
