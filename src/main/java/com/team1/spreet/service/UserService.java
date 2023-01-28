@@ -99,13 +99,13 @@ public class UserService {
     public void updateProfileImage(MultipartFile file, User user) {
         checkUser(user.getId());
 
-        //첨부파일 수정시 기존 첨부파일 삭제
-        String fileName = user.getProfileImage().split(".com/")[1];
-        awsS3Service.deleteFile(fileName);
-
-        //새로운 파일 업로드
-        String profileImage = awsS3Service.uploadFile(file);
-
+        String profileImage;
+        if (user.getProfileImage().contains("https://spreet")) {
+            //첨부파일 수정시 기존 첨부파일 삭제
+            String fileName = user.getProfileImage().split(".com/")[1];
+            awsS3Service.deleteFile(fileName);
+        }
+        profileImage = awsS3Service.uploadFile(file);
         user.updateProfileImage(profileImage);
         userRepository.saveAndFlush(user);
     }
