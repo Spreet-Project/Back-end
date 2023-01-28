@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @Table(name = "USERS")
+@DynamicUpdate
 public class User extends TimeStamped {
 
     @Id
@@ -84,7 +86,7 @@ public class User extends TimeStamped {
         this.nickname = nickname;
     }
 
-    public void resetPassword(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 }
