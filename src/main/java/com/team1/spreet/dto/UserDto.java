@@ -184,7 +184,7 @@ public class UserDto {
         private String category;
 
         @ApiModelProperty(value = "등록 일자")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'hh:mm", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm", timezone = "Asia/Seoul")
         private LocalDateTime createdAt;
 
         public PostResponseDto(String classification, Long id, String title, String category, LocalDateTime createdAt) {
