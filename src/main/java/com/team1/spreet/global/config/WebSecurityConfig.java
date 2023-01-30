@@ -50,6 +50,7 @@ public class WebSecurityConfig {
             .antMatchers("/v2/api-docs").permitAll()
             .antMatchers("/v3/api-docs").permitAll()
             .antMatchers("/webjars/**").permitAll()
+            .antMatchers("/health").permitAll()
 
             .anyRequest().authenticated();
 
