@@ -4,6 +4,7 @@ import com.team1.spreet.domain.shorts.model.Category;
 import com.team1.spreet.domain.shorts.model.Shorts;
 import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class ShortsDto {
 	@NoArgsConstructor
 	@Getter
 	@Setter
-	public static class RequestDto {
+	public static class RequestDto implements Serializable {
 		@ApiModelProperty(value = "제목", required = true)
 		@NotBlank(message = "제목을 입력해 주세요.")
 		private String title;
@@ -61,7 +62,7 @@ public class ShortsDto {
 
 	@NoArgsConstructor
 	@Getter
-	public static class SimpleResponseDto {
+	public static class SimpleResponseDto implements Serializable {
 		@ApiModelProperty(value = "쇼츠 ID")
 		private Long shortsId;
 
@@ -92,7 +93,7 @@ public class ShortsDto {
 
 	@NoArgsConstructor
 	@Getter
-	public static class ResponseDto {
+	public static class ResponseDto implements Serializable {
 		@ApiModelProperty(value = "쇼츠 ID")
 		private Long shortsId;
 
