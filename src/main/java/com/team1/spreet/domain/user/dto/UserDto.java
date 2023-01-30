@@ -71,7 +71,7 @@ public class UserDto {
         private String email;
 
         @ApiModelProperty(value = "이메일 인증 여부", required = true)
-        @NotNull(message = "이메일 인증 여부를을 입력해주세요.")
+        @NotNull(message = "이메일 인증 여부를 입력해주세요.")
         private boolean emailConfirm;
 
         @ApiModelProperty(value = "새로운 비밀번호", required = true)

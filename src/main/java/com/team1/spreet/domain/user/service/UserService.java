@@ -75,7 +75,7 @@ public class UserService {
         return getNickname(requestDto);
     }
 
-    // * 로그인 화면에서 비밀번호를 잊은 경우 재설정
+    // 로그인 화면에서 비밀번호를 잊은 경우 재설정
     public void resetPassword(UserDto.ResetPwRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.MISMATCH_EMAIL)
