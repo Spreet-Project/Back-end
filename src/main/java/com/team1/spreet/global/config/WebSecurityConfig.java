@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.global.auth.jwt.JwtUtil;
 import com.team1.spreet.global.error.handler.CustomAccessDeniedHandler;
 import com.team1.spreet.global.error.handler.CustomAuthenticationEntryPoint;
-import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.servlet.http.HttpSession;
 
 @Configuration  //Bean을 등록하기 위함이거나 설정파일을 만들기 위한 어노테이션
 @RequiredArgsConstructor
@@ -49,6 +50,7 @@ public class WebSecurityConfig {
             .antMatchers("/v2/api-docs").permitAll()
             .antMatchers("/v3/api-docs").permitAll()
             .antMatchers("/webjars/**").permitAll()
+            .antMatchers("/health").permitAll()
 
             .anyRequest().authenticated();
 
