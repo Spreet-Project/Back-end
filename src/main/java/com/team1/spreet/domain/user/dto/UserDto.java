@@ -3,12 +3,13 @@ package com.team1.spreet.domain.user.dto;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 public class UserDto {
@@ -65,10 +66,21 @@ public class UserDto {
     @Getter
     public static class ResetPwRequestDto {
         @ApiModelProperty(value = "이메일", required = true)
-        @Email
         @NotBlank(message = "이메일을 입력해주세요.")
+        @Email
         private String email;
 
+        @ApiModelProperty(value = "이메일 인증 여부", required = true)
+        @NotNull(message = "이메일 인증 여부를을 입력해주세요.")
+        private boolean emailConfirm;
+
+        @ApiModelProperty(value = "새로운 비밀번호", required = true)
+        @NotBlank(message = "비밀번호를 입력해주세요.")
+        private String password;
+    }
+
+    @Getter
+    public static class QuitRequestDto {
         @ApiModelProperty(value = "비밀번호", required = true)
         @NotBlank(message = "비밀번호를 입력해주세요.")
         private String password;

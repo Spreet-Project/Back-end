@@ -1,13 +1,14 @@
 package com.team1.spreet.domain.shorts.repository;
 
 import com.team1.spreet.domain.shorts.model.ShortsComment;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Long> {
     @Query("select distinct sc, sc.user.nickname from ShortsComment sc join fetch sc.user "
@@ -21,5 +22,4 @@ public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Lo
     @Modifying
     @Query("update ShortsComment sc set sc.isDeleted = true where sc.shorts.id = :shortsId")
     void updateIsDeletedTrueByShortsId(@Param("shortsId") Long shortsId);
-
 }
