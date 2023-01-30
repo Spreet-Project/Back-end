@@ -35,23 +35,24 @@ public class WebSecurityConfig {
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-            .antMatchers("/api/user/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
-            .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/user/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
 
-            .antMatchers("/api/doc").permitAll()
-            .antMatchers("/swagger-ui/**").permitAll()
-            .antMatchers("/swagger-resources/**").permitAll()
-            .antMatchers("/swagger-ui.html").permitAll()
-            .antMatchers("/v2/api-docs").permitAll()
-            .antMatchers("/v3/api-docs").permitAll()
-            .antMatchers("/webjars/**").permitAll()
-            .antMatchers("/health").permitAll()
+                .antMatchers("/api/doc").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/v3/api-docs").permitAll()
+                .antMatchers("/webjars/**").permitAll()
+                .antMatchers("/health").permitAll()
+                .antMatchers("/api/confirm-email").permitAll()
 
-            .anyRequest().authenticated();
+                .anyRequest().authenticated();
 
         http
                 .logout()
