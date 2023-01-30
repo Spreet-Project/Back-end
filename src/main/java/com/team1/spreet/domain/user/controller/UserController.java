@@ -5,7 +5,6 @@ import com.team1.spreet.domain.user.service.UserService;
 import com.team1.spreet.global.auth.security.UserDetailsImpl;
 import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
-import com.team1.spreet.global.infra.email.service.EmailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +24,6 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final EmailService emailService;
 
     @ApiOperation(value = "회원가입 API")
     @PostMapping("/signup")
