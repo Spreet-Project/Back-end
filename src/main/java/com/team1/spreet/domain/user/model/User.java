@@ -5,9 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +31,7 @@ public class User extends TimeStamped {
     @Column(nullable = false)
     private String password;    //유저 비밀번호
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;       //유저 이메일
 
     @Column(nullable = false)
@@ -39,7 +39,7 @@ public class User extends TimeStamped {
     private UserRole userRole;  //유저 권한
 
     @Column(nullable = false)
-    private boolean isDeleted;  //유저 탈퇴 여부, 기본값=FALSE
+    private boolean deleted;  //유저 탈퇴 여부, 기본값=FALSE
 
     @Column(nullable = false)
     private String profileImage;   //프로필 사진
@@ -50,7 +50,7 @@ public class User extends TimeStamped {
         this.password = password;
         this.email = email;
         this.userRole = userRole;
-        this.isDeleted = Boolean.FALSE;
+        this.deleted = Boolean.FALSE;
         this.profileImage = profileImage;
     }
 
@@ -88,5 +88,9 @@ public class User extends TimeStamped {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void deleteUser() {
+        this.deleted = true;
     }
 }

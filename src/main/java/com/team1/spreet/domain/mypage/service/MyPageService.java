@@ -132,7 +132,7 @@ public class MyPageService {
 	}
 
 	private void checkUser(Long userId) {
-		if (userRepository.findByIdAndIsDeletedFalse(userId).isEmpty()) {
+		if (userRepository.findByIdAndDeletedFalse(userId).isEmpty()) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
 		}
 	}
