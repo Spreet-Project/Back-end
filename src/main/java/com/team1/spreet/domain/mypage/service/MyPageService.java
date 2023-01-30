@@ -16,6 +16,7 @@ import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -96,6 +97,7 @@ public class MyPageService {
 
 	// 회원이 작성한 게시글 목록(쇼츠,피드,행사) 조회
 	@Transactional(readOnly = true)
+	@Cacheable(key = "#page.toString() + #classification + #user.getId()", value = "shorts")
 	public List<MyPageDto.PostResponseDto> getPostList(String classification, int page, User user) {
 		checkUser(user.getId());
 
