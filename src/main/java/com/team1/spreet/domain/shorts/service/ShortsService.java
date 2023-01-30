@@ -15,6 +15,8 @@ import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
+	@CacheEvict(value = "shorts", allEntries = true)
 	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -39,6 +42,7 @@ public class ShortsService {
 	}
 
 	// shorts 수정
+	@CacheEvict(value = "shorts", allEntries = true)
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
@@ -62,6 +66,7 @@ public class ShortsService {
 
 
 	// shorts 삭제
+	@CacheEvict(value = "shorts", allEntries = true)
 	public void deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
@@ -107,6 +112,7 @@ public class ShortsService {
 
 	// 메인화면에서 shorts 조회(페이징)
 	@Transactional(readOnly = true)
+	@Cacheable(key = "#category", value = "shorts")
 	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable);
