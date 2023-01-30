@@ -1,10 +1,10 @@
 package com.team1.spreet.domain.mypage.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,22 +68,21 @@ public class MyPageDto {
 		private String category;
 
 		@ApiModelProperty(value = "등록 일자")
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm", timezone = "Asia/Seoul")
-		private LocalDateTime createdAt;
+		private String createdAt;
 
 		public PostResponseDto(String classification, Long id, String title, String category, LocalDateTime createdAt) {
 			this.classification = classification;
 			this.id = id;
 			this.title = title;
 			this.category = category;
-			this.createdAt = createdAt;
+			this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 		}
 
 		public PostResponseDto(String classification, Long id, String title, LocalDateTime createdAt) {
 			this.classification = classification;
 			this.id = id;
 			this.title = title;
-			this.createdAt = createdAt;
+			this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 		}
 	}
 }
