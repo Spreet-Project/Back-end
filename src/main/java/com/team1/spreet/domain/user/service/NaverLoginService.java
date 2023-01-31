@@ -65,7 +65,7 @@ public class NaverLoginService {
 		String token = jwtUtil.createToken(authentication);
 		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-		return new UserDto.LoginResponseDto(naverUser.getNickname());
+		return new UserDto.LoginResponseDto(naverUser.getNickname(), naverUser.getUserRole());
 	}
 
 	// 토큰 발급

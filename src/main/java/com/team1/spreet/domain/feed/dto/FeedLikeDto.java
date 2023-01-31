@@ -11,10 +11,10 @@ public class FeedLikeDto {
     public static class ResponseDto{
 
         @ApiModelProperty(value = "좋아요 상태")
-        private boolean isLike;
+        private boolean liked;
 
-        public ResponseDto(boolean isLike) {
-            this.isLike = isLike;
+        public ResponseDto(boolean liked) {
+            this.liked = liked;
         }
     }
 }
