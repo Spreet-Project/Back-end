@@ -52,8 +52,8 @@ public class FeedService {
             List<String> imageUrlList = getFeedImageUrlList(feed.getId());
             //로그인 여부에 따라 좋아요 추가
             if (userId != 0L) {
-                boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
-                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, isLike));
+                boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
+                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, liked));
             }else{
                 recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, false));
             }
@@ -81,8 +81,8 @@ public class FeedService {
         List<String> imageUrlList = getFeedImageUrlList(feedId);
         //로그인 여부 및 좋아요 여부 확인
         if (userId != 0L) {
-            boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
-            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, isLike);
+            boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
+            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, liked);
         }else{
             return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, false);
         }
