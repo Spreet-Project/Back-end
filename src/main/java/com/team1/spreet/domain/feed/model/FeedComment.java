@@ -5,16 +5,14 @@ import com.team1.spreet.global.common.model.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE feed_comment SET is_deleted = true WHERE feed_comment_id = ?")
-@Where(clause = "is_deleted = false")
+@DynamicUpdate
 public class FeedComment extends TimeStamped {
 
     @Id
@@ -26,7 +24,7 @@ public class FeedComment extends TimeStamped {
     private String content;
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;
+    private boolean deleted = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FEED_ID")
@@ -44,5 +42,8 @@ public class FeedComment extends TimeStamped {
         this.content = content;
         this.feed = feed;
         this.user = user;
+    }
+    public void delete(){
+        deleted = true;
     }
 }

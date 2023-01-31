@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
@@ -17,9 +18,11 @@ public class FeedDto {
     @Setter
     public static class RequestDto {
         @ApiModelProperty(value = "제목", required = true)
+        @NotBlank(message = "제목을 입력해 주세요.")
         private String title;
 
         @ApiModelProperty(value = "게시글 내용", required = true)
+        @NotBlank(message = "내용을 입력해 주세요.")
         private String content;
 
         @ApiModelProperty(value = "이미지 파일")

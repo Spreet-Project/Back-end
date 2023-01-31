@@ -115,7 +115,7 @@ public class MyPageService {
 
 		// feed
 		if (classification.equals("feed")) {
-			List<Feed> feedList = feedRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
+			List<Feed> feedList = feedRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
 			for (Feed feed : feedList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, feed.getId(), feed.getTitle(), feed.getCreatedAt()));
 			}

@@ -11,16 +11,11 @@ import java.util.List;
 
 public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> {
 
-    @Query("select distinct fc from FeedComment fc join fetch fc.user where fc.feed.id = :feedId and fc.isDeleted = false order by fc.createdAt DESC")
+    @Query("select distinct fc from FeedComment fc join fetch fc.user where fc.feed.id = :feedId and fc.deleted = false order by fc.createdAt DESC")
     List<FeedComment> findByFeedIdAndOrderByCreatedAtDesc(@Param("feedId")Long feedId);
 
     @Transactional
     @Modifying
-    @Query("update FeedComment f set f.isDeleted = true where f.feed.id = :feedId")
+    @Query("update FeedComment f set f.deleted = true where f.feed.id = :feedId")
     void updateIsDeletedTrueByFeedId(@Param("feedId")Long feedId);
-
-    @Transactional
-    @Modifying
-    @Query("update FeedComment fc set fc.isDeleted = True where fc.id = :commentId")
-    void updateIsDeletedTrueById(@Param("commentId") Long commentId);
 }
