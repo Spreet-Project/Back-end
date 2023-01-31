@@ -39,7 +39,7 @@ public class Event extends TimeStamped {
 	private String eventImageUrl;
 
 	@Column(nullable = false)
-	private boolean isDeleted = Boolean.FALSE;
+	private boolean deleted = Boolean.FALSE;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_ID")
@@ -67,5 +67,9 @@ public class Event extends TimeStamped {
 		this.date = date;
 		this.time = time;
 		this.eventImageUrl = eventImageUrl;
+	}
+
+	public void isDeleted() {
+		this.deleted = true;
 	}
 }

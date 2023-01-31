@@ -12,6 +12,8 @@ import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class EventService {
 	private final EventCommentRepository eventCommentRepository;
 
 	// Event 게시글 등록
+	@CacheEvict(value = "event", allEntries = true)
 	public void saveEvent(EventDto.RequestDto requestDto, User user) {
 		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -32,6 +35,7 @@ public class EventService {
 	}
 
 	// Event 게시글 수정
+	@CacheEvict(value = "event", allEntries = true)
 	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId, User user) {
 		Event event = checkEvent(eventId);
 		String eventImageUrl;
@@ -54,14 +58,17 @@ public class EventService {
 	}
 
 	// Event 게시글 삭제
+	@CacheEvict(value = "event", allEntries = true)
 	public void deleteEvent(Long eventId, User user) {
 		Event event = checkEvent(eventId);
 
-		if (user.getUserRole() == UserRole.ROLE_ADMIN ||checkOwner(event, user.getId())) {
-			String fileName = event.getEventImageUrl().split(".com/")[1];
-			awsS3Service.deleteFile(fileName);
-			deleteEventById(eventId);
+		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !checkOwner(event, user.getId())) {
+			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
+
+		String fileName = event.getEventImageUrl().split(".com/")[1];
+		awsS3Service.deleteFile(fileName);
+		deleteEventById(event);
 	}
 
 	// Event 게시글 상세조회
@@ -74,8 +81,9 @@ public class EventService {
 
 	// Event 게시글 전체조회
 	@Transactional(readOnly = true)
+	@Cacheable(value = "event")
 	public List<EventDto.ResponseDto> getEventList() {
-		List<Event> events = eventRepository.findAllByIsDeletedFalseWithUserOrderByCreatedAtDesc();
+		List<Event> events = eventRepository.findAllByDeletedFalseWithUserOrderByCreatedAtDesc();
 		List<EventDto.ResponseDto> eventList = new ArrayList<>();
 
 		for (Event event : events) {
@@ -87,7 +95,7 @@ public class EventService {
 
 	// Event 게시글이 존재하는지 확인
 	private Event checkEvent(Long eventId) {
-		return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
+		return eventRepository.findByIdAndDeletedFalse(eventId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
 		);
 	}
@@ -100,8 +108,8 @@ public class EventService {
 		return true;
 	}
 
-	private void deleteEventById(Long eventId) {
-		eventCommentRepository.updateIsDeletedTrueByEventId(eventId);
-		eventRepository.updateIsDeletedTrue(eventId);
+	private void deleteEventById(Event event) {
+		eventCommentRepository.updateDeletedTrueByEventId(event.getId());
+		event.isDeleted();
 	}
 }
