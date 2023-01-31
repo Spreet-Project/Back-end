@@ -11,8 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -36,23 +35,24 @@ public class WebSecurityConfig {
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-            .antMatchers("/api/user/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
-            .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/user/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
 
-            .antMatchers("/api/doc").permitAll()
-            .antMatchers("/swagger-ui/**").permitAll()
-            .antMatchers("/swagger-resources/**").permitAll()
-            .antMatchers("/swagger-ui.html").permitAll()
-            .antMatchers("/v2/api-docs").permitAll()
-            .antMatchers("/v3/api-docs").permitAll()
-            .antMatchers("/webjars/**").permitAll()
-            .antMatchers("/health").permitAll()
+                .antMatchers("/api/doc").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/v3/api-docs").permitAll()
+                .antMatchers("/webjars/**").permitAll()
+                .antMatchers("/health").permitAll()
+                .antMatchers("/api/confirm-email").permitAll()
 
-            .anyRequest().authenticated();
+                .anyRequest().authenticated();
 
         http
                 .logout()
@@ -122,7 +122,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 }

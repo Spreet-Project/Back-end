@@ -10,29 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventCommentRepository extends JpaRepository<EventComment, Long> {
-    @Query("select ec from EventComment ec where ec.id = :eventCommentId and ec.isDeleted = false")
-    Optional<EventComment> findByIdAndIsDeletedFalse(@Param("eventCommentId") Long eventCommentId);
 
-    @Transactional
-    @Modifying
-    @Query("update EventComment e set e.content = :content where e.id = :commentId and e.isDeleted = false")
-    void updateContentByIdAndIsDeletedFalse(@Param("content") String content, @Param("commentId") Long commentId);
-
-    @Transactional
-    @Modifying
-    @Query("update EventComment ec set ec.isDeleted = True where ec.id = :commentId")
-    void updateIsDeletedById(@Param("commentId") Long commentId);
+    Optional<EventComment> findByIdAndDeletedFalse(@Param("eventCommentId") Long eventCommentId);
 
     @Query("select distinct ec, ec.user.nickname from EventComment ec join fetch ec.user " +
-            "where ec.event.id = :eventId and ec.isDeleted = false order by ec.createdAt DESC")
-    List<EventComment> findByEventIdWithUserAndIsDeletedFalseOrderByCreatedAtDesc(@Param("eventId") Long eventId);
-
-
-
-
+            "where ec.event.id = :eventId and ec.deleted = false order by ec.createdAt DESC")
+    List<EventComment> findByEventIdWithUserAndDeletedFalseOrderByCreatedAtDesc(@Param("eventId") Long eventId);
 
 	@Transactional
 	@Modifying
-	@Query("update EventComment ec set ec.isDeleted = true where ec.event.id = :eventId")
-	void updateIsDeletedTrueByEventId(@Param("eventId") Long eventId);
+	@Query("update EventComment ec set ec.deleted = true where ec.event.id = :eventId")
+	void updateDeletedTrueByEventId(@Param("eventId") Long eventId);
+
 }

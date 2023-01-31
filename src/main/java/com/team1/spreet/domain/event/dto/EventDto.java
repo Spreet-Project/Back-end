@@ -3,6 +3,7 @@ package com.team1.spreet.domain.event.dto;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -78,7 +79,7 @@ public class EventDto {
 
 	@NoArgsConstructor
 	@Getter
-	public static class ResponseDto {
+	public static class ResponseDto implements Serializable {
 		@ApiModelProperty(value = "행사 게시글 ID")
 		private Long eventId;
 

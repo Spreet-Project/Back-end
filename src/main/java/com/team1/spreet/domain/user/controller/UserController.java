@@ -8,17 +8,13 @@ import com.team1.spreet.global.common.model.SuccessStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @Api(tags = "user")
 @RestController
@@ -39,7 +35,7 @@ public class UserController {
     @ApiOperation(value = "로그인 API")
     @PostMapping("/login")
     public CustomResponseBody<UserDto.LoginResponseDto> login(@RequestBody @ApiParam(value = "로그인 정보") final UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
-        return new CustomResponseBody<>(SuccessStatusCode.LOGIN_SUCCESS ,userService.login(requestDto, httpServletResponse));
+        return new CustomResponseBody<>(SuccessStatusCode.LOGIN_SUCCESS, userService.login(requestDto, httpServletResponse));
     }
 
     @ApiOperation(value = "아이디 중복확인 API")
@@ -56,18 +52,35 @@ public class UserController {
         return new CustomResponseBody<>(SuccessStatusCode.NICKNAME_DUPLICATE_CHECK);
     }
 
+    // *
     @ApiOperation(value = "비밀번호 재설정 API")
-    @PutMapping("/reset/password")
+    @PutMapping("/reset-password")
     public CustomResponseBody<SuccessStatusCode> resetPassword(
-        @RequestBody @Valid @ApiParam(value = "비밀번호 재설정을 위한 정보") UserDto.ResetPwRequestDto requestDto) {
+            @RequestBody @Valid @ApiParam(value = "비밀번호 재설정을 위한 정보") UserDto.ResetPwRequestDto requestDto) {
         userService.resetPassword(requestDto);
         return new CustomResponseBody<>(SuccessStatusCode.UPDATE_PASSWORD);
     }
 
     @ApiOperation(value = "회원탈퇴 API")
-    @PostMapping("/quit")
-    public CustomResponseBody<SuccessStatusCode> userWithdraw(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody String password) {
-        userService.userWithdraw(password, userDetails.getUser());
+    @DeleteMapping("/quit")
+    public CustomResponseBody<SuccessStatusCode> userWithdraw(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody UserDto.QuitRequestDto requestDto) {
+        userService.userWithdraw(requestDto.getPassword(), userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.WITHDRAW_SUCCESS);
+    }
+
+    @ApiOperation(value = "회원가입시 인증을 위해 이메일 전송하는 API")
+    @PostMapping("/send-email")
+    public CustomResponseBody<SuccessStatusCode> sendEmail(
+            @RequestParam @ApiParam(value = "이메일 주소") String email) throws Exception {
+        userService.signupSendEmail(email);
+        return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
+    }
+
+    @ApiOperation(value = "비밀번호 변경시 인증을 위해 이메일을 전송하는 API")
+    @PostMapping("/reset-password/send-email")
+    public CustomResponseBody<SuccessStatusCode> resetPasswordSendEmail(
+            @RequestParam @ApiParam(value = "이메일 주소") String email) throws Exception {
+        userService.resetPasswordSendEmail(email);
+        return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 }

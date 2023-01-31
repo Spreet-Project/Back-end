@@ -76,6 +76,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation 'org.springframework.boot:spring-boot-starter'
+
+    // 역직렬화
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
