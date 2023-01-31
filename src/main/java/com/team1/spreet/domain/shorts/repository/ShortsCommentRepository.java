@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ShortsCommentRepository extends JpaRepository<ShortsComment, Long> {
-    @Query("select distinct sc, sc.user.nickname from ShortsComment sc join fetch sc.user "
-        + "where sc.shorts.id = :shortsId and sc.isDeleted = false order by sc.createdAt desc")
-    List<ShortsComment> findByShortsIdAndIsDeletedFalseWithUserOrderByCreatedAtDesc(@Param("shortsId") Long shortsId);
+    @Query("select distinct sc, sc.user from ShortsComment sc join fetch sc.user "
+        + "where sc.shorts.id = :shortsId and sc.deleted = false order by sc.createdAt desc")
+    List<ShortsComment> findByShortsIdAndDeletedFalseWithUserOrderByCreatedAtDesc(@Param("shortsId") Long shortsId);
 
-    @Query("select distinct sc from ShortsComment sc join fetch sc.user where sc.id = :shortsCommentId and sc.isDeleted = false")
-    Optional<ShortsComment> findByIdAndIsDeletedFalseWithUser(@Param("shortsCommentId") Long shortsCommentId);
+    @Query("select distinct sc from ShortsComment sc join fetch sc.user where sc.id = :shortsCommentId and sc.deleted = false")
+    Optional<ShortsComment> findByIdAndDeletedFalseWithUser(@Param("shortsCommentId") Long shortsCommentId);
 
     @Transactional
     @Modifying
-    @Query("update ShortsComment sc set sc.isDeleted = true where sc.shorts.id = :shortsId")
-    void updateIsDeletedTrueByShortsId(@Param("shortsId") Long shortsId);
+    @Query("update ShortsComment sc set sc.deleted = true where sc.shorts.id = :shortsId")
+    void updateDeletedTrueByShortsId(@Param("shortsId") Long shortsId);
 }

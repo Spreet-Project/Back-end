@@ -106,7 +106,7 @@ public class MyPageService {
 		List<MyPageDto.PostResponseDto> postList = new ArrayList<>();
 		// shorts
 		if (classification.equals("shorts")) {
-			List<Shorts> shortsList = shortsRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
+			List<Shorts> shortsList = shortsRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
 			for (Shorts shorts : shortsList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, shorts.getId(), shorts.getTitle(),
 					shorts.getCategory().value(), shorts.getCreatedAt()));
@@ -115,7 +115,7 @@ public class MyPageService {
 
 		// feed
 		if (classification.equals("feed")) {
-			List<Feed> feedList = feedRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
+			List<Feed> feedList = feedRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
 			for (Feed feed : feedList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, feed.getId(), feed.getTitle(), feed.getCreatedAt()));
 			}

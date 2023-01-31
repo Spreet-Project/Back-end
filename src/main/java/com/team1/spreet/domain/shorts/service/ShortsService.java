@@ -94,7 +94,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, Long userId) {
 		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable);
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByDeletedFalseAndCategory(category, pageable);
 
 		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class ShortsService {
 	@Cacheable(key = "#category", value = "shorts")
 	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByIsDeletedFalseAndCategory(category, pageable);
+		List<Shorts> shortsByCategory = shortsRepository.findShortsByDeletedFalseAndCategory(category, pageable);
 
 		List<ShortsDto.SimpleResponseDto> shortsList = new ArrayList<>();
 
@@ -127,20 +127,20 @@ public class ShortsService {
 
 	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
 	private boolean checkLike(Long shortsId, Long userId) {
-		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, userId)
+		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId)
 			.orElse(null);
 		return shortsLike != null;
 	}
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findByIdAndIsDeletedFalseWithUser(shortsId).orElseThrow(
+		return shortsRepository.findByIdAndDeletedFalseWithUser(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
 	private void deleteShortsById(Shorts shorts) {
-		shortsCommentRepository.updateIsDeletedTrueByShortsId(shorts.getId());
+		shortsCommentRepository.updateDeletedTrueByShortsId(shorts.getId());
 		shortsLikeRepository.deleteByShortsId(shorts.getId());
 		shorts.isDeleted();
 	}
