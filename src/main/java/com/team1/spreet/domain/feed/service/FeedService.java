@@ -43,7 +43,7 @@ public class FeedService {
         //pageable 속성값 설정
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        List<Feed> feedList = feedRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
+        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
         //반환할 feedList 생성
         List<FeedDto.ResponseDto> recentFeedList = new ArrayList<>();
         for (Feed feed : feedList) {
@@ -145,7 +145,7 @@ public class FeedService {
         }
     }
     private void deleteByFeedId(Feed feed) {
-        feedCommentRepository.updateIsDeletedTrueByFeedId(feed.getId());
+        feedCommentRepository.updateDeletedTrueByFeedId(feed.getId());
         feedLikeRepository.deleteByFeedId(feed.getId());    //좋아요 삭제
         deleteImage(feed.getId());    //기존에 업로드된 이미지 제거
         feed.delete();    //feed 삭제
