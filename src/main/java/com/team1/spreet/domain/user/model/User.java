@@ -60,11 +60,15 @@ public class User extends TimeStamped {
     }
 
     public void approveCrew() {
-        this.userRole = UserRole.ROLE_ACCEPTED_CREW;
+        this.userRole = UserRole.ROLE_APPROVED_CREW;
     }
 
     public void rejectCrew() {
-        this.userRole = UserRole.ROLE_USER;
+        this.userRole = UserRole.ROLE_REJECTED_CREW;
+    }
+
+    public void cancel() {
+        this.userRole = UserRole.ROLE_WAITING_CREW;
     }
 
     //프로필 이미지 디폴트값
