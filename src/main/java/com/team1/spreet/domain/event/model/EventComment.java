@@ -28,7 +28,7 @@ public class EventComment extends TimeStamped {
 	private String content;
 
 	@Column(nullable = false)
-	private boolean isDeleted = Boolean.FALSE;
+	private boolean deleted = Boolean.FALSE;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "EVENT_ID")
@@ -46,5 +46,9 @@ public class EventComment extends TimeStamped {
 
 	public void updateEventComment(String content) {
 		this.content = content;
+	}
+
+	public void isDeleted() {
+		this.deleted = true;
 	}
 }

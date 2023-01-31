@@ -123,7 +123,7 @@ public class MyPageService {
 
 		// event
 		if (classification.equals("event")) {
-			List<Event> eventList = eventRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
+			List<Event> eventList = eventRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
 			for (Event event : eventList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, event.getId(), event.getTitle(), event.getCreatedAt()));
 			}
