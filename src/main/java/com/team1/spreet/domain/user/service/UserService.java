@@ -60,7 +60,7 @@ public class UserService {
     public UserDto.LoginResponseDto login(UserDto.LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
 
         // 크루 승인 대기 중인 유저는 로그인 불가
-        if (userRepository.findByLoginIdAndUserRoleAndDeletedFalse(requestDto.getLoginId(), UserRole.ROLE_UNACCEPTED_CREW).isPresent()) {
+        if (userRepository.findByLoginIdAndUserRoleAndDeletedFalse(requestDto.getLoginId(), UserRole.ROLE_WAITING_CREW).isPresent()) {
             throw new RestApiException(ErrorStatusCode.WAITING_CREW_APPROVAL);
         }
 

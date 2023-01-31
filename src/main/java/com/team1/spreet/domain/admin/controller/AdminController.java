@@ -45,4 +45,12 @@ public class AdminController {
 		adminService.rejectCrew(userId);
 		return new CustomResponseBody<>(SuccessStatusCode.REJECT_ROLE_CREW);
 	}
+
+	// 크루 회원 승인/거절 취소
+	@ApiOperation(value = "크루 회원 거절 API")
+	@PutMapping("/cancel/{userId}")
+	public CustomResponseBody<SuccessStatusCode> cancel(@PathVariable @ApiParam(value = "크루 회원 승인/거절 취소를 위한 회원 ID") Long userId) {
+		adminService.cancel(userId);
+		return new CustomResponseBody<>(SuccessStatusCode.CANCEL_ROLE_CREW);
+	}
 }

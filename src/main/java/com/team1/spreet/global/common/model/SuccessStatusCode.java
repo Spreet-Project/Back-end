@@ -31,6 +31,7 @@ public enum SuccessStatusCode {
     GET_CREW_LIST("크루 회원 승인 대기 리스트 조회 성공", HttpStatus.OK.value()),
     APPROVE_ROLE_CREW("크루 회원 승인 성공", HttpStatus.OK.value()),
     REJECT_ROLE_CREW("크루 회원 거절 성공", HttpStatus.OK.value()),
+    CANCEL_ROLE_CREW("크루 회원 승인/거절 취소", HttpStatus.OK.value()),
     EMAIL_SEND_SUCCESS("이메일 전송 성공", HttpStatus.OK.value()),
     EMAIL_CONFIRM_SUCCESS("이메일 인증 성공", HttpStatus.OK.value()),
     ID_DUPLICATE_CHECK("아이디 중복 확인 성공. 사용 가능한 아이디입니다.", HttpStatus.OK.value()),
