@@ -12,15 +12,15 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShortsRepository extends JpaRepository<Shorts, Long> {
-	@Query("select s from Shorts s where s.id = :shortsId and s.isDeleted = false")
-	Optional<Shorts> findByIdAndIsDeletedFalse(@Param("shortsId")Long shortsId);
 
-	@Query("select s from Shorts s join fetch s.user where s.id = :shortsId and s.isDeleted = false")
-	Optional<Shorts> findByIdAndIsDeletedFalseWithUser(@Param("shortsId")Long shortsId);
+	Optional<Shorts> findByIdAndDeletedFalse(Long shortsId);
+
+	@Query("select s from Shorts s join fetch s.user where s.id = :shortsId and s.deleted = false")
+	Optional<Shorts> findByIdAndDeletedFalseWithUser(@Param("shortsId")Long shortsId);
 
 	//카테고리별 조회
-	List<Shorts> findShortsByIsDeletedFalseAndCategory(@Param("category")Category category, Pageable pageable);
+	List<Shorts> findShortsByDeletedFalseAndCategory(Category category, Pageable pageable);
 
-	List<Shorts> findAllByUserIdAndIsDeletedFalse(Long userId, Pageable pageable);
+	List<Shorts> findAllByUserIdAndDeletedFalse(Long userId, Pageable pageable);
 
 }
