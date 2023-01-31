@@ -3,12 +3,12 @@ package com.team1.spreet.domain.event.service;
 import com.team1.spreet.domain.event.dto.EventCommentDto;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.event.model.EventComment;
-import com.team1.spreet.domain.user.model.User;
-import com.team1.spreet.domain.user.model.UserRole;
-import com.team1.spreet.global.error.model.ErrorStatusCode;
-import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.domain.event.repository.EventCommentRepository;
 import com.team1.spreet.domain.event.repository.EventRepository;
+import com.team1.spreet.domain.user.model.User;
+import com.team1.spreet.domain.user.model.UserRole;
+import com.team1.spreet.global.error.exception.RestApiException;
+import com.team1.spreet.global.error.model.ErrorStatusCode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,22 +29,27 @@ public class EventCommentService {
 
     public void updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto, User user){
         EventComment eventComment = checkEventComment(commentId);
+
         if(checkOwner(user, eventComment)){
-            eventCommentRepository.updateContentByIdAndIsDeletedFalse(requestDto.getContent(), commentId);
+            eventComment.updateEventComment(requestDto.getContent());
+            eventCommentRepository.saveAndFlush(eventComment);
         }
     }
 
     public void deleteEventComment(Long commentId, User user) {
         EventComment eventComment = checkEventComment(commentId);
-        if (checkOwner(user, eventComment)) {
-            eventCommentRepository.updateIsDeletedById(commentId);
+
+        if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !checkOwner(user, eventComment)) {
+            throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
         }
+        eventComment.isDeleted();
+        eventCommentRepository.saveAndFlush(eventComment);
     }
 
     @Transactional(readOnly = true)
     public List<EventCommentDto.ResponseDto> getEventCommentList(Long eventId) {
         checkEvent(eventId);
-        List<EventComment> eventComments = eventCommentRepository.findByEventIdWithUserAndIsDeletedFalseOrderByCreatedAtDesc(eventId);
+        List<EventComment> eventComments = eventCommentRepository.findByEventIdWithUserAndDeletedFalseOrderByCreatedAtDesc(eventId);
         List<EventCommentDto.ResponseDto> eventCommentList = new ArrayList<>();
         for (EventComment eventComment : eventComments) {
             eventCommentList.add(new EventCommentDto.ResponseDto(eventComment));
@@ -60,13 +65,13 @@ public class EventCommentService {
     }
 
     private EventComment checkEventComment(Long commentId) {
-        return eventCommentRepository.findByIdAndIsDeletedFalse(commentId).orElseThrow(
+        return eventCommentRepository.findByIdAndDeletedFalse(commentId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_COMMENT)
         );
     }
 
     private Event checkEvent(Long eventId) {
-        return eventRepository.findByIdAndIsDeletedFalse(eventId).orElseThrow(
+        return eventRepository.findByIdAndDeletedFalse(eventId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_EVENT)
         );
     }

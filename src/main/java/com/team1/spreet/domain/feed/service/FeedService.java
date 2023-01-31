@@ -1,6 +1,7 @@
 package com.team1.spreet.domain.feed.service;
 
 import com.team1.spreet.domain.alert.service.AlertService;
+import com.team1.spreet.domain.feed.dto.FeedDto;
 import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.model.FeedImage;
 import com.team1.spreet.domain.feed.repository.FeedCommentRepository;
@@ -11,9 +12,8 @@ import com.team1.spreet.domain.subscribe.model.Subscribe;
 import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
-import com.team1.spreet.domain.feed.dto.FeedDto;
-import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.error.exception.RestApiException;
+import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +32,10 @@ public class FeedService {
     private final AwsS3Service awsS3Service;
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
-    private final FeedCommentRepository feedCommentRepository;
     private final FeedImageRepository imageRepository;
     private final AlertService alertService;
     private final SubscribeRepository subscribeRepository;
+    private final FeedCommentRepository feedCommentRepository;
 
     //feed 최신순 조회
     @Transactional(readOnly = true)
@@ -63,7 +63,7 @@ public class FeedService {
     //feed 조회
     @Transactional(readOnly = true)
     public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
-        Feed feed = isFeedWithUser(feedId);
+        Feed feed = checkFeedWithUser(feedId);
         Long feedLikeCount = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
         List<String> imageUrlList = getFeedImageUrlList(feedId);
         //로그인 여부 및 좋아요 여부 확인
@@ -87,7 +87,7 @@ public class FeedService {
     public void updateFeed(Long feedId, FeedDto.RequestDto requestDto, User user) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         if(checkOwner(feed, user)){
-            feedRepository.updateFeedByIdAndUserId(requestDto.getTitle(), requestDto.getContent(), feedId, user.getId());
+            feed.update(requestDto.getTitle(), requestDto.getContent());
             //이미지가 있다면 새로운 이미지 저장
             if(!requestDto.getFile().isEmpty()) {
                 deleteImage(feedId);    //기존에 업로드된 이미지 제거
@@ -100,7 +100,7 @@ public class FeedService {
     public void deleteFeed(Long feedId, User user) {
         Feed feed = isFeed(feedId);    //feedId로 feed 찾기
         if(user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(feed, user)){
-            deleteFeedById(feedId);
+            deleteByFeedId(feed);
         }
     }
 
@@ -131,7 +131,7 @@ public class FeedService {
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
     }
-    private Feed isFeedWithUser(Long feedId){
+    private Feed checkFeedWithUser(Long feedId){
         return feedRepository.findByIdWithUser(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
@@ -144,11 +144,11 @@ public class FeedService {
             return true;
         }
     }
-    private void deleteFeedById(Long feedId) {
-        feedCommentRepository.updateIsDeletedTrueByFeedId(feedId);
-        feedLikeRepository.deleteByFeed(feedId);    //좋아요 삭제
-        deleteImage(feedId);    //기존에 업로드된 이미지 제거
-        feedRepository.updateIsDeletedTrueById(feedId);    //feed 삭제
+    private void deleteByFeedId(Feed feed) {
+        feedCommentRepository.updateIsDeletedTrueByFeedId(feed.getId());
+        feedLikeRepository.deleteByFeedId(feed.getId());    //좋아요 삭제
+        deleteImage(feed.getId());    //기존에 업로드된 이미지 제거
+        feed.delete();    //feed 삭제
     }
     private List<String> getFeedImageUrlList(Long feedId) {
         List<String> imageUrlList = new ArrayList<>();

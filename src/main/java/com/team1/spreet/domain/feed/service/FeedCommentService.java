@@ -3,12 +3,11 @@ package com.team1.spreet.domain.feed.service;
 import com.team1.spreet.domain.feed.dto.FeedCommentDto;
 import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.model.FeedComment;
-import com.team1.spreet.domain.user.model.User;
-import com.team1.spreet.global.error.model.ErrorStatusCode;
-import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.domain.feed.repository.FeedCommentRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
-import com.team1.spreet.domain.user.repository.UserRepository;
+import com.team1.spreet.domain.user.model.User;
+import com.team1.spreet.global.error.exception.RestApiException;
+import com.team1.spreet.global.error.model.ErrorStatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +21,15 @@ public class FeedCommentService {
 
     private final FeedRepository feedRepository;
     private final FeedCommentRepository feedCommentRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public void saveFeedComment(Long feedId, FeedCommentDto.RequestDto requestDto, User user) {
-        Feed feed = isFeed(feedId);
-        FeedComment feedComment = new FeedComment(requestDto.getContent(), feed, user);
-        feedCommentRepository.save(feedComment);
+        Feed feed = checkFeed(feedId);
+        feedCommentRepository.saveAndFlush(requestDto.toEntity(feed, user));
     }
     @Transactional
     public void updateFeedComment(Long commentId, FeedCommentDto.RequestDto requestDto, User user){
-        FeedComment feedComment = isFeedComment(commentId);
+        FeedComment feedComment = checkFeedComment(commentId);
         if(checkOwner(feedComment, user.getId())){
         feedComment.update(requestDto.getContent());
         }
@@ -40,10 +37,11 @@ public class FeedCommentService {
 
     @Transactional
     public void deleteFeedComment(Long commentId, User user) {
-        isFeedComment(commentId);    //userId, commentId로 comment 찾기
-        feedCommentRepository.updateIsDeletedTrueById(commentId);
+        FeedComment feedComment = checkFeedComment(commentId);    //userId, commentId로 comment 찾기
+        feedComment.delete();
     }
     //댓글 조회
+    @Transactional(readOnly = true)
     public List<FeedCommentDto.ResponseDto> getFeedComment(Long feedId) {
         List<FeedCommentDto.ResponseDto> commentList = new ArrayList<>();
         List<FeedComment> feedCommentList= feedCommentRepository.findByFeedIdAndOrderByCreatedAtDesc(feedId);
@@ -53,7 +51,7 @@ public class FeedCommentService {
         return commentList;
     }
 
-    private Feed isFeed(Long feedId) {
+    private Feed checkFeed(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
@@ -64,10 +62,9 @@ public class FeedCommentService {
         }
         return true;
     }
-    private FeedComment isFeedComment(Long commentId){
+    private FeedComment checkFeedComment(Long commentId){
         return feedCommentRepository.findById(commentId).orElseThrow(
                 ()-> new RestApiException(ErrorStatusCode.NOT_EXIST_COMMENT)
         );
     }
-
 }
