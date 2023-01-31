@@ -39,7 +39,7 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/shorts/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/event/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/event").hasRole("ACCEPTED_CREW")
+                .antMatchers(HttpMethod.POST, "/api/event").hasRole("APPROVED_CREW")
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
 
                 .antMatchers("/api/doc").permitAll()
