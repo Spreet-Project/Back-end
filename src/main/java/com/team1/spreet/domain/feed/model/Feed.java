@@ -5,6 +5,7 @@ import com.team1.spreet.global.common.model.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@DynamicUpdate
 public class Feed extends TimeStamped {
 
     @Id
@@ -27,7 +29,7 @@ public class Feed extends TimeStamped {
     private String content;     //피드 내용
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;  //피드 삭제 여부, 기본값=FALSE
+    private boolean deleted = Boolean.FALSE;  //피드 삭제 여부, 기본값=FALSE
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
@@ -47,9 +49,11 @@ public class Feed extends TimeStamped {
         this.content = content;
         this.user = user;
     }
-    public void update(String title, String content, User user) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.user = user;
+    }
+    public void delete(){
+        deleted = true;
     }
 }

@@ -1,10 +1,10 @@
 package com.team1.spreet.domain.feed.controller;
 
-import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.domain.feed.dto.FeedDto;
-import com.team1.spreet.global.common.model.SuccessStatusCode;
-import com.team1.spreet.global.auth.security.UserDetailsImpl;
 import com.team1.spreet.domain.feed.service.FeedService;
+import com.team1.spreet.global.auth.security.UserDetailsImpl;
+import com.team1.spreet.global.common.dto.CustomResponseBody;
+import com.team1.spreet.global.common.model.SuccessStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Api(tags = "feed")
@@ -45,7 +46,7 @@ public class FeedController {
     //feed 저장
     @ApiOperation(value = "피드 등록 API")
     @PostMapping("")
-    public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute @ApiParam(value = "피드 등록 정보") FeedDto.RequestDto requestDto,
+    public CustomResponseBody<SuccessStatusCode> saveFeed(@ModelAttribute @Valid @ApiParam(value = "피드 등록 정보") FeedDto.RequestDto requestDto,
                                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
         feedService.saveFeed(requestDto, userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.SAVE_FEED);
@@ -54,7 +55,7 @@ public class FeedController {
     @ApiOperation(value = "피드 수정 API")
     @PutMapping("/{feedId}")
     public CustomResponseBody<SuccessStatusCode> updateFeed(@PathVariable @ApiParam(value = "수정할 피드 ID") Long feedId,
-        @ModelAttribute @ApiParam(value = "피드 수정 정보") FeedDto.RequestDto requestDto,
+        @ModelAttribute @Valid @ApiParam(value = "피드 수정 정보") FeedDto.RequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails){
         feedService.updateFeed(feedId, requestDto, userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.UPDATE_FEED);

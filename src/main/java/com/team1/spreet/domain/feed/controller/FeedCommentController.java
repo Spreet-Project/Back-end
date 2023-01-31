@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Api(tags = "feedComment")
@@ -25,7 +26,8 @@ public class FeedCommentController {
     @ApiOperation(value = "피드 댓글 등록 API")
     @PostMapping("/{feedId}/comment")
     public CustomResponseBody<SuccessStatusCode> saveFeedComment(@PathVariable @ApiParam(value = "댓글 등록할 피드 ID") Long feedId,
-        @RequestBody @ApiParam(value = "등록할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                                 @RequestBody @Valid @ApiParam(value = "등록할 댓글 정보") FeedCommentDto.RequestDto requestDto,
+                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
         feedCommentService.saveFeedComment(feedId, requestDto, userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.SAVE_COMMENT);
     }
@@ -33,7 +35,8 @@ public class FeedCommentController {
     @ApiOperation(value = "피드 댓글 수정 API")
     @PutMapping("/comment/{commentId}")
     public CustomResponseBody<SuccessStatusCode> updateFeedComment(@PathVariable @ApiParam(value = "댓글 수정할 피드 ID") Long commentId,
-        @RequestBody @ApiParam(value = "수정할 댓글 정보") FeedCommentDto.RequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                                   @RequestBody @Valid @ApiParam(value = "수정할 댓글 정보") FeedCommentDto.RequestDto requestDto,
+                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         feedCommentService.updateFeedComment(commentId, requestDto, userDetails.getUser());
         return new CustomResponseBody<>(SuccessStatusCode.UPDATE_COMMENT);
     }

@@ -1,9 +1,12 @@
 package com.team1.spreet.domain.feed.dto;
 
+import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.model.FeedComment;
+import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +15,12 @@ public class FeedCommentDto {
     @Getter
     public static class RequestDto{
         @ApiModelProperty(value = "피드 댓글 내용", required = true)
+        @NotBlank(message = "댓글을 입력해 주세요.")
         private String content;
+
+        public FeedComment toEntity(Feed feed, User user){
+            return new FeedComment(this.content, feed, user);
+        }
     }
 
     @Getter
