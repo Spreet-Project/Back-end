@@ -20,7 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MyPageService {
 
 	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+	private final BCryptPasswordEncoder bcryptPasswordEncoder;
 	private final AwsS3Service awsS3Service;
 	private final ShortsRepository shortsRepository;
 	private final FeedRepository feedRepository;
@@ -80,10 +80,10 @@ public class MyPageService {
 		checkUser(user.getId());
 
 		// 기존과 동일한 비밀번호의 경우 에러처리
-		if (user.getPassword().equals(passwordEncoder.encode(requestDto.getPassword()))) {
+		if (user.getPassword().equals(bcryptPasswordEncoder.encode(requestDto.getPassword()))) {
 			throw new RestApiException(ErrorStatusCode.INVALID_PASSWORD);
 		}
-		user.updatePassword(passwordEncoder.encode(requestDto.getPassword()));
+		user.updatePassword(bcryptPasswordEncoder.encode(requestDto.getPassword()));
 		userRepository.saveAndFlush(user);
 	}
 
@@ -115,7 +115,7 @@ public class MyPageService {
 
 		// feed
 		if (classification.equals("feed")) {
-			List<Feed> feedList = feedRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
+			List<Feed> feedList = feedRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
 			for (Feed feed : feedList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, feed.getId(), feed.getTitle(), feed.getCreatedAt()));
 			}
