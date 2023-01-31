@@ -71,4 +71,19 @@ public class FeedDto {
             this.isLike = isLike;
         }
     }
+    @NoArgsConstructor
+    @Getter
+    public static class SimpleResponseDto{
+
+        @ApiModelProperty(value = "피드 ID")
+        private Long feedId;
+
+        @ApiModelProperty(value = "제목")
+        private String title;
+
+        public SimpleResponseDto(Feed feed){
+            this.feedId = feed.getId();
+            this.title = feed.getTitle();
+        }
+    }
 }

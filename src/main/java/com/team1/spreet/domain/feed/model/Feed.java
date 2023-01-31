@@ -53,7 +53,7 @@ public class Feed extends TimeStamped {
         this.title = title;
         this.content = content;
     }
-    public void delete(){
+    public void isDeleted(){
         deleted = true;
     }
 }

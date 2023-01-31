@@ -43,7 +43,7 @@ public class FeedService {
         //pageable 속성값 설정
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        List<Feed> feedList = feedRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
+        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
         //반환할 feedList 생성
         List<FeedDto.ResponseDto> recentFeedList = new ArrayList<>();
         for (Feed feed : feedList) {
@@ -59,6 +59,19 @@ public class FeedService {
             }
         }
         return recentFeedList;
+    }
+    @Transactional(readOnly = true)
+    public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();
+
+        List<FeedDto.SimpleResponseDto> simpleFeedList = new ArrayList<>();
+
+        for (Feed feed : feedList) {
+            simpleFeedList.add(new FeedDto.SimpleResponseDto(feed));
+        }
+        return simpleFeedList;
     }
     //feed 조회
     @Transactional(readOnly = true)
@@ -85,7 +98,7 @@ public class FeedService {
     //feed 수정
     @Transactional
     public void updateFeed(Long feedId, FeedDto.RequestDto requestDto, User user) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         if(checkOwner(feed, user)){
             feed.update(requestDto.getTitle(), requestDto.getContent());
             //이미지가 있다면 새로운 이미지 저장
@@ -98,7 +111,7 @@ public class FeedService {
     //feed 삭제
     @Transactional
     public void deleteFeed(Long feedId, User user) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         if(user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(feed, user)){
             deleteByFeedId(feed);
         }
@@ -126,7 +139,7 @@ public class FeedService {
         }
     }
     //feed 찾기
-    private Feed isFeed(Long feedId){
+    private Feed checkFeed(Long feedId){
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
@@ -148,7 +161,7 @@ public class FeedService {
         feedCommentRepository.updateIsDeletedTrueByFeedId(feed.getId());
         feedLikeRepository.deleteByFeedId(feed.getId());    //좋아요 삭제
         deleteImage(feed.getId());    //기존에 업로드된 이미지 제거
-        feed.delete();    //feed 삭제
+        feed.isDeleted();    //feed 삭제
     }
     private List<String> getFeedImageUrlList(Long feedId) {
         List<String> imageUrlList = new ArrayList<>();

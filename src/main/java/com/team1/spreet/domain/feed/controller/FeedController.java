@@ -35,6 +35,11 @@ public class FeedController {
         Long userId = userDetails == null ? 0L : userDetails.getUser().getId();   //비회원일 경우 userId = 0L
         return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getRecentFeed(page, size, userId));
     }
+    @ApiOperation(value = "메인 화면에서 feed 조회 API")
+    @GetMapping("/main")
+    public CustomResponseBody<List<FeedDto.SimpleResponseDto>> getSimpleFeed(){
+        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getSimpleFeed());
+    }
     //feed 조회
     @ApiOperation(value = "피드 상세조회 API")
     @GetMapping("/{feedId}")
