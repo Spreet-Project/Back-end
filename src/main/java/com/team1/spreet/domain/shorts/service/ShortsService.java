@@ -17,6 +17,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,7 +35,10 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 
 	// shorts 등록
-	@CacheEvict(value = "shorts", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "shorts", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
+	)
 	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -42,7 +46,10 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	@CacheEvict(value = "shorts", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "shorts", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
+	)
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
@@ -66,7 +73,10 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	@CacheEvict(value = "shorts", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "shorts", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
+	)
 	public void deleteShorts(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
