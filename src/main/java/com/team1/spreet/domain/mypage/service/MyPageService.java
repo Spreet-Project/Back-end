@@ -20,7 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MyPageService {
 
 	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+	private final BCryptPasswordEncoder bcryptPasswordEncoder;
 	private final AwsS3Service awsS3Service;
 	private final ShortsRepository shortsRepository;
 	private final FeedRepository feedRepository;
@@ -80,10 +80,10 @@ public class MyPageService {
 		checkUser(user.getId());
 
 		// 기존과 동일한 비밀번호의 경우 에러처리
-		if (user.getPassword().equals(passwordEncoder.encode(requestDto.getPassword()))) {
+		if (user.getPassword().equals(bcryptPasswordEncoder.encode(requestDto.getPassword()))) {
 			throw new RestApiException(ErrorStatusCode.INVALID_PASSWORD);
 		}
-		user.updatePassword(passwordEncoder.encode(requestDto.getPassword()));
+		user.updatePassword(bcryptPasswordEncoder.encode(requestDto.getPassword()));
 		userRepository.saveAndFlush(user);
 	}
 
@@ -106,7 +106,7 @@ public class MyPageService {
 		List<MyPageDto.PostResponseDto> postList = new ArrayList<>();
 		// shorts
 		if (classification.equals("shorts")) {
-			List<Shorts> shortsList = shortsRepository.findAllByUserIdAndIsDeletedFalse(user.getId(), pageable);
+			List<Shorts> shortsList = shortsRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
 			for (Shorts shorts : shortsList) {
 				postList.add(new MyPageDto.PostResponseDto(classification, shorts.getId(), shorts.getTitle(),
 					shorts.getCategory().value(), shorts.getCreatedAt()));

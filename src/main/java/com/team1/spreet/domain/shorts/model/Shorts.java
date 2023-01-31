@@ -49,7 +49,7 @@ public class Shorts extends TimeStamped {
     private Long likeCount = 0L;
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;  //쇼츠 삭제 여부, 기본값=FALSE
+    private boolean deleted = Boolean.FALSE;  //쇼츠 삭제 여부, 기본값=FALSE
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
@@ -77,7 +77,7 @@ public class Shorts extends TimeStamped {
     }
 
     public void isDeleted() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
 
     public void addLike() {

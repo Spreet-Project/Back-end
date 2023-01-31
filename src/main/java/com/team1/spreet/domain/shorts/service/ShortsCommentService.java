@@ -55,7 +55,7 @@ public class ShortsCommentService {
 		checkShorts(shortsId);
 
 		List<ShortsComment> comments = shortsCommentRepository.
-			findByShortsIdAndIsDeletedFalseWithUserOrderByCreatedAtDesc(shortsId);
+			findByShortsIdAndDeletedFalseWithUserOrderByCreatedAtDesc(shortsId);
 
 		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
 		for (ShortsComment comment : comments) {
@@ -66,14 +66,14 @@ public class ShortsCommentService {
 
 	// shorts 가 존재하는지 확인
 	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findByIdAndIsDeletedFalse(shortsId).orElseThrow(
+		return shortsRepository.findByIdAndDeletedFalse(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
 	// shortsComment 가 존재하는지 확인
 	private ShortsComment checkShortsComment(Long shortsCommentId) {
-		return shortsCommentRepository.findByIdAndIsDeletedFalseWithUser(shortsCommentId).orElseThrow(
+		return shortsCommentRepository.findByIdAndDeletedFalseWithUser(shortsCommentId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_COMMENT)
 		);
 	}

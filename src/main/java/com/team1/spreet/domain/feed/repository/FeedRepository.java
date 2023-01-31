@@ -13,7 +13,7 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     //최신순 feed 조회 시 page 별 조회
     @Query("select distinct f from Feed f inner join f.user where f.deleted = false order by f.createdAt DESC")
-    Page<Feed> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<Feed> findByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     @Query("select distinct f from Feed f join fetch f.user where f.id = :feedId")
     Optional<Feed> findByIdWithUser(Long feedId);

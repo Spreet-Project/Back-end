@@ -119,9 +119,9 @@ public class ShortsDto {
 		private Long likeCount = 0L;       //좋아요 갯수
 
 		@ApiModelProperty(value = "좋아요 상태")
-		private boolean isLike;      //좋아요 상태(true, false)
+		private boolean liked;      //좋아요 상태(true, false)
 
-		public ResponseDto(Shorts shorts, boolean isLike) {
+		public ResponseDto(Shorts shorts, boolean liked) {
 			this.shortsId = shorts.getId();
 			this.nickname = shorts.getUser().getNickname();
 			this.title = shorts.getTitle();
@@ -130,7 +130,7 @@ public class ShortsDto {
 			this.category = shorts.getCategory().value();
 			this.profileImageUrl = shorts.getUser().getProfileImage();
 			this.likeCount = shorts.getLikeCount();
-			this.isLike = isLike;
+			this.liked = liked;
 		}
 	}
 

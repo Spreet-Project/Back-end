@@ -25,7 +25,7 @@ public class ShortsLikeService {
 	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, User user) {
 		Shorts shorts = checkShorts(shortsId);
 
-		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserIdAndIsDeletedFalse(shortsId, user.getId()).orElse(null);
+		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, user.getId()).orElse(null);
 		if (findShortsLike != null) {
 			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);

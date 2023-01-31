@@ -30,7 +30,7 @@ public class ShortsComment extends TimeStamped {
     private String content;
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;
+    private boolean deleted = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHORTS_ID")
@@ -51,6 +51,6 @@ public class ShortsComment extends TimeStamped {
     }
 
     public void idDeleted() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
 }
