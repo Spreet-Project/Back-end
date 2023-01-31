@@ -58,9 +58,9 @@ public class FeedDto {
         private Long feedLike;
 
         @ApiModelProperty(value = "좋아요 상태")
-        private boolean isLike;
+        private boolean liked;
 
-        public ResponseDto(Feed feed, List<String> imageUrlList, Long feedLike, boolean isLike) {
+        public ResponseDto(Feed feed, List<String> imageUrlList, Long feedLike, boolean liked) {
             this.feedId = feed.getId();
             this.nickname = feed.getUser().getNickname();
             this.title = feed.getTitle();
@@ -68,7 +68,22 @@ public class FeedDto {
             this.imageUrlList = imageUrlList;
             this.profileImageUrl = feed.getUser().getProfileImage();
             this.feedLike = feedLike;
-            this.isLike = isLike;
+            this.liked = liked;
+        }
+    }
+    @NoArgsConstructor
+    @Getter
+    public static class SimpleResponseDto{
+
+        @ApiModelProperty(value = "피드 ID")
+        private Long feedId;
+
+        @ApiModelProperty(value = "제목")
+        private String title;
+
+        public SimpleResponseDto(Feed feed){
+            this.feedId = feed.getId();
+            this.title = feed.getTitle();
         }
     }
 }

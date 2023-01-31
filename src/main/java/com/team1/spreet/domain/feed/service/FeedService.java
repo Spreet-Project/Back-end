@@ -52,13 +52,26 @@ public class FeedService {
             List<String> imageUrlList = getFeedImageUrlList(feed.getId());
             //로그인 여부에 따라 좋아요 추가
             if (userId != 0L) {
-                boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
-                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, isLike));
+                boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
+                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, liked));
             }else{
                 recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, false));
             }
         }
         return recentFeedList;
+    }
+    @Transactional(readOnly = true)
+    public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();
+
+        List<FeedDto.SimpleResponseDto> simpleFeedList = new ArrayList<>();
+
+        for (Feed feed : feedList) {
+            simpleFeedList.add(new FeedDto.SimpleResponseDto(feed));
+        }
+        return simpleFeedList;
     }
     //feed 조회
     @Transactional(readOnly = true)
@@ -68,8 +81,8 @@ public class FeedService {
         List<String> imageUrlList = getFeedImageUrlList(feedId);
         //로그인 여부 및 좋아요 여부 확인
         if (userId != 0L) {
-            boolean isLike = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
-            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, isLike);
+            boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
+            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, liked);
         }else{
             return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, false);
         }
@@ -85,7 +98,7 @@ public class FeedService {
     //feed 수정
     @Transactional
     public void updateFeed(Long feedId, FeedDto.RequestDto requestDto, User user) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         if(checkOwner(feed, user)){
             feed.update(requestDto.getTitle(), requestDto.getContent());
             //이미지가 있다면 새로운 이미지 저장
@@ -98,7 +111,7 @@ public class FeedService {
     //feed 삭제
     @Transactional
     public void deleteFeed(Long feedId, User user) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         if(user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(feed, user)){
             deleteByFeedId(feed);
         }
@@ -126,7 +139,7 @@ public class FeedService {
         }
     }
     //feed 찾기
-    private Feed isFeed(Long feedId){
+    private Feed checkFeed(Long feedId){
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
@@ -148,7 +161,7 @@ public class FeedService {
         feedCommentRepository.updateDeletedTrueByFeedId(feed.getId());
         feedLikeRepository.deleteByFeedId(feed.getId());    //좋아요 삭제
         deleteImage(feed.getId());    //기존에 업로드된 이미지 제거
-        feed.delete();    //feed 삭제
+        feed.isDeleted();    //feed 삭제
     }
     private List<String> getFeedImageUrlList(Long feedId) {
         List<String> imageUrlList = new ArrayList<>();
