@@ -124,8 +124,12 @@ public class UserDto {
         @ApiModelProperty(value = "닉네임")
         private String nickname;
 
-        public LoginResponseDto(String nickname) {
+        @ApiModelProperty(value = "회원 권한")
+        private String userRole;
+
+        public LoginResponseDto(String nickname, UserRole userRole) {
             this.nickname = nickname;
+            this.userRole = userRole.value();
         }
     }
 

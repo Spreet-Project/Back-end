@@ -54,7 +54,7 @@ public class KakaoLoginService {
 
         httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return new UserDto.LoginResponseDto(kakaoUser.getNickname());
+        return new UserDto.LoginResponseDto(kakaoUser.getNickname(), kakaoUser.getUserRole());
     }
 
     private String getToken(String code) throws JsonProcessingException {

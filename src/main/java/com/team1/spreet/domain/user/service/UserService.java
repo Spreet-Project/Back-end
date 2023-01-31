@@ -124,6 +124,6 @@ public class UserService {
         User user = userRepository.findByLoginId(requestDto.getLoginId()).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_USER)
         );
-        return new UserDto.LoginResponseDto(user.getNickname());
+        return new UserDto.LoginResponseDto(user.getNickname(), user.getUserRole());
     }
 }
