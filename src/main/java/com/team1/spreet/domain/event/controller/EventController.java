@@ -65,7 +65,7 @@ public class EventController {
 	}
 
 	// Event 전체 조회
-	@ApiOperation(value = "행사 게시글 상세조회 API")
+	@ApiOperation(value = "행사 게시글 전체조회 API")
 	@GetMapping
 	public CustomResponseBody<List<EventDto.ResponseDto>> getEventList() {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventList());
