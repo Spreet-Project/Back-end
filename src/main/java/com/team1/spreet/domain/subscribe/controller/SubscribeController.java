@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class SubscribeController {
     private final SubscribeService subscribeService;
     @PostMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 ID") @PathVariable Long publisherId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 ID") @PathVariable Long publisherId,
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return new CustomResponseBody<>(subscribeService.subscribe(publisherId, userDetails));
     }
     @DeleteMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 ID") @PathVariable Long publisherId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 ID") @PathVariable Long publisherId,
+                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return new CustomResponseBody<>(subscribeService.cancelSubscribe(publisherId, userDetails));
     }
 }
