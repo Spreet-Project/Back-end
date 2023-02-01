@@ -33,9 +33,9 @@ public class AlarmService {
         if(emitters.containsKey(userId)){
             SseEmitter emitter = emitters.get(userId);
             try {
-                List<Alarm> alarms = alarmRepository.findAllByReceiverIdAndReadFalse(user.getId());
+                List<Alarm> alarms = alarmRepository.findAllByReceiverIdAndCheckedFalse(user.getId());
                 for (Alarm alarm : alarms) {
-                    if (!alarm.isRead()) {
+                    if (!alarm.isChecked()) {
                         emitter.send(SseEmitter
                                 .event()
                                 .name("미수신 알림")
@@ -71,7 +71,7 @@ public class AlarmService {
     @Transactional(readOnly = true)
     public List<AlarmDto.ResponseDto> getAllAlarm(User user) {
         List<AlarmDto.ResponseDto> alarmList = new ArrayList<>();
-        List<Alarm> alarms = alarmRepository.findAllByReceiverIdAndReadFalse(user.getId());
+        List<Alarm> alarms = alarmRepository.findAllByReceiverIdAndCheckedFalse(user.getId());
         for (Alarm alarm : alarms) {
             alarmList.add(new AlarmDto.ResponseDto(alarm));
         }
