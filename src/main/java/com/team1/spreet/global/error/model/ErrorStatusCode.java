@@ -16,7 +16,7 @@ public enum ErrorStatusCode {
     UNAVAILABLE_MODIFICATION("작성자만 수정/삭제 할 수 있습니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_FEED("존재하지 않는 피드입니다", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_COMMENT("존재하지 않는 댓글입니다",HttpStatus.BAD_REQUEST.value()),
-    NOT_EXIST_ALERT("존재하지 않는 알람입니다",HttpStatus.BAD_REQUEST.value()),
+    NOT_EXIST_ALARM("존재하지 않는 알람입니다",HttpStatus.BAD_REQUEST.value()),
     WAITING_CREW_APPROVAL("크루회원 승인 대기 중입니다.", HttpStatus.BAD_REQUEST.value()),
     NOT_EXIST_USER("존재하지 않는 회원입니다.", HttpStatus.BAD_REQUEST.value()),
     EMAIL_CONFIRM_INCORRECT("올바른 인증코드가 아닙니다.", HttpStatus.BAD_REQUEST.value()),

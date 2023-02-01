@@ -1,6 +1,6 @@
 package com.team1.spreet.domain.feed.service;
 
-import com.team1.spreet.domain.alert.service.AlertService;
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.feed.dto.FeedDto;
 import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.model.FeedImage;
@@ -33,7 +33,7 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final FeedImageRepository imageRepository;
-    private final AlertService alertService;
+    private final AlarmService alertService;
     private final SubscribeRepository subscribeRepository;
     private final FeedCommentRepository feedCommentRepository;
 
