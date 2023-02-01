@@ -16,14 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/subscribe")
 public class SubscribeController {
     private final SubscribeService subscribeService;
-    @PostMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 ID") @PathVariable Long publisherId,
+    @PostMapping("/{publisherNickname}")
+    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 ID") @PathVariable String publisherNickname,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(subscribeService.subscribe(publisherId, userDetails));
+        subscribeService.subscribe(publisherNickname, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.SUBSCRIBE);
     }
-    @DeleteMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 ID") @PathVariable Long publisherId,
+    @DeleteMapping("/{publisherNickname}")
+    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 ID") @PathVariable String  publisherNickname,
                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(subscribeService.cancelSubscribe(publisherId, userDetails));
+        subscribeService.cancelSubscribe(publisherNickname, userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.CANCEL_SUBSCRIBE);
     }
 }
