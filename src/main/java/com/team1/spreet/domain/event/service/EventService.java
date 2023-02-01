@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,10 @@ public class EventService {
 	private final EventCommentRepository eventCommentRepository;
 
 	// Event 게시글 등록
-	@CacheEvict(value = "event", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "event", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'event'", value = "postList")}
+	)
 	public void saveEvent(EventDto.RequestDto requestDto, User user) {
 		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -35,7 +39,10 @@ public class EventService {
 	}
 
 	// Event 게시글 수정
-	@CacheEvict(value = "event", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "event", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'event'", value = "postList")}
+	)
 	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId, User user) {
 		Event event = checkEvent(eventId);
 		String eventImageUrl;
@@ -58,7 +65,10 @@ public class EventService {
 	}
 
 	// Event 게시글 삭제
-	@CacheEvict(value = "event", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "event", allEntries = true),
+		@CacheEvict(key = "#user.getId() + 'event'", value = "postList")}
+	)
 	public void deleteEvent(Long eventId, User user) {
 		Event event = checkEvent(eventId);
 

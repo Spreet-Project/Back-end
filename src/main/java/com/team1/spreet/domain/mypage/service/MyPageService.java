@@ -97,7 +97,7 @@ public class MyPageService {
 
 	// 회원이 작성한 게시글 목록(쇼츠,피드,행사) 조회
 	@Transactional(readOnly = true)
-	@Cacheable(key = "#page.toString() + #classification + #user.getId()", value = "shorts")
+	@Cacheable(key = "#user.getId() + #classification", value = "postList")
 	public List<MyPageDto.PostResponseDto> getPostList(String classification, int page, User user) {
 		checkUser(user.getId());
 
