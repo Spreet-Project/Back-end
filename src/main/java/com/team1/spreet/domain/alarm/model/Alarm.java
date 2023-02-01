@@ -1,5 +1,6 @@
-package com.team1.spreet.domain.alert.model;
+package com.team1.spreet.domain.alarm.model;
 
+import com.team1.spreet.domain.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +12,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Alert {
+public class Alarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "alert_id")
+    @Column(name = "alarm_id")
     private Long id;
 
     @Column
@@ -25,22 +26,24 @@ public class Alert {
     private String url;    //알림 클릭시 이동할 페이지
 
     @Column
-    private boolean isRead;    //알림 확인 여부
+    private boolean read;    //알림 확인 여부
 
-    @Column
-    private String sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SENDER_ID")
+    private User sender;
 
-    @Column
-    private String receiver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RECEIVER_ID")
+    private User receiver;
     @Builder
-    public Alert(String content, String url, boolean isRead, String sender, String receiver) {
+    public Alarm(String content, String url, boolean read, User sender, User receiver) {
         this.content = content;
         this.url = url;
-        this.isRead = isRead;
+        this.read = read;
         this.sender = sender;
         this.receiver = receiver;
     }
-    public void ReadAlert(){
-        this.isRead = true;
+    public void readAlarm(){
+        this.read = true;
     }
 }
