@@ -3,7 +3,6 @@ package com.team1.spreet.domain.shorts.service;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
 import com.team1.spreet.domain.shorts.model.Category;
 import com.team1.spreet.domain.shorts.model.Shorts;
-import com.team1.spreet.domain.shorts.model.ShortsLike;
 import com.team1.spreet.domain.shorts.repository.ShortsCommentRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsLikeRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
@@ -12,15 +11,11 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
-import java.util.ArrayList;
+import com.team1.spreet.global.util.RedisUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +28,9 @@ public class ShortsService {
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
+	private final RedisUtil redisUtil;
 
 	// shorts 등록
-	@Caching(evict = {
-		@CacheEvict(value = "shorts", allEntries = true),
-		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
-	)
 	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -46,12 +38,9 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	@Caching(evict = {
-		@CacheEvict(value = "shorts", allEntries = true),
-		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
-	)
+	@CacheEvict(key = "#requestDto.getCategory()",value = "shorts")
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
-		Shorts shorts = checkShorts(shortsId);
+		Shorts shorts = getShortsWithUserIfExists(shortsId);
 		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
@@ -73,12 +62,8 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	@Caching(evict = {
-		@CacheEvict(value = "shorts", allEntries = true),
-		@CacheEvict(key = "#user.getId() + 'shorts'", value = "postList")}
-	)
 	public void deleteShorts(Long shortsId, User user) {
-		Shorts shorts = checkShorts(shortsId);
+		Shorts shorts = getShortsWithUserIfExists(shortsId);
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
@@ -86,69 +71,40 @@ public class ShortsService {
 		String fileName = shorts.getVideoUrl().split(".com/")[1];
 		awsS3Service.deleteFile(fileName);
 		deleteShortsById(shorts);
+
+		redisUtil.deleteCache(shorts.getCategory());    // 해당 카테고리 캐시 삭제
 	}
 
 	// shorts 상세조회
 	@Transactional(readOnly = true)
 	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
-		Shorts shorts = checkShorts(shortsId);
-
-		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
-			return new ShortsDto.ResponseDto(shorts, false);
-		} else {
-			return new ShortsDto.ResponseDto(shorts, checkLike(shortsId, userId));
+		if (shortsRepository.findByIdAndDeletedFalse(shortsId).isEmpty()) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS);
 		}
+		return shortsRepository.findByIdAndUserId(shortsId, userId);
 	}
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, int page, Long userId) {
-		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByDeletedFalseAndCategory(category, pageable);
-
-		List<ShortsDto.ResponseDto> shortsList = new ArrayList<>();
-
-		if (userId == 0L) {   //로그인 하지 않은 user 의 경우
-			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts, false));
-			}
-		} else {
-			for (Shorts shorts : shortsByCategory) {
-				shortsList.add(new ShortsDto.ResponseDto(shorts, checkLike(shorts.getId(), userId)));
-			}
-		}
-		return shortsList;
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, Long page, Long userId) {
+		return shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
 	}
 
 	// 메인화면에서 shorts 조회(페이징)
 	@Transactional(readOnly = true)
 	@Cacheable(key = "#category", value = "shorts")
-	public List<ShortsDto.SimpleResponseDto> getSimpleShortsByCategory(Category category) {
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<Shorts> shortsByCategory = shortsRepository.findShortsByDeletedFalseAndCategory(category, pageable);
-
-		List<ShortsDto.SimpleResponseDto> shortsList = new ArrayList<>();
-
-		for (Shorts shorts : shortsByCategory) {
-			shortsList.add(new ShortsDto.SimpleResponseDto(shorts));
-		}
-		return shortsList;
-	}
-
-	// user 가 해당 shorts 에 좋아요를 눌렀는지 확인
-	private boolean checkLike(Long shortsId, Long userId) {
-		ShortsLike shortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, userId)
-			.orElse(null);
-		return shortsLike != null;
+	public List<ShortsDto.MainResponseDto> getMainShortsByCategory(Category category) {
+		return shortsRepository.findMainShortsByCategory(category);
 	}
 
 	// shorts 가 존재하는지 확인
-	private Shorts checkShorts(Long shortsId) {
+	private Shorts getShortsWithUserIfExists(Long shortsId) {
 		return shortsRepository.findByIdAndDeletedFalseWithUser(shortsId).orElseThrow(
 			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
 		);
 	}
 
+	// shorts 삭제시, 댓글 -> 좋아요 -> shorts 순으로 삭제
 	private void deleteShortsById(Shorts shorts) {
 		shortsCommentRepository.updateDeletedTrueByShortsId(shorts.getId());
 		shortsLikeRepository.deleteByShortsId(shorts.getId());

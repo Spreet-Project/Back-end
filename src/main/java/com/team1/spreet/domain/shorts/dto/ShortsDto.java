@@ -62,7 +62,7 @@ public class ShortsDto {
 
 	@NoArgsConstructor
 	@Getter
-	public static class SimpleResponseDto implements Serializable {
+	public static class MainResponseDto implements Serializable {
 		@ApiModelProperty(value = "쇼츠 ID")
 		private Long shortsId;
 
@@ -76,17 +76,17 @@ public class ShortsDto {
 		private String videoUrl;
 
 		@ApiModelProperty(value = "카테고리")
-		private String category;
+		private Category category;
 
 		@ApiModelProperty(value = "프로필 이미지")
 		private String profileImageUrl;
 
-		public SimpleResponseDto(Shorts shorts) {
+		public MainResponseDto(Shorts shorts) {
 			this.shortsId = shorts.getId();
 			this.nickname = shorts.getUser().getNickname();
 			this.title = shorts.getTitle();
 			this.videoUrl = shorts.getVideoUrl();
-			this.category = shorts.getCategory().value();
+			this.category = shorts.getCategory();
 			this.profileImageUrl = shorts.getUser().getProfileImage();
 		}
 	}
@@ -110,7 +110,7 @@ public class ShortsDto {
 		private String videoUrl;
 
 		@ApiModelProperty(value = "카테고리")
-		private String category;
+		private Category category;
 
 		@ApiModelProperty(value = "프로필 이미지")
 		private String profileImageUrl;
@@ -127,7 +127,7 @@ public class ShortsDto {
 			this.title = shorts.getTitle();
 			this.content = shorts.getContent();
 			this.videoUrl = shorts.getVideoUrl();
-			this.category = shorts.getCategory().value();
+			this.category = shorts.getCategory();
 			this.profileImageUrl = shorts.getUser().getProfileImage();
 			this.likeCount = shorts.getLikeCount();
 			this.liked = liked;

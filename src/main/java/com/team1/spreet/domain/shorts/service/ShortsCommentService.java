@@ -9,7 +9,6 @@ import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,14 +53,7 @@ public class ShortsCommentService {
 	public List<ShortsCommentDto.ResponseDto> getCommentList(Long shortsId) {
 		checkShorts(shortsId);
 
-		List<ShortsComment> comments = shortsCommentRepository.
-			findByShortsIdAndDeletedFalseWithUserOrderByCreatedAtDesc(shortsId);
-
-		List<ShortsCommentDto.ResponseDto> commentList = new ArrayList<>();
-		for (ShortsComment comment : comments) {
-			commentList.add(new ShortsCommentDto.ResponseDto(comment));
-		}
-		return commentList;
+		return shortsCommentRepository.findAllByShortsId(shortsId);
 	}
 
 	// shorts 가 존재하는지 확인

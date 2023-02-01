@@ -57,16 +57,9 @@ public class RedisConfig {
 
         // 캐시키별 유효시간 설정
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
-        cacheConfigurations.put(CacheKey.POST_LIST, RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofSeconds(CacheKey.POST_EXPIRE_SEC)));
-
-        cacheConfigurations.put(CacheKey.EVENT, RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofSeconds(CacheKey.EVENT_EXPIRE_SEC)));
 
         cacheConfigurations.put(CacheKey.SHORTS, RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofSeconds(CacheKey.DEFAULT_EXPIRE_SEC)));
-
-
 
         return RedisCacheManager.RedisCacheManagerBuilder
             .fromConnectionFactory(redisConnectionFactory())
