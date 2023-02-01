@@ -17,7 +17,7 @@ public class AlarmDto {
             this.id = alarm.getId();
             this.content = alarm.getContent();
             this.url = alarm.getUrl();
-            this.read = alarm.isRead();
+            this.read = alarm.isChecked();
         }
     }
 }
