@@ -79,7 +79,7 @@ public class MyPageController {
 	@GetMapping("/post")
 	public CustomResponseBody<List<MyPageDto.PostResponseDto>> getPostList (
 		@RequestParam(value = "classification") @ApiParam(value = "게시글 분류") String classification,
-		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") int page,
+		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_POST_LIST,
 			myPageService.getPostList(classification, page, userDetails.getUser()));

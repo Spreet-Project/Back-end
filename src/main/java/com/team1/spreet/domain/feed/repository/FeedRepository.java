@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface FeedRepository extends JpaRepository<Feed, Long> {
+public interface FeedRepository extends JpaRepository<Feed, Long>, FeedCustomRepository {
 
     //최신순 feed 조회 시 page 별 조회
     @Query("select distinct f from Feed f inner join f.user where f.deleted = false order by f.createdAt DESC")
