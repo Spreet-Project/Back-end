@@ -1,9 +1,10 @@
 package com.team1.spreet.domain.subscribe.controller;
 
+import com.team1.spreet.domain.subscribe.dto.SubscribeDto;
+import com.team1.spreet.domain.subscribe.service.SubscribeService;
+import com.team1.spreet.global.auth.security.UserDetailsImpl;
 import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
-import com.team1.spreet.global.auth.security.UserDetailsImpl;
-import com.team1.spreet.domain.subscribe.service.SubscribeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/subscribe")
 public class SubscribeController {
     private final SubscribeService subscribeService;
-    @PostMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 ID") @PathVariable Long publisherId,
+    @PostMapping
+    public CustomResponseBody<SuccessStatusCode> subscribe(@ApiParam(value = "구독을 요청한 회원 nickname") @RequestBody SubscribeDto.RequestDto requestDto,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(subscribeService.subscribe(publisherId, userDetails));
+        subscribeService.subscribe(requestDto.getNickname(), userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.SUBSCRIBE);
     }
-    @DeleteMapping("/{publisherId}")
-    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 ID") @PathVariable Long publisherId,
+    @DeleteMapping
+    public CustomResponseBody<SuccessStatusCode> cancelSubscribe(@ApiParam(value = "구독 취소를 요청한 회원 nickname") @RequestBody SubscribeDto.RequestDto requestDto,
                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return new CustomResponseBody<>(subscribeService.cancelSubscribe(publisherId, userDetails));
+        subscribeService.cancelSubscribe(requestDto.getNickname(), userDetails.getUser());
+        return new CustomResponseBody<>(SuccessStatusCode.CANCEL_SUBSCRIBE);
     }
 }
