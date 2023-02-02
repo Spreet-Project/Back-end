@@ -11,11 +11,8 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
-import com.team1.spreet.global.util.RedisUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +25,8 @@ public class ShortsService {
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
-	private final RedisUtil redisUtil;
 
-	// shorts 등록
-	@CacheEvict(key = "#requestDto.getCategory()",value = "shorts")
+	// shorts 등록제
 	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
@@ -39,7 +34,6 @@ public class ShortsService {
 	}
 
 	// shorts 수정
-	@CacheEvict(key = "#requestDto.getCategory()",value = "shorts")
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
 		Shorts shorts = getShortsWithUserIfExists(shortsId);
 		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
@@ -72,8 +66,6 @@ public class ShortsService {
 		String fileName = shorts.getVideoUrl().split(".com/")[1];
 		awsS3Service.deleteFile(fileName);
 		deleteShortsById(shorts);
-
-		redisUtil.deleteCache(shorts.getCategory());    // 해당 카테고리 캐시 삭제
 	}
 
 	// shorts 상세조회
@@ -93,7 +85,6 @@ public class ShortsService {
 
 	// 메인화면에서 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	@Cacheable(key = "#category", value = "shorts")
 	public List<ShortsDto.MainResponseDto> getMainShortsByCategory(Category category) {
 		return shortsRepository.findMainShortsByCategory(category);
 	}
