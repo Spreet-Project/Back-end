@@ -121,7 +121,14 @@ public class NaverLoginService {
 
 		String id = jsonNode.get("response").get("id").asText();
 		String email = jsonNode.get("response").get("email").asText();
+		if (userRepository.findByEmail(email).isPresent()) {
+			throw new RestApiException(ErrorStatusCode.OVERLAPPED_EMAIL);
+		}
+
 		String nickname = jsonNode.get("response").get("nickname").asText();
+		if (userRepository.findByNickname(nickname).isPresent()) {
+			nickname = "naver_" + email.split("@")[0];
+		}
 
 		// 네이버에서 이미지 가져오기
 		String profileImage = jsonNode.get("response").get("profile_image").asText();

@@ -9,6 +9,8 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.auth.jwt.JwtUtil;
 import com.team1.spreet.domain.user.repository.UserRepository;
 import com.team1.spreet.global.auth.security.UserDetailsImpl;
+import com.team1.spreet.global.error.exception.RestApiException;
+import com.team1.spreet.global.error.model.ErrorStatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -105,8 +107,16 @@ public class KakaoLoginService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long id = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RestApiException(ErrorStatusCode.OVERLAPPED_EMAIL);
+        }
+
+        String nickname = jsonNode.get("properties").get("nickname").asText();
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            nickname = "kakao_" + email.split("@")[0];
+        }
+
         String profileImage = jsonNode.get("properties").get("profile_image").asText();
 
         return new UserDto.KakaoInfoDto(id, nickname, email, profileImage);
