@@ -31,6 +31,7 @@ public class ShortsService {
 	private final RedisUtil redisUtil;
 
 	// shorts 등록
+	@CacheEvict(key = "#requestDto.getCategory()",value = "shorts")
 	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
