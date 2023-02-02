@@ -32,6 +32,9 @@ public class EventCommentDto {
         @ApiParam(value = "닉네임")
         private String nickname;
 
+        @ApiParam(value = "프로필 이미지")
+        private String profileImageUrl;
+
         @ApiParam(value = "행사 댓글 내용")
         private String content;
 
@@ -44,6 +47,7 @@ public class EventCommentDto {
         public ResponseDto(EventComment eventComment) {
             this.eventCommentId = eventComment.getId();
             this.nickname = eventComment.getUser().getNickname();
+            this.profileImageUrl = eventComment.getUser().getProfileImage();
             this.content = eventComment.getContent();
             this.createdAt = eventComment.getCreatedAt();
             this.modifiedAt = eventComment.getModifiedAt();
