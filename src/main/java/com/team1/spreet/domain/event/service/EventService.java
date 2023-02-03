@@ -9,6 +9,7 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
+import com.team1.spreet.global.util.SecurityUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,14 +25,24 @@ public class EventService {
 	private final EventCommentRepository eventCommentRepository;
 
 	// Event 게시글 등록
-	public void saveEvent(EventDto.RequestDto requestDto, User user) {
+	public void saveEvent(EventDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
 
 		eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
 	}
 
 	// Event 게시글 수정
-	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId, User user) {
+	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Event event = getEventWithUserIfExists(eventId);
 
 		if (!event.getUser().getId().equals(user.getId())) {    // 수정하려는 유저가 작성자가 아닌 경우
@@ -55,7 +66,12 @@ public class EventService {
 	}
 
 	// Event 게시글 삭제
-	public void deleteEvent(Long eventId, User user) {
+	public void deleteEvent(Long eventId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Event event = getEventWithUserIfExists(eventId);
 
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !event.getUser().getId().equals(user.getId())) {
