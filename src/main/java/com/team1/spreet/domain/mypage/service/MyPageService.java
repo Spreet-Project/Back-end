@@ -37,7 +37,7 @@ public class MyPageService {
 	public MyPageDto.UserInfoResponseDto getUserInfo() {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		return new MyPageDto.UserInfoResponseDto(user.getLoginId(), user.getNickname(),
@@ -48,7 +48,7 @@ public class MyPageService {
 	public void updateProfileImage(MultipartFile file) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 		String profileImage;
 		if (user.getProfileImage().contains("https://spreet")) {
@@ -65,7 +65,7 @@ public class MyPageService {
 	public void updateNickname(MyPageDto.NicknameRequestDto requestDto) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		// 변경하려는 닉네임이 중복인 경우
@@ -80,7 +80,7 @@ public class MyPageService {
 	public void updatePassword(MyPageDto.PasswordRequestDto requestDto) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		// 기존과 동일한 비밀번호의 경우 에러처리
@@ -95,7 +95,7 @@ public class MyPageService {
 	public void sendConfirmEmail(String email) throws Exception {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		if (!email.equals(user.getEmail())) {
@@ -109,7 +109,7 @@ public class MyPageService {
 	public List<MyPageDto.PostResponseDto> getPostList(String classification, Long page) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		// shorts
