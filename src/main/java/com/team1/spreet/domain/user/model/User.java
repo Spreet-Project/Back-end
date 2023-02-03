@@ -54,11 +54,6 @@ public class User extends TimeStamped {
         this.profileImage = profileImage;
     }
 
-    public User socialIdUpdate(String socialId) {
-        this.loginId = socialId;
-        return this;
-    }
-
     public void approveCrew() {
         this.userRole = UserRole.ROLE_APPROVED_CREW;
     }
