@@ -9,6 +9,7 @@ import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
+import com.team1.spreet.global.util.SecurityUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,23 @@ public class EventCommentService {
 	private final EventRepository eventRepository;
 	private final EventCommentRepository eventCommentRepository;
 
-	public void saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto, User user) {
+	public void saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Event event = checkEvent(eventId);
 		eventCommentRepository.saveAndFlush(
 			requestDto.toEntity(requestDto.getContent(), event, user));
 	}
 
-	public void updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto,
-		User user) {
+	public void updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		EventComment eventComment = checkEventComment(commentId);
 
 		if (!user.getId().equals(eventComment.getUser().getId())) {
@@ -38,7 +48,12 @@ public class EventCommentService {
 		eventCommentRepository.saveAndFlush(eventComment);
 	}
 
-	public void deleteEventComment(Long commentId, User user) {
+	public void deleteEventComment(Long commentId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		EventComment eventComment = checkEventComment(commentId);
 
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(eventComment.getUser().getId())) {

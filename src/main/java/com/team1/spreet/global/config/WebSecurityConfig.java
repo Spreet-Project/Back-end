@@ -91,7 +91,7 @@ public class WebSecurityConfig {
 
         config.addAllowedOrigin("http://localhost:3000");
 
-        config.addAllowedOrigin("https://spreet.co.kr/");
+        config.addAllowedOrigin("https://www.spreet.co.kr/");
 
         config.addAllowedOrigin("https://dev.d2hev55rb01409.amplifyapp.com/");
 

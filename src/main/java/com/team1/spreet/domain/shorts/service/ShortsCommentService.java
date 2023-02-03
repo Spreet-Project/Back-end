@@ -9,6 +9,7 @@ import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
+import com.team1.spreet.global.util.SecurityUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,23 @@ public class ShortsCommentService {
 	private final ShortsRepository shortsRepository;
 
 	// shortsComment 등록
-	public void saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto, User user) {
+	public void saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Shorts shorts = checkShorts(shortsId);
 		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
 	}
 
 	// shortsComment 수정
-	public void updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto, User user) {
+	public void updateShortsComment(Long shortsCommentId, ShortsCommentDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
 		if (!user.getId().equals(shortsComment.getUser().getId())) {
@@ -39,7 +50,12 @@ public class ShortsCommentService {
 	}
 
 	// shortsComment 삭제
-	public void deleteShortsComment(Long shortsCommentId, User user) {
+	public void deleteShortsComment(Long shortsCommentId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
 
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shortsComment.getUser().getId())) {
