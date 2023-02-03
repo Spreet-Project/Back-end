@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.domain.user.dto.UserDto;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
-import com.team1.spreet.global.error.model.ErrorStatusCode;
-import com.team1.spreet.global.error.exception.RestApiException;
-import com.team1.spreet.global.auth.jwt.JwtUtil;
 import com.team1.spreet.domain.user.repository.UserRepository;
+import com.team1.spreet.global.auth.jwt.JwtUtil;
 import com.team1.spreet.global.auth.security.UserDetailsImpl;
+import com.team1.spreet.global.error.exception.RestApiException;
+import com.team1.spreet.global.error.model.ErrorStatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -34,6 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class NaverLoginService {
+
 	@Value("${spring.security.oauth2.client.registration.naver.client-id}")
 	private String clientId;
 	@Value("${spring.security.oauth2.client.registration.naver.client-secret}")
@@ -43,12 +44,13 @@ public class NaverLoginService {
 	@Value("${spring.security.oauth2.client.provider.naver.token-uri}")
 	private String tokenUri;
 	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+	private final BCryptPasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 
 
 	// 네이버 로그인 로직
-	public UserDto.LoginResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+	public UserDto.LoginResponseDto naverLogin(String code, String state,
+		HttpServletResponse response) throws JsonProcessingException {
 		//1. 인가코드와 state 를 통해 access_token 발급받기
 		String accessToken = getToken(code, state);
 
@@ -81,7 +83,8 @@ public class NaverLoginService {
 		body.add("state", state);
 
 		// POST 요청 보내기
-		HttpEntity<MultiValueMap<String, String>> naverUserInfoRequest = new HttpEntity<>(body, headers);
+		HttpEntity<MultiValueMap<String, String>> naverUserInfoRequest = new HttpEntity<>(body,
+			headers);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> response = restTemplate.exchange(
 			tokenUri,
@@ -133,21 +136,26 @@ public class NaverLoginService {
 		String naverId = naverInfoDto.getId();
 		User naverUser = userRepository.findByLoginId(naverId).orElse(null);
 
+		// 네이버 아이디가 DB 에 없는 경우
 		if (naverUser == null) {
+			// 중복된 이메일이 있는 경우
 			String naverEmail = naverInfoDto.getEmail();
-			User sameEmailUser = userRepository.findByEmail(naverEmail).orElse(null);
-
-			if (sameEmailUser != null) {
-				naverUser = sameEmailUser;
-				naverUser = naverUser.socialIdUpdate(naverId);
-			} else {
-				String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
-				String email = naverInfoDto.getEmail();
-				String profileImage = naverInfoDto.getProfileImage();
-
-				naverUser = new User(naverId, naverInfoDto.getNickname(), encodedPassword, email,
-					profileImage, UserRole.ROLE_USER);
+			if (userRepository.findByEmail(naverEmail).isPresent()) {
+				throw new RestApiException(ErrorStatusCode.OVERLAPPED_EMAIL);
 			}
+
+			// 닉네임이 중복된 경우
+			String nickname = naverInfoDto.getNickname();
+			if (userRepository.findByNickname(nickname).isPresent()) {
+				nickname = "naver_" + naverEmail.split("@")[0];
+			}
+
+			String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
+			String profileImage = naverInfoDto.getProfileImage();
+
+			naverUser = new User(naverId, nickname, encodedPassword, naverEmail,
+				profileImage, UserRole.ROLE_USER);
+
 			userRepository.save(naverUser);
 		}
 		return naverUser;

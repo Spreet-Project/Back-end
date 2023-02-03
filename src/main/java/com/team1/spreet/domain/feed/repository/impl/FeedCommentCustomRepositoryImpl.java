@@ -1,4 +1,4 @@
-package com.team1.spreet.domain.feed.repository.Impl;
+package com.team1.spreet.domain.feed.repository.impl;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

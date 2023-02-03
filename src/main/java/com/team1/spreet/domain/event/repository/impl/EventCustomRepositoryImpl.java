@@ -1,15 +1,18 @@
 package com.team1.spreet.domain.event.repository.impl;
 
-import static com.team1.spreet.domain.event.model.QEvent.event;
-import static com.team1.spreet.domain.user.model.QUser.user;
-
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team1.spreet.domain.event.dto.EventDto;
 import com.team1.spreet.domain.event.repository.EventCustomRepository;
-import java.util.List;
+import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.team1.spreet.domain.event.model.QEvent.event;
+import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,8 +36,7 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
 				event.user.profileImage.as("profileImageUrl")
 			))
 			.from(event)
-			.join(user)
-			.on(event.user.id.eq(user.id))
+			.join(event.user, user)
 			.where(event.deleted.eq(false))
 			.orderBy(event.createdAt.desc(), event.id.desc())
 			.fetch();
@@ -56,10 +58,27 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
 				event.user.profileImage.as("profileImageUrl")
 			))
 			.from(event)
-			.join(user)
-			.on(event.user.id.eq(user.id))
+			.join(event.user, user)
 			.where(event.id.eq(eventId), event.deleted.eq(false))
 			.fetchOne();
+	}
+
+	@Override
+	public List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId) {
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				MyPageDto.PostResponseDto.class,
+				ExpressionUtils.toExpression(classification),
+				event.id,
+				event.title,
+				event.createdAt
+			))
+			.from(event)
+			.where(event.user.id.eq(userId), event.deleted.eq(false))
+			.orderBy(event.createdAt.desc())
+			.offset(page * 10)
+			.limit(10)
+			.fetch();
 	}
 
 }

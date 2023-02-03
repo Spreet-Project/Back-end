@@ -1,20 +1,22 @@
 package com.team1.spreet.domain.shorts.repository.impl;
 
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.team1.spreet.domain.shorts.model.QShorts.shorts;
-import static com.team1.spreet.domain.shorts.model.QShortsLike.shortsLike;
-import static com.team1.spreet.domain.user.model.QUser.user;
-
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
-import com.team1.spreet.domain.shorts.dto.ShortsDto.ResponseDto;
 import com.team1.spreet.domain.shorts.model.Category;
 import com.team1.spreet.domain.shorts.repository.ShortsCustomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.team1.spreet.domain.shorts.model.QShorts.shorts;
+import static com.team1.spreet.domain.shorts.model.QShortsLike.shortsLike;
+import static com.team1.spreet.domain.subscribe.model.QSubscribe.subscribe;
+import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,8 +37,7 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 				shorts.user.profileImage.as("profileImageUrl")
 			))
 			.from(shorts)
-			.join(user)
-			.on(shorts.user.id.eq(user.id))
+			.join(shorts.user, user)
 			.where(shorts.category.eq(category), shorts.deleted.eq(false))
 			.orderBy(shorts.likeCount.desc(), shorts.id.desc())
 			.limit(10)
@@ -62,11 +63,16 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
 						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)),
-					"liked"))
+					"liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
-			.join(user)
-			.on(shorts.user.id.eq(user.id))
+			.join(shorts.user, user)
 			.where(shorts.category.eq(category), shorts.deleted.eq(false))
 			.orderBy(shorts.createdAt.desc())
 			.offset(page * 10)
@@ -75,7 +81,7 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 	}
 
 	@Override
-	public List<ResponseDto> findAllSortByPopularAndCategory(Category category, Long page,
+	public List<ShortsDto.ResponseDto> findAllSortByPopularAndCategory(Category category, Long page,
 		Long userId) {
 		return jpaQueryFactory
 			.select(Projections.fields(
@@ -92,11 +98,16 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 				ExpressionUtils.as(
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
-						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"))
+						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
-			.join(user)
-			.on(shorts.user.id.eq(user.id))
+			.join(shorts.user, user)
 			.where(shorts.category.eq(category), shorts.deleted.eq(false))
 			.orderBy(shorts.likeCount.desc(), shorts.id.desc())
 			.offset(page * 10)
@@ -121,13 +132,37 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 				ExpressionUtils.as(
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
-						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"))
+						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
-			.join(user)
-			.on(shorts.user.id.eq(user.id))
+			.join(shorts.user, user)
 			.where(shorts.id.eq(shortsId), shorts.deleted.eq(false))
 			.fetchOne();
+	}
+
+	@Override
+	public List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId) {
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				MyPageDto.PostResponseDto.class,
+				ExpressionUtils.toExpression(classification),
+				shorts.id,
+				shorts.title,
+				shorts.category,
+				shorts.createdAt
+			))
+			.from(shorts)
+			.where(shorts.user.id.eq(userId), shorts.deleted.eq(false))
+			.orderBy(shorts.createdAt.desc())
+			.offset(page * 10)
+			.limit(10)
+			.fetch();
 	}
 
 }

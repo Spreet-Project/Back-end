@@ -1,15 +1,16 @@
 package com.team1.spreet.domain.event.repository.impl;
 
-import static com.team1.spreet.domain.event.model.QEventComment.eventComment;
-import static com.team1.spreet.domain.user.model.QUser.user;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team1.spreet.domain.event.dto.EventCommentDto;
 import com.team1.spreet.domain.event.repository.EventCommentCustomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.team1.spreet.domain.event.model.QEventComment.eventComment;
+import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,8 +31,7 @@ public class EventCommentCustomRepositoryImpl implements EventCommentCustomRepos
 				eventComment.modifiedAt
 			))
 			.from(eventComment)
-			.join(user)
-			.on(eventComment.user.id.eq(user.id))
+			.join(eventComment.user, user)
 			.where(eventComment.event.id.eq(eventId), eventComment.deleted.eq(false))
 			.orderBy(eventComment.createdAt.desc())
 			.fetch();

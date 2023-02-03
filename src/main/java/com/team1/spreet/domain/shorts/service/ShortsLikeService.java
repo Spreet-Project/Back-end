@@ -10,6 +10,7 @@ import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
+import com.team1.spreet.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,30 +19,34 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class ShortsLikeService {
+
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final ShortsRepository shortsRepository;
 
 	// shortsLike 등록
-	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId, User user) {
-		Shorts shorts = checkShorts(shortsId);
+	public CustomResponseBody<ShortsLikeDto.ResponseDto> setShortsLike(Long shortsId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
 
-		ShortsLike findShortsLike = shortsLikeRepository.findByShortsIdAndUserId(shortsId, user.getId()).orElse(null);
+		// shorts 가 존재하는지 확인
+		Shorts shorts = shortsRepository.findByIdAndDeletedFalse(shortsId).orElseThrow(
+			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS));
+
+		ShortsLike findShortsLike = shortsLikeRepository
+			.findByShortsIdAndUserId(shortsId, user.getId()).orElse(null);
 		if (findShortsLike != null) {
 			shorts.cancelLike();
 			shortsLikeRepository.delete(findShortsLike);
-			return new CustomResponseBody<>(SuccessStatusCode.DISLIKE, new ShortsLikeDto.ResponseDto(false));
+			return new CustomResponseBody<>(SuccessStatusCode.DISLIKE,
+				new ShortsLikeDto.ResponseDto(false));
 		} else {
 			ShortsLike shortsLike = new ShortsLike(shorts, user);
 			shorts.addLike();
 			shortsLikeRepository.save(shortsLike);
-			return new CustomResponseBody<>(SuccessStatusCode.LIKE, new ShortsLikeDto.ResponseDto(true));
+			return new CustomResponseBody<>(SuccessStatusCode.LIKE,
+				new ShortsLikeDto.ResponseDto(true));
 		}
-	}
-
-	// shorts 가 존재하는지 확인
-	private Shorts checkShorts(Long shortsId) {
-		return shortsRepository.findById(shortsId).orElseThrow(
-			() -> new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS)
-		);
 	}
 }
