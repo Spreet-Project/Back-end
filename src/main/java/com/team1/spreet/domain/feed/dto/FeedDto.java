@@ -70,6 +70,9 @@ public class FeedDto {
             this.feedLike = feedLike;
             this.liked = liked;
         }
+        public void addImageUrlList(List<String> imageUrlList){
+            this.imageUrlList = imageUrlList;
+        }
     }
     @NoArgsConstructor
     @Getter
@@ -80,10 +83,5 @@ public class FeedDto {
 
         @ApiModelProperty(value = "제목")
         private String title;
-
-        public SimpleResponseDto(Feed feed){
-            this.feedId = feed.getId();
-            this.title = feed.getTitle();
-        }
     }
 }

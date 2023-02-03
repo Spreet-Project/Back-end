@@ -5,11 +5,10 @@ import com.team1.spreet.domain.feed.model.FeedComment;
 import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FeedCommentDto {
     @Getter
@@ -23,6 +22,7 @@ public class FeedCommentDto {
         }
     }
 
+    @NoArgsConstructor
     @Getter
     public static class ResponseDto{
         @ApiModelProperty(value = "피드 댓글 ID")
@@ -50,15 +50,6 @@ public class FeedCommentDto {
             this.profileImageUrl = feedComment.getUser().getProfileImage();
             this.createdAt = feedComment.getCreatedAt();
             this.modifiedAt = feedComment.getModifiedAt();
-        }
-    }
-    @Getter
-    public static class CommentListDto{
-        @ApiModelProperty(value = "피드 댓글 리스트")
-        private List<ResponseDto> commentList = new ArrayList<>();
-
-        public void addComment(ResponseDto responseDto) {
-            commentList.add(responseDto);
         }
     }
 }
