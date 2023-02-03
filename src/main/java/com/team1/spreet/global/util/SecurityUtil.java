@@ -16,7 +16,7 @@ public class SecurityUtil {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null) {
-			throw new RestApiException(ErrorStatusCode.NOT_EXIST_USER);
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
 		if (authentication.getPrincipal() instanceof UserDetails) {

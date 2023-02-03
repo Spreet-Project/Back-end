@@ -11,6 +11,7 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
+import com.team1.spreet.global.util.SecurityUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,25 @@ public class ShortsService {
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
 
-	// shorts 등록제
-	public void saveShorts(ShortsDto.RequestDto requestDto, User user) {
+	// shorts 등록
+	public void saveShorts(ShortsDto.RequestDto requestDto) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
 
 		shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
 	}
 
 	// shorts 수정
-	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId, User user) {
+	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Shorts shorts = getShortsWithUserIfExists(shortsId);
 		if (!user.getId().equals(shorts.getUser().getId())) {   // 수정하려는 유저가 작성자가 아닌 경우
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
@@ -57,7 +68,12 @@ public class ShortsService {
 
 
 	// shorts 삭제
-	public void deleteShorts(Long shortsId, User user) {
+	public void deleteShorts(Long shortsId) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
 		Shorts shorts = getShortsWithUserIfExists(shortsId);
 		if (!user.getUserRole().equals(UserRole.ROLE_ADMIN) && !user.getId().equals(shorts.getUser().getId())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
@@ -70,7 +86,10 @@ public class ShortsService {
 
 	// shorts 상세조회
 	@Transactional(readOnly = true)
-	public ShortsDto.ResponseDto getShorts(Long shortsId, Long userId) {
+	public ShortsDto.ResponseDto getShorts(Long shortsId) {
+		User user = SecurityUtil.getCurrentUser();
+		Long userId = user == null? 0L : user.getId();
+
 		if (shortsRepository.findByIdAndDeletedFalse(shortsId).isEmpty()) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_SHORTS);
 		}
@@ -79,7 +98,10 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(페이징)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, Long page, Long userId) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, Long page) {
+		User user = SecurityUtil.getCurrentUser();
+		Long userId = user == null? 0L : user.getId();
+
 		return shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
 	}
 
