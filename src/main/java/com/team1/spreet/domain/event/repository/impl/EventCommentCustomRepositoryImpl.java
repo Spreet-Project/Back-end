@@ -30,8 +30,7 @@ public class EventCommentCustomRepositoryImpl implements EventCommentCustomRepos
 				eventComment.modifiedAt
 			))
 			.from(eventComment)
-			.join(user)
-			.on(eventComment.user.id.eq(user.id))
+			.join(eventComment.user, user)
 			.where(eventComment.event.id.eq(eventId), eventComment.deleted.eq(false))
 			.orderBy(eventComment.createdAt.desc())
 			.fetch();

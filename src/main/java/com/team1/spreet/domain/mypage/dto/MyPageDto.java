@@ -1,10 +1,11 @@
 package com.team1.spreet.domain.mypage.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.team1.spreet.domain.shorts.model.Category;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,24 +66,25 @@ public class MyPageDto {
 
 		@ApiModelProperty(value = "카테고리")
 		@JsonInclude(JsonInclude.Include.NON_EMPTY)
-		private String category;
+		private Category category;
 
 		@ApiModelProperty(value = "등록 일자")
-		private String createdAt;
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm")
+		private LocalDateTime createdAt;
 
-		public PostResponseDto(String classification, Long id, String title, String category, LocalDateTime createdAt) {
+		public PostResponseDto(String classification, Long id, String title, Category category, LocalDateTime createdAt) {
 			this.classification = classification;
 			this.id = id;
 			this.title = title;
 			this.category = category;
-			this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+			this.createdAt = createdAt;
 		}
 
 		public PostResponseDto(String classification, Long id, String title, LocalDateTime createdAt) {
 			this.classification = classification;
 			this.id = id;
 			this.title = title;
-			this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+			this.createdAt = createdAt;
 		}
 	}
 }
