@@ -1,11 +1,8 @@
 package com.team1.spreet.domain.mypage.service;
 
-import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.event.repository.EventRepository;
-import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
-import com.team1.spreet.domain.shorts.model.Shorts;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.repository.UserRepository;
@@ -13,13 +10,8 @@ import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.email.service.EmailService;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,38 +89,24 @@ public class MyPageService {
 
 	// 회원이 작성한 게시글 목록(쇼츠,피드,행사) 조회
 	@Transactional(readOnly = true)
-	@Cacheable(key = "#user.getId() + #classification", value = "postList")
-	public List<MyPageDto.PostResponseDto> getPostList(String classification, int page, User user) {
+	public List<MyPageDto.PostResponseDto> getPostList(String classification, Long page, User user) {
 		checkUser(user.getId());
 
-		Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-		List<MyPageDto.PostResponseDto> postList = new ArrayList<>();
 		// shorts
 		if (classification.equals("shorts")) {
-			List<Shorts> shortsList = shortsRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
-			for (Shorts shorts : shortsList) {
-				postList.add(new MyPageDto.PostResponseDto(classification, shorts.getId(), shorts.getTitle(),
-					shorts.getCategory().value(), shorts.getCreatedAt()));
-			}
+			return shortsRepository.findByUserId(classification, page - 1, user.getId());
 		}
 
 		// feed
 		if (classification.equals("feed")) {
-			List<Feed> feedList = feedRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
-			for (Feed feed : feedList) {
-				postList.add(new MyPageDto.PostResponseDto(classification, feed.getId(), feed.getTitle(), feed.getCreatedAt()));
-			}
+			return feedRepository.findByUserId(classification, page - 1, user.getId());
 		}
 
 		// event
 		if (classification.equals("event")) {
-			List<Event> eventList = eventRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
-			for (Event event : eventList) {
-				postList.add(new MyPageDto.PostResponseDto(classification, event.getId(), event.getTitle(), event.getCreatedAt()));
-			}
+			return eventRepository.findByUserId(classification, page - 1, user.getId());
 		}
-		return postList;
+		return null;
 	}
 
 	private void checkUser(Long userId) {

@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.shorts.repository;
 
+import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
 import com.team1.spreet.domain.shorts.model.Category;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface ShortsCustomRepository {
 	// shorts 상세조회
 	ShortsDto.ResponseDto findByIdAndUserId(Long shortsId, Long userId);
 
+	// 회원이 작성한 shorts 조회
+	List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId);
 }

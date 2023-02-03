@@ -30,8 +30,7 @@ public class ShortsCommentCustomRepositoryImpl implements ShortsCommentCustomRep
 				shortsComment.modifiedAt
 			))
 			.from(shortsComment)
-			.join(user)
-			.on(shortsComment.user.id.eq(user.id))
+			.join(shortsComment.user, user)
 			.where(shortsComment.shorts.id.eq(shortsId), shortsComment.deleted.eq(false))
 			.orderBy(shortsComment.createdAt.desc())
 			.fetch();
