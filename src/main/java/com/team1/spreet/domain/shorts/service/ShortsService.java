@@ -1,11 +1,14 @@
 package com.team1.spreet.domain.shorts.service;
 
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
 import com.team1.spreet.domain.shorts.model.Category;
 import com.team1.spreet.domain.shorts.model.Shorts;
 import com.team1.spreet.domain.shorts.repository.ShortsCommentRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsLikeRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
+import com.team1.spreet.domain.subscribe.model.Subscribe;
+import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
@@ -26,6 +29,8 @@ public class ShortsService {
 	private final AwsS3Service awsS3Service;
 	private final ShortsLikeRepository shortsLikeRepository;
 	private final ShortsCommentRepository shortsCommentRepository;
+	private final AlarmService alarmService;
+	private final SubscribeRepository subscribeRepository;
 
 	// shorts 등록
 	public void saveShorts(ShortsDto.RequestDto requestDto) {
@@ -35,8 +40,8 @@ public class ShortsService {
 		}
 
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
-
-		shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
+		Shorts shorts = shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
+		alarmToSubscriber(user, shorts);
 	}
 
 	// shorts 수정
@@ -100,7 +105,7 @@ public class ShortsService {
 	@Transactional(readOnly = true)
 	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, Long page) {
 		User user = SecurityUtil.getCurrentUser();
-		Long userId = user == null? 0L : user.getId();
+		Long userId = user == null ? 0L : user.getId();
 
 		return shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
 	}
@@ -123,5 +128,18 @@ public class ShortsService {
 		shortsCommentRepository.updateDeletedTrueByShortsId(shorts.getId());
 		shortsLikeRepository.deleteByShortsId(shorts.getId());
 		shorts.isDeleted();
+	}
+
+	// 구독자에게 알림 보내기
+	private void alarmToSubscriber(User user, Shorts shorts) {
+		List<Subscribe> subscribes = subscribeRepository.findByPublisher(user).orElse(null);
+		if (subscribes != null) {
+			for (Subscribe subscribe : subscribes) {
+				alarmService.send(user.getId(),
+					"🔔" + user.getNickname() + "님의 " + "새로운 shorts가 등록되었어Yo!\n" + shorts.getTitle(),
+					"https://www.spreet.co.kr/api/shorts/" + shorts.getId(),
+					subscribe.getSubscriber().getId());
+			}
+		}
 	}
 }

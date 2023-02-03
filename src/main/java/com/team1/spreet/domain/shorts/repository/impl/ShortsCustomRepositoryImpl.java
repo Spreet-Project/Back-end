@@ -3,6 +3,7 @@ package com.team1.spreet.domain.shorts.repository.impl;
 import static com.querydsl.jpa.JPAExpressions.select;
 import static com.team1.spreet.domain.shorts.model.QShorts.shorts;
 import static com.team1.spreet.domain.shorts.model.QShortsLike.shortsLike;
+import static com.team1.spreet.domain.subscribe.model.QSubscribe.subscribe;
 import static com.team1.spreet.domain.user.model.QUser.user;
 
 import com.querydsl.core.types.ExpressionUtils;
@@ -61,7 +62,13 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
 						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)),
-					"liked"))
+					"liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
 			.join(shorts.user, user)
@@ -90,7 +97,13 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 				ExpressionUtils.as(
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
-						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"))
+						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
 			.join(shorts.user, user)
@@ -118,7 +131,13 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 				ExpressionUtils.as(
 					select(shortsLike.user.id.isNotNull())
 						.from(shortsLike)
-						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"))
+						.where(shortsLike.shorts.eq(shorts), shortsLike.user.id.eq(userId)), "liked"),
+				// 로그인 유저의 해당 유저 구독 유무
+				ExpressionUtils.as(
+					select(subscribe.subscriber.id.isNotNull())
+						.from(subscribe)
+						.where(subscribe.publisher.id.eq(shorts.user.id), subscribe.subscriber.id.eq(userId)),
+					"subscribed"))
 			)
 			.from(shorts)
 			.join(shorts.user, user)

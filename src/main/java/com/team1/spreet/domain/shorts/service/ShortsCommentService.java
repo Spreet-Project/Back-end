@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.shorts.service;
 
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.shorts.dto.ShortsCommentDto;
 import com.team1.spreet.domain.shorts.model.Shorts;
 import com.team1.spreet.domain.shorts.model.ShortsComment;
@@ -22,6 +23,7 @@ public class ShortsCommentService {
 
 	private final ShortsCommentRepository shortsCommentRepository;
 	private final ShortsRepository shortsRepository;
+	private final AlarmService alarmService;
 
 	// shortsComment 등록
 	public void saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto) {
@@ -32,6 +34,12 @@ public class ShortsCommentService {
 
 		Shorts shorts = checkShorts(shortsId);
 		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
+
+		if (!shorts.getUser().getId().equals(user.getId())) {
+			alarmService.send(user.getId(),
+				"💬" + shorts.getUser().getNickname() + "님! " + "작성하신 shorts에 댓글 알림이 도착했어Yo!\n",
+				"https://www.spreet.co.kr/api/shorts/" + shorts.getId(), shorts.getUser().getId());
+		}
 	}
 
 	// shortsComment 수정

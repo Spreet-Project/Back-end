@@ -80,15 +80,6 @@ public class ShortsDto {
 
 		@ApiModelProperty(value = "프로필 이미지")
 		private String profileImageUrl;
-
-		public MainResponseDto(Shorts shorts) {
-			this.shortsId = shorts.getId();
-			this.nickname = shorts.getUser().getNickname();
-			this.title = shorts.getTitle();
-			this.videoUrl = shorts.getVideoUrl();
-			this.category = shorts.getCategory();
-			this.profileImageUrl = shorts.getUser().getProfileImage();
-		}
 	}
 
 	@NoArgsConstructor
@@ -121,7 +112,10 @@ public class ShortsDto {
 		@ApiModelProperty(value = "좋아요 상태")
 		private boolean liked;      //좋아요 상태(true, false)
 
-		public ResponseDto(Shorts shorts, boolean liked) {
+		@ApiModelProperty(value = "구독 유무")
+		private boolean subscribed;      //true, false
+
+		public ResponseDto(Shorts shorts, boolean liked, boolean subscribed) {
 			this.shortsId = shorts.getId();
 			this.nickname = shorts.getUser().getNickname();
 			this.title = shorts.getTitle();
@@ -131,6 +125,7 @@ public class ShortsDto {
 			this.profileImageUrl = shorts.getUser().getProfileImage();
 			this.likeCount = shorts.getLikeCount();
 			this.liked = liked;
+			this.subscribed = subscribed;
 		}
 	}
 
