@@ -2,7 +2,6 @@ package com.team1.spreet.domain.mypage.controller;
 
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.mypage.service.MyPageService;
-import com.team1.spreet.global.auth.security.UserDetailsImpl;
 import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
 import io.swagger.annotations.ApiOperation;
@@ -10,7 +9,6 @@ import io.swagger.annotations.ApiParam;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,17 +28,16 @@ public class MyPageController {
 	// 마이페이지 회원정보 조회
 	@ApiOperation(value = "회원정보 조회 API")
 	@GetMapping
-	public CustomResponseBody<MyPageDto.UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_USER_INFO, myPageService.getUserInfo(userDetails.getUser()));
+	public CustomResponseBody<MyPageDto.UserInfoResponseDto> getUserInfo() {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_USER_INFO, myPageService.getUserInfo());
 	}
 
 	// 프로필 사진 변경
 	@ApiOperation(value = "프로필 이미지 수정 API")
 	@PutMapping("/edit/profile-image")
 	public CustomResponseBody<SuccessStatusCode> updateProfileImage(
-		@RequestParam(value = "file") @Valid @ApiParam(value = "새로운 프로필 이미지") MultipartFile file,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		myPageService.updateProfileImage(file, userDetails.getUser());
+		@RequestParam(value = "file") @Valid @ApiParam(value = "새로운 프로필 이미지") MultipartFile file) {
+		myPageService.updateProfileImage(file);
 		return new CustomResponseBody<>(SuccessStatusCode.UPDATE_USER_INFO);
 	}
 
@@ -48,9 +45,8 @@ public class MyPageController {
 	@ApiOperation(value = "닉네임 수정 API")
 	@PutMapping("/edit/nickname")
 	public CustomResponseBody<SuccessStatusCode> updateNickname(
-		@RequestBody @Valid @ApiParam(value = "새로운 닉네임") MyPageDto.NicknameRequestDto requestDto,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		myPageService.updateNickname(requestDto, userDetails.getUser());
+		@RequestBody @Valid @ApiParam(value = "새로운 닉네임") MyPageDto.NicknameRequestDto requestDto) {
+		myPageService.updateNickname(requestDto);
 		return new CustomResponseBody<>(SuccessStatusCode.UPDATE_USER_INFO);
 	}
 
@@ -58,9 +54,8 @@ public class MyPageController {
 	@ApiOperation(value = "회원 비밀번호 수정 API")
 	@PutMapping("/edit/password")
 	public CustomResponseBody<SuccessStatusCode> updatePassword(
-		@RequestBody @Valid @ApiParam(value = "수정할 비밀번호") MyPageDto.PasswordRequestDto requestDto,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		myPageService.updatePassword(requestDto, userDetails.getUser());
+		@RequestBody @Valid @ApiParam(value = "수정할 비밀번호") MyPageDto.PasswordRequestDto requestDto) {
+		myPageService.updatePassword(requestDto);
 		return new CustomResponseBody<>(SuccessStatusCode.UPDATE_PASSWORD);
 	}
 
@@ -68,9 +63,8 @@ public class MyPageController {
 	@ApiOperation(value = "비밀번호 변경시 인증을 위해 이메일 전송하는 API")
 	@PostMapping("/send-email")
 	public CustomResponseBody<SuccessStatusCode> sendConfirmEmail(
-		@RequestParam @ApiParam(value = "이메일 주소") String email,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-		myPageService.sendConfirmEmail(email, userDetails.getUser());
+		@RequestParam @ApiParam(value = "이메일 주소") String email) throws Exception {
+		myPageService.sendConfirmEmail(email);
 		return new CustomResponseBody<>(SuccessStatusCode.EMAIL_SEND_SUCCESS);
 	}
 
@@ -79,10 +73,9 @@ public class MyPageController {
 	@GetMapping("/post")
 	public CustomResponseBody<List<MyPageDto.PostResponseDto>> getPostList (
 		@RequestParam(value = "classification") @ApiParam(value = "게시글 분류") String classification,
-		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_POST_LIST,
-			myPageService.getPostList(classification, page, userDetails.getUser()));
+			myPageService.getPostList(classification, page));
 	}
 
 }
