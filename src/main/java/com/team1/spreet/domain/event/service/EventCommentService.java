@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.event.service;
 
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.event.dto.EventCommentDto;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.event.model.EventComment;
@@ -21,6 +22,7 @@ public class EventCommentService {
 
 	private final EventRepository eventRepository;
 	private final EventCommentRepository eventCommentRepository;
+	private final AlarmService alarmService;
 
 	public void saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto) {
 		User user = SecurityUtil.getCurrentUser();
@@ -31,6 +33,12 @@ public class EventCommentService {
 		Event event = checkEvent(eventId);
 		eventCommentRepository.saveAndFlush(
 			requestDto.toEntity(requestDto.getContent(), event, user));
+
+		if (!event.getUser().getId().equals(user.getId())) {
+			alarmService.send(user.getId(),
+				"💬" + event.getUser().getNickname() + "님! " + "작성하신 행사 정보에 댓글 알림이 도착했어Yo!\n",
+				"https://www.spreet.co.kr/api/event/" + event.getId(), event.getUser().getId());
+		}
 	}
 
 	public void updateEventComment(Long commentId, EventCommentDto.RequestDto requestDto) {

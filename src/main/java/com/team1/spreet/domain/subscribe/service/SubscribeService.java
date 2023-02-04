@@ -17,6 +17,12 @@ public class SubscribeService {
 
     public void subscribe(String publisherNickname, User subscriber) {
         User publisher = checkUser(publisherNickname);
+
+        // 본인 계정은 구독할 수 없도록
+        if (publisher.getId().equals(subscriber.getId())) {
+            throw new RestApiException(ErrorStatusCode.INVALID_SUBSCRIBE);
+        }
+
         Subscribe subscribe = new Subscribe(publisher, subscriber);
         subscribeRepository.save(subscribe);
     }

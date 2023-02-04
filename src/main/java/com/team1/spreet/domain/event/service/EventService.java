@@ -1,20 +1,22 @@
 package com.team1.spreet.domain.event.service;
 
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.event.dto.EventDto;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.event.repository.EventCommentRepository;
 import com.team1.spreet.domain.event.repository.EventRepository;
+import com.team1.spreet.domain.subscribe.model.Subscribe;
+import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import com.team1.spreet.global.util.SecurityUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,8 @@ public class EventService {
 	private final AwsS3Service awsS3Service;
 	private final EventRepository eventRepository;
 	private final EventCommentRepository eventCommentRepository;
+	private final SubscribeRepository subscribeRepository;
+	private final AlarmService alarmService;
 
 	// Event 게시글 등록
 	public void saveEvent(EventDto.RequestDto requestDto) {
@@ -33,8 +37,8 @@ public class EventService {
 		}
 
 		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
-
-		eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
+		Event event = eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
+		alarmToSubscriber(user, event);
 	}
 
 	// Event 게시글 수정
@@ -109,5 +113,18 @@ public class EventService {
 	private void deleteEventById(Event event) {
 		eventCommentRepository.updateDeletedTrueByEventId(event.getId());
 		event.isDeleted();
+	}
+
+	// 구독자에게 알림 보내기
+	private void alarmToSubscriber(User user, Event event) {
+		List<Subscribe> subscribes = subscribeRepository.findByPublisher(user).orElse(null);
+		if (subscribes != null) {
+			for (Subscribe subscribe : subscribes) {
+				alarmService.send(user.getId(),
+					"🤸🏻" + user.getNickname() + "님의 " + "새로운 행사 정보가 등록되었어Yo!\n" + event.getTitle(),
+					"https://www.spreet.co.kr/api/event/" + event.getId(),
+					subscribe.getSubscriber().getId());
+			}
+		}
 	}
 }
