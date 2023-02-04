@@ -1,15 +1,16 @@
 package com.team1.spreet.domain.event.repository.impl;
 
-import static com.team1.spreet.domain.event.model.QEventComment.eventComment;
-import static com.team1.spreet.domain.user.model.QUser.user;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team1.spreet.domain.event.dto.EventCommentDto;
 import com.team1.spreet.domain.event.repository.EventCommentCustomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.team1.spreet.domain.event.model.QEventComment.eventComment;
+import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor

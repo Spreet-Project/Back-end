@@ -26,7 +26,8 @@ public enum ErrorStatusCode {
     NOT_EXIST_EVENT("존재하지 않는 행사 게시글 입니다.", HttpStatus.BAD_REQUEST.value()),
     INVALID_PASSWORD("기존과 동일한 비밀번호는 설정하실 수 없습니다.", HttpStatus.BAD_REQUEST.value()),
     MISMATCH_EMAIL("등록된 이메일과 일치하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
-    NOT_EXIST_AUTHORIZATION("인증 정보가 없습니다.", HttpStatus.BAD_REQUEST.value());
+    NOT_EXIST_AUTHORIZATION("인증 정보가 없습니다.", HttpStatus.BAD_REQUEST.value()),
+    INVALID_SUBSCRIBE("본인 계정은 구독할 수 없습니다.", HttpStatus.BAD_REQUEST.value());
 
     private final String msg;
     private final int statusCode;

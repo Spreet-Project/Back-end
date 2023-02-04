@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,24 +30,21 @@ public class FeedCommentService {
     public void updateFeedComment(Long commentId, FeedCommentDto.RequestDto requestDto, User user){
         FeedComment feedComment = checkFeedComment(commentId);
         if(checkOwner(feedComment, user.getId())){
-        feedComment.update(requestDto.getContent());
+            feedComment.update(requestDto.getContent());
         }
     }
 
     @Transactional
     public void deleteFeedComment(Long commentId, User user) {
         FeedComment feedComment = checkFeedComment(commentId);    //userId, commentId로 comment 찾기
-        feedComment.delete();
+        if(checkOwner(feedComment, user.getId())) {
+            feedComment.delete();
+        }
     }
     //댓글 조회
     @Transactional(readOnly = true)
     public List<FeedCommentDto.ResponseDto> getFeedComment(Long feedId) {
-        List<FeedCommentDto.ResponseDto> commentList = new ArrayList<>();
-        List<FeedComment> feedCommentList= feedCommentRepository.findByFeedIdAndOrderByCreatedAtDesc(feedId);
-        for (FeedComment feedComment : feedCommentList) {
-            commentList.add(new FeedCommentDto.ResponseDto(feedComment));
-        }
-        return commentList;
+        return feedCommentRepository.findAllByFeedId(feedId);
     }
 
     private Feed checkFeed(Long feedId) {
