@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface SubscribeRepository extends JpaRepository<Subscribe, Long> {
     Optional<List<Subscribe>> findByPublisher(User publisher);
 
-    void deleteByPublisherAndSubscriber(User publisher, User subscriber);
+    Optional<Subscribe> findByPublisherIdAndSubscriberId(Long publisherId, Long subscriberId);
+
 
 }
