@@ -15,12 +15,13 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
-import java.io.IOException;
+import com.team1.spreet.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,10 @@ public class FeedService {
 
 	//feed 최신순 조회
 	@Transactional(readOnly = true)
-	public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size, Long userId) {
-		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(page,
+	public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size) {
+		User user = SecurityUtil.getCurrentUser();
+		Long userId = user == null ? 0L : user.getId();
+		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(page-1,
 			size, userId);
 		for (FeedDto.ResponseDto responseDto : recentFeedList) {
 			List<String> imageUrlList = getFeedImageUrlList(responseDto.getFeedId());
@@ -55,8 +58,13 @@ public class FeedService {
 
 	//feed 조회
 	@Transactional(readOnly = true)
-	public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
+	public FeedDto.ResponseDto getFeed(Long feedId) {
+		User user = SecurityUtil.getCurrentUser();
+		Long userId = user == null ? 0L : user.getId();
 		FeedDto.ResponseDto responseDto = feedRepository.findByIdAndUserId(feedId, userId);
+		if(responseDto==null){
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_FEED);
+		}
 		List<String> imageUrlList = getFeedImageUrlList(feedId);
 		responseDto.addImageUrlList(imageUrlList);
 		return responseDto;
@@ -64,7 +72,8 @@ public class FeedService {
 
 	//feed 저장
 	@Transactional
-	public void saveFeed(FeedDto.RequestDto requestDto, User user) {
+	public void saveFeed(FeedDto.RequestDto requestDto) {
+		User user = checkUser();
 		Feed feed = requestDto.toEntity(user);    //feed 엔티티 초기화
 		feedRepository.save(feed);    //feed 저장
 		saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
@@ -73,7 +82,8 @@ public class FeedService {
 
 	//feed 수정
 	@Transactional
-	public void updateFeed(Long feedId, FeedDto.RequestDto requestDto, User user) {
+	public void updateFeed(Long feedId, FeedDto.RequestDto requestDto) {
+		User user = checkUser();
 		Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
 		if (checkOwner(feed, user)) {
 			feed.update(requestDto.getTitle(), requestDto.getContent());
@@ -87,7 +97,8 @@ public class FeedService {
 
 	//feed 삭제
 	@Transactional
-	public void deleteFeed(Long feedId, User user) {
+	public void deleteFeed(Long feedId) {
+		User user = checkUser();
 		Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
 		if (user.getUserRole() == UserRole.ROLE_ADMIN || checkOwner(feed, user)) {
 			deleteByFeedId(feed);
@@ -136,6 +147,13 @@ public class FeedService {
 		} else {
 			return true;
 		}
+	}
+	private User checkUser(){
+		User user = SecurityUtil.getCurrentUser();
+		if(user == null){
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+		return user;
 	}
 
 	private void deleteByFeedId(Feed feed) {

@@ -60,16 +60,6 @@ public class FeedDto {
         @ApiModelProperty(value = "좋아요 상태")
         private boolean liked;
 
-        public ResponseDto(Feed feed, List<String> imageUrlList, Long feedLike, boolean liked) {
-            this.feedId = feed.getId();
-            this.nickname = feed.getUser().getNickname();
-            this.title = feed.getTitle();
-            this.content = feed.getContent();
-            this.imageUrlList = imageUrlList;
-            this.profileImageUrl = feed.getUser().getProfileImage();
-            this.feedLike = feedLike;
-            this.liked = liked;
-        }
         public void addImageUrlList(List<String> imageUrlList){
             this.imageUrlList = imageUrlList;
         }

@@ -30,7 +30,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                                 feed.user.nickname,
                                 feed.title,
                                 feed.content,
-                                feed.user.profileImage,
+                                feed.user.profileImage.as("profileImageUrl"),
                                 ExpressionUtils.as(
                                         JPAExpressions.select(feedLike.count())
                                                 .from(feedLike)
@@ -60,7 +60,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         feed.user.nickname,
                         feed.title,
                         feed.content,
-                        feed.user.profileImage,
+                        feed.user.profileImage.as("profileImageUrl"),
                         ExpressionUtils.as(
                                 JPAExpressions.select(feedLike.count())
                                         .from(feedLike)
