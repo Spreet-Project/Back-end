@@ -1,11 +1,5 @@
 package com.team1.spreet.domain.shorts.repository.impl;
 
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.team1.spreet.domain.shorts.model.QShorts.shorts;
-import static com.team1.spreet.domain.shorts.model.QShortsLike.shortsLike;
-import static com.team1.spreet.domain.subscribe.model.QSubscribe.subscribe;
-import static com.team1.spreet.domain.user.model.QUser.user;
-
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,9 +7,16 @@ import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
 import com.team1.spreet.domain.shorts.model.Category;
 import com.team1.spreet.domain.shorts.repository.ShortsCustomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.team1.spreet.domain.shorts.model.QShorts.shorts;
+import static com.team1.spreet.domain.shorts.model.QShortsLike.shortsLike;
+import static com.team1.spreet.domain.subscribe.model.QSubscribe.subscribe;
+import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor

@@ -16,9 +16,6 @@ import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,53 +36,25 @@ public class FeedService {
 
     //feed 최신순 조회
     @Transactional(readOnly = true)
-    public List<FeedDto.ResponseDto> getRecentFeed(int page, int size, Long userId) {
-        //pageable 속성값 설정
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();    //페이징한 feed 리스트
-        //반환할 feedList 생성
-        List<FeedDto.ResponseDto> recentFeedList = new ArrayList<>();
-        for (Feed feed : feedList) {
-            Long feedLike = feedLikeRepository.countByFeedId(feed.getId());    //좋아요 개수 조회
-            //저장된 이미지 조회
-            List<String> imageUrlList = getFeedImageUrlList(feed.getId());
-            //로그인 여부에 따라 좋아요 추가
-            if (userId != 0L) {
-                boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);    //좋아요 여부 확인
-                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, liked));
-            }else{
-                recentFeedList.add(new FeedDto.ResponseDto(feed, imageUrlList, feedLike, false));
-            }
+    public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size, Long userId) {
+        List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(page, size, userId);
+        for (FeedDto.ResponseDto responseDto : recentFeedList) {
+            List<String> imageUrlList = getFeedImageUrlList(responseDto.getFeedId());
+            responseDto.addImageUrlList(imageUrlList);
         }
         return recentFeedList;
     }
     @Transactional(readOnly = true)
     public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(0, 10, sort);
-        List<Feed> feedList = feedRepository.findByDeletedFalseOrderByCreatedAtDesc(pageable).getContent();
-
-        List<FeedDto.SimpleResponseDto> simpleFeedList = new ArrayList<>();
-
-        for (Feed feed : feedList) {
-            simpleFeedList.add(new FeedDto.SimpleResponseDto(feed));
-        }
-        return simpleFeedList;
+        return feedRepository.getSimpleFeed();
     }
     //feed 조회
     @Transactional(readOnly = true)
     public FeedDto.ResponseDto getFeed(Long feedId, Long userId) {
-        Feed feed = checkFeedWithUser(feedId);
-        Long feedLikeCount = feedLikeRepository.countByFeedId(feedId);    //좋아요 개수 조회
+        FeedDto.ResponseDto responseDto = feedRepository.findByIdAndUserId(feedId, userId);
         List<String> imageUrlList = getFeedImageUrlList(feedId);
-        //로그인 여부 및 좋아요 여부 확인
-        if (userId != 0L) {
-            boolean liked = feedLikeRepository.existsByUserIdAndFeed(userId, feed);
-            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, liked);
-        }else{
-            return new FeedDto.ResponseDto(feed, imageUrlList, feedLikeCount, false);
-        }
+        responseDto.addImageUrlList(imageUrlList);
+        return responseDto;
     }
     //feed 저장
     @Transactional
@@ -144,12 +113,6 @@ public class FeedService {
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
     }
-    private Feed checkFeedWithUser(Long feedId){
-        return feedRepository.findByIdWithUser(feedId).orElseThrow(
-                () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
-        );
-    }
-
     private boolean checkOwner(Feed feed, User user) {
         if (!feed.getUser().getId().equals(user.getId())) {
             throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
@@ -176,8 +139,9 @@ public class FeedService {
         if(subscribes!=null){
             for (Subscribe subscribe : subscribes) {
                 alertService.send(user.getId(),
-                        "새로운 feed가 생성되었습니다"+System.lineSeparator()+user.getNickname()+": "+feed.getTitle(),
-                        "localhost:8080/api/feed/"+feed.getId(),
+                        "📢" + user.getNickname() + "님의 새로운 feed가 등록되었어Yo!\n"
+                                + feed.getTitle(),
+                        "https://www.spreet.co.kr/api/feed/" + feed.getId(),
                         subscribe.getSubscriber().getId());
             }
         }

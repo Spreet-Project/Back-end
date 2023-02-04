@@ -29,8 +29,8 @@ public class FeedController {
     @ApiOperation(value = "피드 최신순 조회 API")
     @GetMapping("/recent")
 
-    public CustomResponseBody<List<FeedDto.ResponseDto>> getRecentFeed(@RequestParam(value ="page") @ApiParam(value = "조회할 페이지") int page,
-                                                                       @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") int size,
+    public CustomResponseBody<List<FeedDto.ResponseDto>> getRecentFeed(@RequestParam(value ="page") @ApiParam(value = "조회할 페이지") Long page,
+                                                                       @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") Long size,
                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails == null ? 0L : userDetails.getUser().getId();   //비회원일 경우 userId = 0L
         return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getRecentFeed(page, size, userId));
