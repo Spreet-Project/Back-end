@@ -80,6 +80,9 @@ dependencies {
     // 역직렬화
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // imgscalr
+    implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
