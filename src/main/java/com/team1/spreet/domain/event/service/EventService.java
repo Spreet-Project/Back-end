@@ -13,6 +13,7 @@ import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import com.team1.spreet.global.util.SecurityUtil;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,12 @@ public class EventService {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
-		String eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
+		String eventImageUrl;
+		try {
+			eventImageUrl = awsS3Service.uploadImage(requestDto.getFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		Event event = eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
 		alarmToSubscriber(user, event);
 	}
@@ -61,7 +67,11 @@ public class EventService {
 			awsS3Service.deleteFile(fileName);
 
 			//새로운 파일 업로드
-			eventImageUrl = awsS3Service.uploadFile(requestDto.getFile());
+			try {
+				eventImageUrl = awsS3Service.uploadImage(requestDto.getFile());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			//첨부파일 수정 안함
 			eventImageUrl = event.getEventImageUrl();
