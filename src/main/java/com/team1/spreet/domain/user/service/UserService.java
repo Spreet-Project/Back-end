@@ -1,6 +1,7 @@
 package com.team1.spreet.domain.user.service;
 
 import com.team1.spreet.domain.user.dto.UserDto;
+import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.domain.user.repository.UserRepository;
@@ -43,7 +44,8 @@ public class UserService {
             throw new RestApiException(ErrorStatusCode.EMAIL_CONFIRM_EXCEPTION);
         }
 
-        userRepository.save(requestDto.toEntity(bcryptPasswordEncoder.encode(requestDto.getPassword())));
+        userRepository.save(requestDto.toEntity(
+            bcryptPasswordEncoder.encode(requestDto.getPassword()), Provider.LOCAL));
     }
 
     // 회원 탈퇴

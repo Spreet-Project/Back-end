@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.domain.user.dto.UserDto;
+import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.domain.user.repository.UserRepository;
@@ -140,7 +141,7 @@ public class KakaoLoginService {
 			String profileImage = kakaoInfoDto.getProfileImage();
 
 			kakaoUser = new User(kakaoId, nickname, encodedPassword, kakaoEmail,
-				profileImage, UserRole.ROLE_USER);
+				profileImage, UserRole.ROLE_USER, Provider.KAKAO);
 
 			userRepository.save(kakaoUser);
 		}
