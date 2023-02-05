@@ -39,19 +39,24 @@ public class User extends TimeStamped {
     private UserRole userRole;  //유저 권한
 
     @Column(nullable = false)
-    private boolean deleted;  //유저 탈퇴 여부, 기본값=FALSE
+    private boolean deleted = Boolean.FALSE;  //유저 탈퇴 여부, 기본값=FALSE
 
     @Column(nullable = false)
     private String profileImage;   //프로필 사진
 
-    public User(String loginId, String nickname, String password, String email, String profileImage, UserRole userRole) {
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Provider provider;   // 어떻게 회원가입을 했는지
+
+    public User(String loginId, String nickname, String password, String email,
+        String profileImage, UserRole userRole, Provider provider) {
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
-        this.userRole = userRole;
-        this.deleted = Boolean.FALSE;
         this.profileImage = profileImage;
+        this.userRole = userRole;
+        this.provider = provider;
     }
 
     public void approveCrew() {
