@@ -42,14 +42,14 @@ public class FeedCommentDto {
 
         @ApiModelProperty(value = "수정 일자")
         private LocalDateTime modifiedAt;
-
-        public ResponseDto(FeedComment feedComment) {
-            this.commentId = feedComment.getId();
-            this.nickname = feedComment.getUser().getNickname();
-            this.content = feedComment.getContent();
-            this.profileImageUrl = feedComment.getUser().getProfileImage();
-            this.createdAt = feedComment.getCreatedAt();
-            this.modifiedAt = feedComment.getModifiedAt();
-        }
+//
+//        public ResponseDto(FeedComment feedComment) {
+//            this.commentId = feedComment.getId();
+//            this.nickname = feedComment.getUser().getNickname();
+//            this.content = feedComment.getContent();
+//            this.profileImageUrl = feedComment.getUser().getProfileImage();
+//            this.createdAt = feedComment.getCreatedAt();
+//            this.modifiedAt = feedComment.getModifiedAt();
+//        }
     }
 }

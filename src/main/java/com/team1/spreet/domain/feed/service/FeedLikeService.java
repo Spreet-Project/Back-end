@@ -10,6 +10,7 @@ import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
 import com.team1.spreet.domain.feed.repository.FeedLikeRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
+import com.team1.spreet.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +21,12 @@ public class FeedLikeService {
     private final FeedRepository feedRepository;
     //feed 좋아요
     @Transactional
-    public CustomResponseBody<FeedLikeDto.ResponseDto> setFeedLike(Long feedId, User user) {
-        Feed feed = isFeed(feedId);    //feedId로 feed 찾기
+    public CustomResponseBody<FeedLikeDto.ResponseDto> setFeedLike(Long feedId) {
+        User user = SecurityUtil.getCurrentUser();
+        if(user == null){
+            throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+        }
+        Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
         FeedLike feedLike = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId).orElse(null);
         if (feedLike!=null) {
             feedLikeRepository.delete(feedLike);
@@ -32,7 +37,7 @@ public class FeedLikeService {
         }
     }
     //feed 찾기
-    private Feed isFeed(Long feedId){
+    private Feed checkFeed(Long feedId){
         return feedRepository.findById(feedId).orElseThrow(
                 () -> new RestApiException(ErrorStatusCode.NOT_EXIST_FEED)
         );
