@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.user.dto;
 
+import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import io.swagger.annotations.ApiModelProperty;
@@ -49,8 +50,9 @@ public class UserDto {
         @ApiModelProperty(value = "회원 권한", required = true)
         private UserRole userRole;
 
-        public User toEntity(String encodePassword) {
-            return new User(this.loginId, this.nickname, this.password = encodePassword, this.email, this.profileImage, this.userRole);
+        public User toEntity(String encodePassword, Provider provider) {
+            return new User(this.loginId, this.nickname, this.password = encodePassword,
+                this.email, this.profileImage, this.userRole, provider);
         }
     }
 
