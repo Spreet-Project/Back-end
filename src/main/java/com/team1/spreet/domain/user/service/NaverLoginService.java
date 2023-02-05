@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.spreet.domain.user.dto.UserDto;
+import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.domain.user.repository.UserRepository;
@@ -154,7 +155,7 @@ public class NaverLoginService {
 			String profileImage = naverInfoDto.getProfileImage();
 
 			naverUser = new User(naverId, nickname, encodedPassword, naverEmail,
-				profileImage, UserRole.ROLE_USER);
+				profileImage, UserRole.ROLE_USER, Provider.NAVER);
 
 			userRepository.save(naverUser);
 		}

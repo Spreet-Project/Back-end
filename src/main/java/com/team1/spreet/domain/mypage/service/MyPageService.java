@@ -4,6 +4,7 @@ import com.team1.spreet.domain.event.repository.EventRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
+import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.repository.UserRepository;
 import com.team1.spreet.global.error.exception.RestApiException;
@@ -40,7 +41,16 @@ public class MyPageService {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
-		return new MyPageDto.UserInfoResponseDto(user.getLoginId(), user.getNickname(),
+		String loginId = user.getLoginId();
+		if (user.getProvider().equals(Provider.NAVER)) {
+			loginId = "네이버 로그인 이용중";
+		}
+
+		if (user.getProvider().equals(Provider.KAKAO)) {
+			loginId = "카카오 로그인 이용중";
+		}
+
+		return new MyPageDto.UserInfoResponseDto(loginId, user.getNickname(),
 			user.getEmail(), user.getProfileImage());
 	}
 
