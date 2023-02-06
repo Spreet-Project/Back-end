@@ -12,16 +12,6 @@ import org.springframework.stereotype.Service;
 public class BadWordService {
 
 	private final BadWordRepository badWordRepository;
-	private final RedisUtil redisUtil;
-
-
-	// 비속어 레디스 저장
-	public void addBadWord() {
-		List<BadWord> badWordList = badWordRepository.findAll();
-		for (BadWord badWord : badWordList) {
-			redisUtil.addBadWord(badWord.getContent());
-		}
-	}
 
 	// 비속어 DB 저장
 	public void createBadWord(BadWordDto.RequestDto requestDto) {
