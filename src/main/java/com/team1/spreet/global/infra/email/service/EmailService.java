@@ -1,6 +1,5 @@
 package com.team1.spreet.global.infra.email.service;
 
-import com.team1.spreet.domain.user.repository.UserRepository;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.email.dto.EmailDto;
@@ -22,7 +21,6 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
     private final EmailConfirmRepository emailConfirmRepository;
-    private final UserRepository userRepository;
 
     public String ePw;
 
@@ -55,26 +53,11 @@ public class EmailService {
     }
 
     public String createKey() {
-        StringBuffer key = new StringBuffer();
+        StringBuilder key = new StringBuilder();
         Random random = new Random();
 
-        for (int i = 0; i < 8; i++) {
-            int index = random.nextInt(3);
-
-            switch (index) {
-                case 0:
-                    key.append((char) ((random.nextInt(26)) + 97));
-                    //  a~z  (ex. 1+97=98 => (char)98 = 'b')
-                    break;
-                case 1:
-                    key.append((char) ((random.nextInt(26)) + 65));
-                    //  A~Z
-                    break;
-                case 2:
-                    key.append((random.nextInt(10)));
-                    // 0~9
-                    break;
-            }
+        for (int i = 0; i < 6; i++) {    // 인증코드 6자리
+            key.append((random.nextInt(10)));
         }
         return key.toString();
     }
