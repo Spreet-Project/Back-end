@@ -24,11 +24,4 @@ public class BadWordController {
 		return new CustomResponseBody<>(SuccessStatusCode.SAVE_BAD_WORD);
 	}
 
-	// 비속어 레디스 저장
-	@PostMapping("/bad-word")
-	public CustomResponseBody<SuccessStatusCode> addBadWord() {
-		badWordService.addBadWord();
-		return new CustomResponseBody<>(SuccessStatusCode.SAVE_BAD_WORD);
-	}
-
 }
