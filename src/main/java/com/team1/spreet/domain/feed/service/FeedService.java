@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.feed.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.feed.dto.FeedDto;
 import com.team1.spreet.domain.feed.model.Feed;
@@ -36,13 +37,15 @@ public class FeedService {
 	private final AlarmService alertService;
 	private final SubscribeRepository subscribeRepository;
 	private final FeedCommentRepository feedCommentRepository;
+	private final BadWordService badWordService;
 
 	//feed 최신순 조회
 	@Transactional(readOnly = true)
 	public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
-		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(page-1,
+		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(
+			page - 1,
 			size, userId);
 		for (FeedDto.ResponseDto responseDto : recentFeedList) {
 			List<String> imageUrlList = getFeedImageUrlList(responseDto.getFeedId());
@@ -62,7 +65,7 @@ public class FeedService {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
 		FeedDto.ResponseDto responseDto = feedRepository.findByIdAndUserId(feedId, userId);
-		if(responseDto==null){
+		if (responseDto == null) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_FEED);
 		}
 		List<String> imageUrlList = getFeedImageUrlList(feedId);
@@ -74,7 +77,11 @@ public class FeedService {
 	@Transactional
 	public void saveFeed(FeedDto.RequestDto requestDto) {
 		User user = checkUser();
-		Feed feed = requestDto.toEntity(user);    //feed 엔티티 초기화
+
+		String title = badWordService.checkBadWord(requestDto.getTitle());
+		String content = badWordService.checkBadWord(requestDto.getContent());
+
+		Feed feed = requestDto.toEntity(title, content, user);    //feed 엔티티 초기화
 		feedRepository.save(feed);    //feed 저장
 		saveImage(requestDto.getFile(), feed);    //새로운 이미지 저장
 		alarmToSubscriber(user, feed);
@@ -86,7 +93,9 @@ public class FeedService {
 		User user = checkUser();
 		Feed feed = checkFeed(feedId);    //feedId로 feed 찾기
 		if (checkOwner(feed, user)) {
-			feed.update(requestDto.getTitle(), requestDto.getContent());
+			String title = badWordService.checkBadWord(requestDto.getTitle());
+			String content = badWordService.checkBadWord(requestDto.getContent());
+			feed.update(title, content);
 			//이미지가 있다면 새로운 이미지 저장
 			if (!requestDto.getFile().isEmpty()) {
 				deleteImage(feedId);    //기존에 업로드된 이미지 제거
@@ -148,9 +157,10 @@ public class FeedService {
 			return true;
 		}
 	}
-	private User checkUser(){
+
+	private User checkUser() {
 		User user = SecurityUtil.getCurrentUser();
-		if(user == null){
+		if (user == null) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 		return user;

@@ -28,8 +28,8 @@ public class FeedDto {
         @ApiModelProperty(value = "이미지 파일")
         private List<MultipartFile> file;
 
-        public Feed toEntity(User user){
-            return new Feed(this.title, this.content, user);
+        public Feed toEntity(String title, String content, User user){
+            return new Feed(title, content, user);
         }
     }
 

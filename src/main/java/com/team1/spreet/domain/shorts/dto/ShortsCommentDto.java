@@ -18,8 +18,8 @@ public class ShortsCommentDto {
 		@ApiParam(value = "댓글 내용", required = true)
 		private String content;
 
-		public ShortsComment toEntity(Shorts shorts, User user) {
-			return new ShortsComment(this.content, shorts, user);
+		public ShortsComment toEntity(String content, Shorts shorts, User user) {
+			return new ShortsComment(content, shorts, user);
 		}
 	}
 

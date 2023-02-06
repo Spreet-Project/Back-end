@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.event.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.event.dto.EventDto;
 import com.team1.spreet.domain.event.model.Event;
@@ -29,6 +30,7 @@ public class EventService {
 	private final EventCommentRepository eventCommentRepository;
 	private final SubscribeRepository subscribeRepository;
 	private final AlarmService alarmService;
+	private final BadWordService badWordService;
 
 	// Event 게시글 등록
 	public void saveEvent(EventDto.RequestDto requestDto) {
@@ -37,13 +39,16 @@ public class EventService {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
+		String title = badWordService.checkBadWord(requestDto.getTitle());
+		String content = badWordService.checkBadWord(requestDto.getContent());
+
 		String eventImageUrl;
 		try {
 			eventImageUrl = awsS3Service.uploadImage(requestDto.getFile());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		Event event = eventRepository.saveAndFlush(requestDto.toEntity(eventImageUrl, user));
+		Event event = eventRepository.saveAndFlush(requestDto.toEntity(title, content, eventImageUrl, user));
 		alarmToSubscriber(user, event);
 	}
 
@@ -59,6 +64,9 @@ public class EventService {
 		if (!event.getUser().getId().equals(user.getId())) {    // 수정하려는 유저가 작성자가 아닌 경우
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
+
+		String title = badWordService.checkBadWord(requestDto.getTitle());
+		String content = badWordService.checkBadWord(requestDto.getContent());
 
 		String eventImageUrl;
 		if (!requestDto.getFile().isEmpty()) {
@@ -76,8 +84,8 @@ public class EventService {
 			//첨부파일 수정 안함
 			eventImageUrl = event.getEventImageUrl();
 		}
-		event.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getLocation(),
-			requestDto.getDate(), requestDto.getTime(), eventImageUrl);
+		event.update(title, content, requestDto.getLocation(), requestDto.getDate(),
+			requestDto.getTime(), eventImageUrl);
 	}
 
 	// Event 게시글 삭제
