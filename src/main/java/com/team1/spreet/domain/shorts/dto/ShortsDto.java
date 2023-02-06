@@ -36,8 +36,8 @@ public class ShortsDto {
 		private Category category;
 
 
-		public Shorts toEntity(String videoUrl, User user) {
-			return new Shorts(this.title, this.content, videoUrl, this.category, user);
+		public Shorts toEntity(String title, String content, String videoUrl, User user) {
+			return new Shorts(title, content, videoUrl, this.category, user);
 		}
 	}
 

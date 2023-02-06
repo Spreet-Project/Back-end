@@ -17,8 +17,8 @@ public class FeedCommentDto {
         @NotBlank(message = "댓글을 입력해 주세요.")
         private String content;
 
-        public FeedComment toEntity(Feed feed, User user){
-            return new FeedComment(this.content, feed, user);
+        public FeedComment toEntity(String content, Feed feed, User user){
+            return new FeedComment(content, feed, user);
         }
     }
 

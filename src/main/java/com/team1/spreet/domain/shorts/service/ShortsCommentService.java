@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.shorts.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.shorts.dto.ShortsCommentDto;
 import com.team1.spreet.domain.shorts.model.Shorts;
@@ -11,11 +12,10 @@ import com.team1.spreet.domain.user.model.UserRole;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.util.SecurityUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class ShortsCommentService {
 	private final ShortsCommentRepository shortsCommentRepository;
 	private final ShortsRepository shortsRepository;
 	private final AlarmService alarmService;
+	private final BadWordService badWordService;
 
 	// shortsComment 등록
 	public void saveShortsComment(Long shortsId, ShortsCommentDto.RequestDto requestDto) {
@@ -34,7 +35,9 @@ public class ShortsCommentService {
 		}
 
 		Shorts shorts = checkShorts(shortsId);
-		shortsCommentRepository.saveAndFlush(requestDto.toEntity(shorts, user));
+
+		String content = badWordService.checkBadWord(requestDto.getContent());
+		shortsCommentRepository.saveAndFlush(requestDto.toEntity(content, shorts, user));
 
 		if (!shorts.getUser().getId().equals(user.getId())) {
 			alarmService.send(user.getId(),
@@ -51,11 +54,12 @@ public class ShortsCommentService {
 		}
 
 		ShortsComment shortsComment = checkShortsComment(shortsCommentId);
-
 		if (!user.getId().equals(shortsComment.getUser().getId())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		shortsComment.updateShortsComment(requestDto.getContent());
+
+		String content = badWordService.checkBadWord(requestDto.getContent());
+		shortsComment.updateShortsComment(content);
 	}
 
 	// shortsComment 삭제

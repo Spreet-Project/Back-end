@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.event.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.event.dto.EventCommentDto;
 import com.team1.spreet.domain.event.model.Event;
@@ -23,6 +24,7 @@ public class EventCommentService {
 	private final EventRepository eventRepository;
 	private final EventCommentRepository eventCommentRepository;
 	private final AlarmService alarmService;
+	private final BadWordService badWordService;
 
 	public void saveEventComment(Long eventId, EventCommentDto.RequestDto requestDto) {
 		User user = SecurityUtil.getCurrentUser();
@@ -31,8 +33,10 @@ public class EventCommentService {
 		}
 
 		Event event = checkEvent(eventId);
+
+		String content = badWordService.checkBadWord(requestDto.getContent());
 		eventCommentRepository.saveAndFlush(
-			requestDto.toEntity(requestDto.getContent(), event, user));
+			requestDto.toEntity(content, event, user));
 
 		if (!event.getUser().getId().equals(user.getId())) {
 			alarmService.send(user.getId(),
@@ -52,7 +56,9 @@ public class EventCommentService {
 		if (!user.getId().equals(eventComment.getUser().getId())) {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
-		eventComment.updateEventComment(requestDto.getContent());
+
+		String content = badWordService.checkBadWord(requestDto.getContent());
+		eventComment.updateEventComment(content);
 		eventCommentRepository.saveAndFlush(eventComment);
 	}
 

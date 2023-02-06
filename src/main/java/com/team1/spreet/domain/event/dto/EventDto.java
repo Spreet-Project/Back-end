@@ -42,8 +42,8 @@ public class EventDto {
 		@NotNull(message = "이벤트 이미지를 업로드 해주세요.")
 		private MultipartFile file;
 
-		public Event toEntity(String eventImageUrl, User user) {
-			return new Event(this.title, this.content, this.location, this.date,
+		public Event toEntity(String title, String content, String eventImageUrl, User user) {
+			return new Event(title, content, this.location, this.date,
 				this.time, eventImageUrl, user);
 		}
 	}

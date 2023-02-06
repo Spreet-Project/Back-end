@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.shorts.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
 import com.team1.spreet.domain.shorts.model.Category;
@@ -32,6 +33,7 @@ public class ShortsService {
 	private final ShortsCommentRepository shortsCommentRepository;
 	private final AlarmService alarmService;
 	private final SubscribeRepository subscribeRepository;
+	private final BadWordService badWordService;
 
 	// shorts 등록
 	public void saveShorts(ShortsDto.RequestDto requestDto) {
@@ -40,8 +42,11 @@ public class ShortsService {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 
+		String title = badWordService.checkBadWord(requestDto.getTitle());
+		String content = badWordService.checkBadWord(requestDto.getContent());
+
 		String videoUrl = awsS3Service.uploadFile(requestDto.getFile());
-		Shorts shorts = shortsRepository.saveAndFlush(requestDto.toEntity(videoUrl, user));
+		Shorts shorts = shortsRepository.saveAndFlush(requestDto.toEntity(title, content, videoUrl, user));
 		alarmToSubscriber(user, shorts);
 	}
 
@@ -57,6 +62,9 @@ public class ShortsService {
 			throw new RestApiException(ErrorStatusCode.UNAVAILABLE_MODIFICATION);
 		}
 
+		String title = badWordService.checkBadWord(requestDto.getTitle());
+		String content = badWordService.checkBadWord(requestDto.getContent());
+
 		String videoUrl;
 		if (!requestDto.getFile().isEmpty()) {
 			//첨부파일 수정시 기존 첨부파일 삭제
@@ -69,7 +77,7 @@ public class ShortsService {
 			//첨부파일 수정 안함
 			videoUrl = shorts.getVideoUrl();
 		}
-		shorts.update(requestDto.getTitle(), requestDto.getContent(), videoUrl, requestDto.getCategory());
+		shorts.update(title, content, videoUrl, requestDto.getCategory());
 	}
 
 
