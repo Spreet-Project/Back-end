@@ -100,3 +100,14 @@ jobs:
       run: chmod +x ./gradlew      
     - name: Build with Gradle
       run: ./gradlew build
+
+        # 빌드 결과를 Slack 으로 알려주기
+    - name: Send Msg to Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: workflow,job,commit,repo,author,took,ref
+        author_name: Github Action Bot
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always()
