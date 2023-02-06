@@ -5,7 +5,8 @@
 **Spreed(퍼뜨리다) + Street = Spreet 입니다!**  
 힙합이 궁금하다면?  
 [🎤**힙합을 즐겨보아Yo! Spreet 방문하기**](https://www.spreet.co.kr)  
-  
+<br>    
+   
 [😎Front-End GitHub](https://github.com/Spreet-Project/Front-end)  
 [🛹Spreet Notion](https://www.notion.so/Spreet-30f5391e7e524289b3d44ec0abc11cbc)  
 
@@ -34,11 +35,24 @@
 
 ## 🛠️기술 스택
 <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=SpringBoot&logoColor=white"/> <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=Gradle&logoColor=white"/> <img src="https://img.shields.io/badge/QueryDSL-008ED2?style=flat&logo=QueryDSL&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=Redis&logoColor=white"/> <img src="https://img.shields.io/badge/NGINX-009639?style=flat&logo=NGINX&logoColor=white"/> <img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=flat&logo=AmazonRDS&logoColor=white"/> <img src="https://img.shields.io/badge/AmazonS3-569A31?style=flat&logo=AmazonS3&logoColor=white"/>   
-<img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=AmazonEC2&logoColor=white"/> <img src="https://img.shields.io/badge/WebHooks-41454A?style=flat&logo=WebHooks&logoColor=white"/> <img src="https://img.shields.io/badge/ImgScalr-EF2D5E?style=flat&logo=ImgScalr&logoColor=white"/> <img src="https://img.shields.io/badge/GitHubActions-2088FF?style=flat&logo=GitHubActions&logoColor=white"/> <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Postman&logoColor=white"/> <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=Postman&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white"/> <img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=Slack&logoColor=white"/>  
+<img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=AmazonEC2&logoColor=white"/> <img src="https://img.shields.io/badge/WebHooks-41454A?style=flat&logo=WebHooks&logoColor=white"/> <img src="https://img.shields.io/badge/ImgScalr-EF2D5E?style=flat&logo=ImgScalr&logoColor=white"/> <img src="https://img.shields.io/badge/GitHubActions-2088FF?style=flat&logo=GitHubActions&logoColor=white"/> <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Postman&logoColor=white"/> <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=Postman&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white"/> <img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=Slack&logoColor=white"/> <img src="https://img.shields.io/badge/JiraSorfware-0052CC?style=flat&logo=JiraSorfware&logoColor=white"/>   
 <br>    
   
 ## 🧐 기술적 의사 결정
-    
+  
+  
 ## 🔥 트러블 슈팅
-[EC2 RAM 초과 & Memory 성능 이슈](https://github.com/Spreet-Project/Back-end/wiki/EC2-RAM-%EC%B4%88%EA%B3%BC-&-Memory-%EC%84%B1%EB%8A%A5-%EC%9D%B4%EC%8A%88)
-[Image Resizing](https://github.com/Spreet-Project/Back-end/wiki/Image-Resizing)
+[EC2 RAM 초과 & Memory 성능 이슈](https://github.com/Spreet-Project/Back-end/wiki/EC2-RAM-%EC%B4%88%EA%B3%BC-&-Memory-%EC%84%B1%EB%8A%A5-%EC%9D%B4%EC%8A%88)  
+[Image Resizing](https://github.com/Spreet-Project/Back-end/wiki/Image-Resizing)  
+<br>  
+  
+## 👩🏻‍💻🧑🏻‍💻 팀원
+|김규민|이승열|김소라|나준영|오채운|임성신|
+|----|----|----|----|----|----|
+|BE(부팀장)|BE|BE|FE(팀장)|FE|Designer|
+|[:link:](https://github.com/starMinK)|[:link:](https://github.com/misracis2)|[:link:](https://github.com/dev-rara)|[:link:](https://github.com/junyoungNA)|[:link:](https://github.com/chaewoon-Front)||  
+        
+### ⚙️BackEnd  
+|김규민|이승열|김소라|
+|----|----|----|
+|1.회원가입<br>2.로그인<br>3.카카오 로그인<br>4.이메일 인증|1.피드 CRUD<br>2.행사 댓글<br>3.구독/알림 기능<br>4.Nginx 무중단배포<br>5.QueryDSL|1.쇼츠 CRUD<br>2.비속어 필터링<br>3.네이버 로그인<br>4.행사 게시글<br>5.QueryDSL<br>6.마이페이지 기능<br>7.관리자 기능<br>8.CI/CD 구축 및 서버 환경 관리<br>(AWS route53, ACM , EC2, CodeDeploy)|
