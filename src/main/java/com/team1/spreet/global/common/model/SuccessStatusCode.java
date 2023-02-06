@@ -44,7 +44,8 @@ public enum SuccessStatusCode {
     UPDATE_EVENT("행사 게시글 수정 성공", HttpStatus.OK.value()),
     DELETE_EVENT("행사 게시글 삭제 성공", HttpStatus.OK.value()),
     GET_EVENT("행사 게시글 상세조회 성공", HttpStatus.OK.value()),
-    GET_EVENT_LIST("행사 게시글 리스트 조회 성공", HttpStatus.OK.value());
+    GET_EVENT_LIST("행사 게시글 리스트 조회 성공", HttpStatus.OK.value()),
+    SAVE_BAD_WORD("비속어 저장 완료", HttpStatus.OK.value());
 
     private final String msg;
     private final int statusCode;

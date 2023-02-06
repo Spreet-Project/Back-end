@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.mypage.service;
 
+import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.event.repository.EventRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
@@ -31,7 +32,7 @@ public class MyPageService {
 	private final FeedRepository feedRepository;
 	private final EventRepository eventRepository;
 	private final EmailService emailService;
-
+	private final BadWordService badWordService;
 
 	// 회원 정보 조회
 	@Transactional(readOnly = true)
@@ -82,7 +83,9 @@ public class MyPageService {
 		if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
 			throw new RestApiException(ErrorStatusCode.OVERLAPPED_NICKNAME);
 		}
-		user.updateNickname(requestDto.getNickname());
+
+		String nickname = badWordService.checkBadWord(requestDto.getNickname());
+		user.updateNickname(nickname);
 		userRepository.saveAndFlush(user);
 	}
 
