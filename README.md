@@ -55,4 +55,4 @@
 ### ⚙️BackEnd  
 |김규민|이승열|김소라|
 |----|----|----|
-|1.회원가입<br>2.로그인<br>3.카카오 로그인<br>4.이메일 인증|1.피드 CRUD<br>2.행사 댓글<br>3.구독/알림 기능<br>4.Nginx 무중단배포<br>5.QueryDSL|1.쇼츠 CRUD<br>2.비속어 필터링<br>3.네이버 로그인<br>4.행사 게시글<br>5.QueryDSL<br>6.마이페이지 기능<br>7.관리자 기능<br>8.CI/CD 구축 및 서버 환경 관리<br>(AWS route53, ACM , EC2, CodeDeploy)|
+|1.회원가입<br>2.로그인<br>3.카카오 로그인<br>4.이메일 인증|1.피드 CRUD<br>2.행사 댓글<br>3.구독 기능<br>4.알림 기능<br>5.Nginx 무중단배포<br>6.QueryDSL|1.쇼츠 CRUD<br>2.비속어 필터링<br>3.네이버 로그인<br>4.행사 게시글<br>5.QueryDSL<br>6.마이페이지 기능<br>7.관리자 기능<br>8.CI/CD 구축 및 서버 환경 관리<br>(AWS route53, ACM , EC2, CodeDeploy)|
