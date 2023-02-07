@@ -1,6 +1,7 @@
 package com.team1.spreet.domain.feed.service;
 
 import com.team1.spreet.domain.admin.service.BadWordService;
+import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.feed.dto.FeedCommentDto;
 import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.feed.model.FeedComment;
@@ -10,10 +11,11 @@ import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.util.SecurityUtil;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class FeedCommentService {
     private final FeedRepository feedRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final BadWordService badWordService;
+    private final AlarmService alarmService;
 
     @Transactional
     public void saveFeedComment(Long feedId, FeedCommentDto.RequestDto requestDto) {
@@ -33,6 +36,13 @@ public class FeedCommentService {
 
         String content = badWordService.checkBadWord(requestDto.getContent());
         feedCommentRepository.saveAndFlush(requestDto.toEntity(content, feed, user));
+
+        if (!feed.getUser().getId().equals(user.getId())) {
+            alarmService.send(user.getId(),
+                    "💬" + feed.getUser().getNickname() + "님! " + "작성하신 feed에 댓글 알림이 도착했어Yo!\n",
+                    "https://www.spreet.co.kr/api/feed/" + feed.getId(),
+                    feed.getUser().getId());
+        }
     }
 
     @Transactional
