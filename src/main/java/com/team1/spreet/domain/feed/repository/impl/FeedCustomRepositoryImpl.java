@@ -14,6 +14,7 @@ import java.util.List;
 
 import static com.team1.spreet.domain.feed.model.QFeed.feed;
 import static com.team1.spreet.domain.feed.model.QFeedLike.feedLike;
+import static com.team1.spreet.domain.subscribe.model.QSubscribe.subscribe;
 import static com.team1.spreet.domain.user.model.QUser.user;
 
 @Repository
@@ -22,7 +23,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
     @Override
-    public FeedDto.ResponseDto findByIdAndUserId(Long feedId, Long userId){
+    public FeedDto.ResponseDto findAllByIdAndUserId(Long feedId, Long userId){
         return jpaQueryFactory
                 .select(Projections
                         .fields(FeedDto.ResponseDto.class,
@@ -42,17 +43,23 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                                                 .from(feedLike)
                                                 .where(feedLike.feed.id.eq(feed.id), feedLike.user.id.eq(userId)),
                                         "liked"
+                                ),
+                                ExpressionUtils.as(
+                                        JPAExpressions.select(subscribe.id.isNotNull())
+                                                .from(subscribe)
+                                                .where(subscribe.publisher.id.eq(feed.user.id), subscribe.subscriber.id.eq(userId)),
+                                        "subscribed"
                                 )
                         )
                 )
                 .from(feed)
-                .join(user)
+                .join(feed.user, user)
                 .on(feed.user.id.eq(user.id))
                 .where(feed.id.eq(feedId), feed.deleted.eq(false))
                 .fetchOne();
     }
     @Override
-    public List<FeedDto.ResponseDto> findByOrderByCreatedAtDesc(Long page, Long size, Long userId){
+    public List<FeedDto.ResponseDto> findAllOrderByCreatedAtDesc(Long page, Long size, Long userId){
         return jpaQueryFactory
                 .select(Projections
                     .fields(FeedDto.ResponseDto.class,
@@ -72,12 +79,17 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                                         .from(feedLike)
                                         .where(feedLike.feed.id.eq(feed.id), feedLike.user.id.eq(userId)),
                                 "liked"
-                        )
+                        ),
+                            ExpressionUtils.as(
+                                JPAExpressions.select(subscribe.id.isNotNull())
+                                        .from(subscribe)
+                                        .where(subscribe.publisher.id.eq(feed.user.id), subscribe.subscriber.id.eq(userId)),
+                               "subscribed"
+                            )
                     )
                 )
                 .from(feed)
-                .join(user)
-                .on(feed.user.id.eq(user.id))
+                .join(feed.user, user)
                 .where(feed.deleted.eq(false))
                 .orderBy(feed.createdAt.desc())
                 .offset(page*10)
