@@ -60,6 +60,9 @@ public class FeedDto {
         @ApiModelProperty(value = "좋아요 상태")
         private boolean liked;
 
+        @ApiModelProperty(value = "구독 유무")
+        private boolean subscribed;
+
         public void addImageUrlList(List<String> imageUrlList){
             this.imageUrlList = imageUrlList;
         }

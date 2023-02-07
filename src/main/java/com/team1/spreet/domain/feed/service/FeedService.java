@@ -44,7 +44,7 @@ public class FeedService {
 	public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
-		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findByOrderByCreatedAtDesc(
+		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findAllOrderByCreatedAtDesc(
 			page - 1,
 			size, userId);
 		for (FeedDto.ResponseDto responseDto : recentFeedList) {
@@ -64,7 +64,7 @@ public class FeedService {
 	public FeedDto.ResponseDto getFeed(Long feedId) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
-		FeedDto.ResponseDto responseDto = feedRepository.findByIdAndUserId(feedId, userId);
+		FeedDto.ResponseDto responseDto = feedRepository.findAllByIdAndUserId(feedId, userId);
 		if (responseDto == null) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_FEED);
 		}
