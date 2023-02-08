@@ -13,12 +13,13 @@ import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.email.service.EmailService;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import com.team1.spreet.global.util.SecurityUtil;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -132,7 +133,7 @@ public class MyPageService {
 
 		// feed
 		if (classification.equals("feed")) {
-			return feedRepository.findByUserId(classification, page - 1, user.getId());
+			return feedRepository.findAllByUserId(classification, page - 1, user.getId());
 		}
 
 		// event

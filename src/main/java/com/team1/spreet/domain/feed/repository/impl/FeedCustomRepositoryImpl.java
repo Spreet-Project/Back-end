@@ -97,7 +97,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .fetch();
     }
     @Override
-    public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
+    public List<FeedDto.SimpleResponseDto> findMainFeed() {
         return jpaQueryFactory
                 .select(Projections
                         .fields(FeedDto.SimpleResponseDto.class,
@@ -113,7 +113,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .fetch();
     }
 	@Override
-	public List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId) {
+	public List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId) {
 		return jpaQueryFactory
 				.select(Projections.constructor(
 						MyPageDto.PostResponseDto.class,
