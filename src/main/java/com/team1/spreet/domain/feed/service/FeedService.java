@@ -56,7 +56,7 @@ public class FeedService {
 
 	@Transactional(readOnly = true)
 	public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
-		return feedRepository.getSimpleFeed();
+		return feedRepository.findMainFeed();
 	}
 
 	//feed 조회

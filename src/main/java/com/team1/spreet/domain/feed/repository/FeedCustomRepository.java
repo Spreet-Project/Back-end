@@ -10,10 +10,10 @@ public interface FeedCustomRepository {
     FeedDto.ResponseDto findAllByIdAndUserId(Long feedId, Long userId);
 
 	// 회원이 작성한 feed 조회
-	List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId);
+	List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId);
     List<FeedDto.ResponseDto> findAllOrderByCreatedAtDesc(Long page, Long size, Long userId);
 
-    List<FeedDto.SimpleResponseDto> getSimpleFeed();
+    List<FeedDto.SimpleResponseDto> findMainFeed();
 
     void updateDeletedTrueByUserId(Long userId);
 }
