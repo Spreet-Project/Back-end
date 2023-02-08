@@ -129,4 +129,13 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
 				.limit(10)
 				.fetch();
 	}
+
+    @Override
+    public void updateDeletedTrueByUserId(Long userId) {
+        jpaQueryFactory
+                .update(feed)
+                .set(feed.deleted, true)
+                .where(feed.user.id.eq(userId))
+                .execute();
+    }
 }

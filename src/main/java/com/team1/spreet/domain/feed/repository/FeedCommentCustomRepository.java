@@ -9,4 +9,6 @@ public interface FeedCommentCustomRepository {
     List<FeedCommentDto.ResponseDto> findAllByFeedId(Long feedId);
 
     void updateDeletedTrueByFeedId(Long feedId);
+
+    void updateDeletedTrueByUserId(Long userId);
 }

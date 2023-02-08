@@ -14,4 +14,6 @@ public interface FeedCustomRepository {
     List<FeedDto.ResponseDto> findAllOrderByCreatedAtDesc(Long page, Long size, Long userId);
 
     List<FeedDto.SimpleResponseDto> getSimpleFeed();
+
+    void updateDeletedTrueByUserId(Long userId);
 }

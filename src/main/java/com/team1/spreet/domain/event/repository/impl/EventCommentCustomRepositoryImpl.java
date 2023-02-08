@@ -45,4 +45,13 @@ public class EventCommentCustomRepositoryImpl implements EventCommentCustomRepos
 			.where(eventComment.event.id.eq(eventId))
 			.execute();
 	}
+
+	@Override
+	public void updateDeletedTrueByUserId(Long userId) {
+		jpaQueryFactory
+				.update(eventComment)
+				.set(eventComment.deleted, true)
+				.where(eventComment.user.id.eq(userId))
+				.execute();
+	}
 }

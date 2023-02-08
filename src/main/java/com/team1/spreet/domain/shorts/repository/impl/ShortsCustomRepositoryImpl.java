@@ -165,4 +165,13 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 			.fetch();
 	}
 
+	@Override
+	public void updateDeletedTrueByUserId(Long userId){
+		jpaQueryFactory
+				.update(shorts)
+				.set(shorts.deleted, true)
+				.where(shorts.user.id.eq(userId))
+				.execute();
+	}
+
 }

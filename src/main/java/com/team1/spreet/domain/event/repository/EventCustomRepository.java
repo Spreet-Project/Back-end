@@ -14,4 +14,7 @@ public interface EventCustomRepository {
 
 	// 회원이 작성한 게시글 조회
 	List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId);
+
+	// 회원탈퇴 시 event soft delete
+	void updateDeletedTrueByUserId(Long userId);
 }
