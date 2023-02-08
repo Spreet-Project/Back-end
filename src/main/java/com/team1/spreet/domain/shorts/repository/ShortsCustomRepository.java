@@ -21,4 +21,7 @@ public interface ShortsCustomRepository {
 
 	// 회원이 작성한 shorts 조회
 	List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId);
+
+	// 회원탈퇴 시 shorts soft delete
+	void updateDeletedTrueByUserId(Long userId);
 }

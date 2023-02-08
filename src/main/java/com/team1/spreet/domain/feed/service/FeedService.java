@@ -131,7 +131,7 @@ public class FeedService {
 	}
 
 	//이미지 파일 삭제
-	private void deleteImage(Long feedId) {
+	public void deleteImage(Long feedId) {
 		List<FeedImage> imageList = imageRepository.findByFeedId(feedId);
 		if (!imageList.isEmpty()) {
 			for (FeedImage image : imageList) {

@@ -1,5 +1,15 @@
 package com.team1.spreet.domain.user.service;
 
+import com.team1.spreet.domain.event.repository.EventCommentRepository;
+import com.team1.spreet.domain.event.repository.EventRepository;
+import com.team1.spreet.domain.feed.repository.FeedCommentRepository;
+import com.team1.spreet.domain.feed.repository.FeedImageRepository;
+import com.team1.spreet.domain.feed.repository.FeedLikeRepository;
+import com.team1.spreet.domain.feed.repository.FeedRepository;
+import com.team1.spreet.domain.shorts.repository.ShortsCommentRepository;
+import com.team1.spreet.domain.shorts.repository.ShortsLikeRepository;
+import com.team1.spreet.domain.shorts.repository.ShortsRepository;
+import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.dto.UserDto;
 import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
@@ -26,13 +36,22 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @Transactional
 public class UserService {
+    private final SubscribeRepository subscribeRepository;
+    private final EventRepository eventRepository;
+    private final EventCommentRepository eventCommentRepository;
+    private final ShortsRepository shortsRepository;
+    private final ShortsLikeRepository shortsLikeRepository;
+    private final ShortsCommentRepository shortsCommentRepository;
+    private final FeedRepository feedRepository;
+    private final FeedImageRepository feedImageRepository;
+    private final FeedCommentRepository feedCommentRepository;
 
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bcryptPasswordEncoder;
-
     private final EmailService emailService;
+    private final FeedLikeRepository feedLikeRepository;
 
     //회원 가입
     public void signup(final UserDto.SignupRequestDto requestDto) {
@@ -49,8 +68,25 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Transactional
     public void userWithdraw(String password, User user) {
         if (bcryptPasswordEncoder.matches(password, user.getPassword())) {
+            feedCommentRepository.updateDeletedTrueByUserId(user.getId());
+            feedLikeRepository.deleteByUserId(user.getId());
+            feedImageRepository.deleteByUserId(user.getId());
+            feedRepository.updateDeletedTrueByUserId(user.getId());
+
+            shortsCommentRepository.updateDeletedTrueByUserId(user.getId());
+            shortsLikeRepository.deleteByUserId(user.getId());
+            shortsRepository.updateDeletedTrueByUserId(user.getId());
+
+            subscribeRepository.deleteByUserId(user.getId());
+
+            eventCommentRepository.updateDeletedTrueByUserId(user.getId());
+            if(user.getUserRole().equals(UserRole.ROLE_APPROVED_CREW) || user.getUserRole().equals(UserRole.ROLE_ADMIN)){
+                eventRepository.updateDeletedTrueByUserId(user.getId());
+            }
+
             user.deleteUser();
             userRepository.saveAndFlush(user);
         } else {

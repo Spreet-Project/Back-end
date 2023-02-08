@@ -45,4 +45,13 @@ public class ShortsCommentCustomRepositoryImpl implements ShortsCommentCustomRep
 			.where(shortsComment.shorts.id.eq(shortsId))
 			.execute();
 	}
+
+	@Override
+	public void updateDeletedTrueByUserId(Long userId) {
+		jpaQueryFactory
+				.update(shortsComment)
+				.set(shortsComment.deleted, true)
+				.where(shortsComment.user.id.eq(userId))
+				.execute();
+	}
 }
