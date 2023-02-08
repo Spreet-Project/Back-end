@@ -9,6 +9,7 @@ import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsCommentRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsLikeRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
+import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.dto.UserDto;
 import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @Transactional
 public class UserService {
+    private final SubscribeRepository subscribeRepository;
     private final EventRepository eventRepository;
     private final EventCommentRepository eventCommentRepository;
     private final ShortsRepository shortsRepository;
@@ -77,6 +79,8 @@ public class UserService {
             shortsCommentRepository.updateDeletedTrueByUserId(user.getId());
             shortsLikeRepository.deleteByUserId(user.getId());
             shortsRepository.updateDeletedTrueByUserId(user.getId());
+
+            subscribeRepository.deleteByUserId(user.getId());
 
             eventCommentRepository.updateDeletedTrueByUserId(user.getId());
             if(user.getUserRole().equals(UserRole.ROLE_APPROVED_CREW) || user.getUserRole().equals(UserRole.ROLE_ADMIN)){
