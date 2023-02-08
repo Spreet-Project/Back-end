@@ -110,13 +110,14 @@ public class ShortsService {
 		return shortsRepository.findByIdAndUserId(shortsId, userId);
 	}
 
-	// 카테고리별 shorts 조회(페이징)
+	// 카테고리별 shorts 조회(최신순, 인기순)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(Category category, Long page) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(String sort, Category category, Long page) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
 
-		return shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
+		return sort.equals("popular") ? shortsRepository.findAllSortByPopularAndCategory(category, page - 1, userId)
+			: shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
 	}
 
 	// 메인화면에서 shorts 조회(페이징)

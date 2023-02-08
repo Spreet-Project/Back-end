@@ -3,6 +3,7 @@ package com.team1.spreet.domain.event.service;
 import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.alarm.service.AlarmService;
 import com.team1.spreet.domain.event.dto.EventDto;
+import com.team1.spreet.domain.event.model.AreaCode;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.event.repository.EventCommentRepository;
 import com.team1.spreet.domain.event.repository.EventRepository;
@@ -42,13 +43,21 @@ public class EventService {
 		String title = badWordService.checkBadWord(requestDto.getTitle());
 		String content = badWordService.checkBadWord(requestDto.getContent());
 
+		// 어느 지역인지 주소 확인
+		AreaCode areaCode = null;
+		for (AreaCode code : AreaCode.values()) {
+			if (requestDto.getLocation().substring(0, 2).equals(code.value())) {
+				areaCode = code;
+			}
+		}
+
 		String eventImageUrl;
 		try {
 			eventImageUrl = awsS3Service.uploadImage(requestDto.getFile());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		Event event = eventRepository.saveAndFlush(requestDto.toEntity(title, content, eventImageUrl, user));
+		Event event = eventRepository.saveAndFlush(requestDto.toEntity(title, content, eventImageUrl, areaCode, user));
 		alarmToSubscriber(user, event);
 	}
 
@@ -68,6 +77,14 @@ public class EventService {
 		String title = badWordService.checkBadWord(requestDto.getTitle());
 		String content = badWordService.checkBadWord(requestDto.getContent());
 
+		// 어느 지역인지 주소 확인
+		AreaCode areaCode = null;
+		for (AreaCode code : AreaCode.values()) {
+			if (requestDto.getLocation().substring(0, 2).equals(code.value())) {
+				areaCode = code;
+			}
+		}
+
 		String eventImageUrl;
 		if (!requestDto.getFile().isEmpty()) {
 			//첨부파일 수정시 기존 첨부파일 삭제
@@ -85,7 +102,7 @@ public class EventService {
 			eventImageUrl = event.getEventImageUrl();
 		}
 		event.update(title, content, requestDto.getLocation(), requestDto.getDate(),
-			requestDto.getTime(), eventImageUrl);
+			requestDto.getTime(), eventImageUrl, areaCode);
 	}
 
 	// Event 게시글 삭제
@@ -119,6 +136,12 @@ public class EventService {
 	@Transactional(readOnly = true)
 	public List<EventDto.ResponseDto> getEventList() {
 		return eventRepository.findAllSortByNew();
+	}
+
+	// Event 게시글 지역별 조회
+	@Transactional(readOnly = true)
+	public List<EventDto.ResponseDto> getEventListByAreaCode(AreaCode areaCode) {
+		return eventRepository.findAllByAreaCode(areaCode);
 	}
 
 	// Event 게시글이 존재하는지 확인
