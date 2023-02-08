@@ -127,7 +127,7 @@ public class MyPageService {
 
 		// shorts
 		if (classification.equals("shorts")) {
-			return shortsRepository.findByUserId(classification, page - 1, user.getId());
+			return shortsRepository.findAllByUserId(classification, page - 1, user.getId());
 		}
 
 		// feed
@@ -137,7 +137,7 @@ public class MyPageService {
 
 		// event
 		if (classification.equals("event")) {
-			return eventRepository.findByUserId(classification, page - 1, user.getId());
+			return eventRepository.findAllByUserId(classification, page - 1, user.getId());
 		}
 		return null;
 	}
