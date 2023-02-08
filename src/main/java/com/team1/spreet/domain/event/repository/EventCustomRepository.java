@@ -14,7 +14,7 @@ public interface EventCustomRepository {
 	EventDto.ResponseDto findByEventId(Long eventId);
 
 	// 회원이 작성한 게시글 조회
-	List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId);
+	List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId);
 
 	// 지역별 event 게시글 조회
 	List<EventDto.ResponseDto> findAllByAreaCode(AreaCode areaCode);

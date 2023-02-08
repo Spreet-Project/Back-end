@@ -20,5 +20,5 @@ public interface ShortsCustomRepository {
 	ShortsDto.ResponseDto findByIdAndUserId(Long shortsId, Long userId);
 
 	// 회원이 작성한 shorts 조회
-	List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId);
+	List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId);
 }
