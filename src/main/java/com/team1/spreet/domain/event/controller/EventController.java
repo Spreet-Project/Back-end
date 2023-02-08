@@ -1,6 +1,7 @@
 package com.team1.spreet.domain.event.controller;
 
 import com.team1.spreet.domain.event.dto.EventDto;
+import com.team1.spreet.domain.event.model.AreaCode;
 import com.team1.spreet.domain.event.service.EventService;
 import com.team1.spreet.global.common.dto.CustomResponseBody;
 import com.team1.spreet.global.common.model.SuccessStatusCode;
@@ -62,5 +63,13 @@ public class EventController {
 	@GetMapping
 	public CustomResponseBody<List<EventDto.ResponseDto>> getEventList() {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventList());
+	}
+
+	// Event 지역별 조회
+	@ApiOperation(value = "행사 게시글 지역별 조회 API")
+	@GetMapping("/search")
+	public CustomResponseBody<List<EventDto.ResponseDto>> getEventListByAreaCode(
+		@RequestParam @ApiParam(value = "조회할 지역코드") AreaCode code) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventListByAreaCode(code));
 	}
 }
