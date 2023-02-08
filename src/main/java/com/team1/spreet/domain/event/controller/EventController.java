@@ -67,7 +67,7 @@ public class EventController {
 
 	// Event 지역별 조회
 	@ApiOperation(value = "행사 게시글 지역별 조회 API")
-	@GetMapping("/search")
+	@GetMapping("/sort")
 	public CustomResponseBody<List<EventDto.ResponseDto>> getEventListByAreaCode(
 		@RequestParam @ApiParam(value = "조회할 지역코드") AreaCode code) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventListByAreaCode(code));
