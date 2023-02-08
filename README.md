@@ -10,14 +10,15 @@
 [😎Front-End GitHub](https://github.com/Spreet-Project/Front-end)  
 [🛹Spreet Notion](https://www.notion.so/Spreet-30f5391e7e524289b3d44ec0abc11cbc)  
 
----- 
+----   
 ## 아키텍처  
-<img width="912" alt="스크린샷 2023-02-07 15 20 05" src="https://user-images.githubusercontent.com/65327103/217165384-e94dfc4b-b5a2-4960-83d7-cf25f07c5ed2.png">
-<!-- <img width="912" alt="image" src="https://user-images.githubusercontent.com/65327103/217009789-bf9dd273-2fef-4168-911e-92a7ce6121ac.png">   -->
+<img width="912" src="https://user-images.githubusercontent.com/65327103/217558089-48917d2d-0e17-4844-88d6-6e4489692aa2.png">
   
 ## ERD  
+<img width="912" src="https://user-images.githubusercontent.com/65327103/217559605-b8aca83c-d3a2-4936-a443-9fb8043b0883.png">
+
+----
   
-----  
 ## 📆 전체 프로젝트 개발 기간  
 2022.12.30 ~ 2023.02.10    
 <br>  
@@ -55,7 +56,7 @@
 [Image Resizing](https://github.com/Spreet-Project/Back-end/wiki/Image-Resizing)  
 <br>  
   
-## 👩🏻‍💻🧑🏻‍💻 BackEnd 팀원
+## 👩🏻‍💻🧑🏻‍💻 BackEnd 팀원소개
 |김규민|이승열|김소라|
 |:----:|:----:|:----:|
 |BE(부팀장)|BE|BE|
