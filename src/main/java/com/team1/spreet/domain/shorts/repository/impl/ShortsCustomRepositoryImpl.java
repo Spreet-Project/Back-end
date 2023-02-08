@@ -147,7 +147,7 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 	}
 
 	@Override
-	public List<MyPageDto.PostResponseDto> findByUserId(String classification, Long page, Long userId) {
+	public List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId) {
 		return jpaQueryFactory
 			.select(Projections.constructor(
 				MyPageDto.PostResponseDto.class,

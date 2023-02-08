@@ -1,5 +1,6 @@
 package com.team1.spreet.domain.event.dto;
 
+import com.team1.spreet.domain.event.model.AreaCode;
 import com.team1.spreet.domain.event.model.Event;
 import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,9 +43,9 @@ public class EventDto {
 		@NotNull(message = "이벤트 이미지를 업로드 해주세요.")
 		private MultipartFile file;
 
-		public Event toEntity(String title, String content, String eventImageUrl, User user) {
+		public Event toEntity(String title, String content, String eventImageUrl, AreaCode areaCode, User user) {
 			return new Event(title, content, this.location, this.date,
-				this.time, eventImageUrl, user);
+				this.time, eventImageUrl, areaCode, user);
 		}
 	}
 
