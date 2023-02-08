@@ -58,13 +58,14 @@ public class ShortsController {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS, shortsService.getShorts(shortsId));
 	}
 
-	// shorts 화면에서 카테고리별 조회(최신순)
-	@ApiOperation(value = "쇼츠 카테고리별 최신순 조회 API")
+	// shorts 화면에서 카테고리별 조회(최신순, 인기순)
+	@ApiOperation(value = "쇼츠 카테고리별 조회 API")
 	@GetMapping
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory(
-			@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category,
-			@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(category, page));
+		@RequestParam(value = "sort", defaultValue = "popular") @ApiParam(value = "정렬 방법")String sort,
+		@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category,
+		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(sort, category, page));
 	}
 
 	// 메인화면에서 카테고리별 조회
