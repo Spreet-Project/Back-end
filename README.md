@@ -60,6 +60,6 @@
 |김규민|이승열|김소라|
 |:----:|:----:|:----:|
 |BE(부팀장)|BE|BE|
-||<img width="125" height="170" src="https://user-images.githubusercontent.com/65327103/217715347-edc8120f-8914-45d0-9b06-06f426771085.jpeg">|<img width="125" height="170" src="https://user-images.githubusercontent.com/65327103/217549219-cd7b14c2-04f1-4204-b4f2-fa24c6ba963f.jpg">|
+|<img width="125" height="170" src="https://user-images.githubusercontent.com/65327103/217717307-e6cd5cf9-dd00-4a86-8823-90b882d14a3b.png">|<img width="125" height="170" src="https://user-images.githubusercontent.com/65327103/217715347-edc8120f-8914-45d0-9b06-06f426771085.jpeg">|<img width="125" height="170" src="https://user-images.githubusercontent.com/65327103/217549219-cd7b14c2-04f1-4204-b4f2-fa24c6ba963f.jpg">|
 |[:link:](https://github.com/starMinK)|[:link:](https://github.com/misracis2)|[:link:](https://github.com/dev-rara)|
-|1.회원가입<br>2.로그인<br>3.카카오 로그인<br>4.이메일 인증|1.피드 CRUD<br>2.행사 댓글<br>3.구독 기능<br>4.알림 기능<br>5.Nginx 무중단배포<br>6.QueryDSL|1.쇼츠 CRUD<br>2.비속어 필터링<br>3.네이버 로그인<br>4.행사 게시글<br>5.QueryDSL<br>6.마이페이지 기능<br>7.관리자 기능<br>8.CI/CD 구축 및 서버 환경 관리<br>(AWS route53, ACM , EC2, CodeDeploy)|
+|1.회원가입<br>2.로그인<br>3.카카오 로그인<br>4.이메일 인증|1.피드 CRUD<br>2.행사 댓글<br>3.구독 기능<br>4.알림 기능<br>5.Nginx 무중단배포<br>6.QueryDSL|1.쇼츠 CRUD<br>2.비속어 필터링<br>3.네이버 로그인<br>4.행사 게시글<br>5.QueryDSL<br>6.마이페이지 기능<br>7.관리자 기능<br>8.CI/CD 구축 및 서버 환경 관리|
