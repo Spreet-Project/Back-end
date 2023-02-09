@@ -16,11 +16,12 @@ import com.team1.spreet.global.error.exception.RestApiException;
 import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import com.team1.spreet.global.util.SecurityUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,7 @@ public class ShortsService {
 	}
 
 	// shorts 수정
+	@CacheEvict(cacheNames = "shortsList", allEntries = true)
 	public void updateShorts(ShortsDto.UpdateRequestDto requestDto, Long shortsId) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
@@ -82,6 +84,7 @@ public class ShortsService {
 
 
 	// shorts 삭제
+	@CacheEvict(cacheNames = "shortsList", allEntries = true)
 	public void deleteShorts(Long shortsId) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
@@ -121,6 +124,7 @@ public class ShortsService {
 	}
 
 	// 메인화면에서 shorts 조회(페이징)
+	@Cacheable(key = "#category", cacheNames = "shortsList")
 	@Transactional(readOnly = true)
 	public List<ShortsDto.MainResponseDto> getMainShortsByCategory(Category category) {
 		return shortsRepository.findMainShortsByCategory(category);
