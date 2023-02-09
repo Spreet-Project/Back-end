@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -73,6 +74,7 @@ public class EmailService {
             emailConfirmRepository.save(emailConfirm);
     }
 
+    @Async
     public void sendSimpleMessage(String email)throws Exception {
         ePw = createKey();
         MimeMessage message = createMessage(email);
