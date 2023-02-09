@@ -12,7 +12,7 @@
 
 ----   
 ## 아키텍처  
-<img width="912" src="https://user-images.githubusercontent.com/65327103/217558089-48917d2d-0e17-4844-88d6-6e4489692aa2.png">
+<img width="912" src="https://user-images.githubusercontent.com/65327103/217727329-a8a82378-5b8f-4cd6-9473-4141d7b1b58d.png">
   
 ## ERD  
 <img width="912" src="https://user-images.githubusercontent.com/65327103/217715294-690acdcd-2ce5-4302-b8aa-7487fac72506.png">
