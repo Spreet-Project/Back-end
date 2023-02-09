@@ -30,9 +30,11 @@ public class FeedLikeService {
         FeedLike feedLike = feedLikeRepository.findByUserIdAndFeedId(user.getId(), feedId).orElse(null);
         if (feedLike!=null) {
             feedLikeRepository.delete(feedLike);
+            feed.cancelLike();
             return new CustomResponseBody<>(SuccessStatusCode.DISLIKE, new FeedLikeDto.ResponseDto(false));
         }else{
             feedLikeRepository.save(new FeedLike(user, feed));
+            feed.addLike();
             return new CustomResponseBody<>(SuccessStatusCode.LIKE, new FeedLikeDto.ResponseDto(true));
         }
     }

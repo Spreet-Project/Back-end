@@ -55,7 +55,7 @@ public class FeedDto {
         private String profileImageUrl;
 
         @ApiModelProperty(value = "좋아요 개수")
-        private Long feedLike;
+        private Long likeCount;
 
         @ApiModelProperty(value = "좋아요 상태")
         private boolean liked;
