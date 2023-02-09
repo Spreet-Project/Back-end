@@ -55,6 +55,7 @@
 [EC2 RAM 초과 & Memory 성능 이슈](https://github.com/Spreet-Project/Back-end/wiki/EC2-RAM-%EC%B4%88%EA%B3%BC-&-Memory-%EC%84%B1%EB%8A%A5-%EC%9D%B4%EC%8A%88)  
 [Image Resizing](https://github.com/Spreet-Project/Back-end/wiki/Image-Resizing)  
 [인증번호 이메일 전송시 응답 속도 개선(827%)](https://github.com/Spreet-Project/Back-end/wiki/%EC%9D%B8%EC%A6%9D%EB%B2%88%ED%98%B8-%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%A0%84%EC%86%A1%EC%8B%9C-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0)
+[Redis 캐싱, 진짜 빠를까?](https://github.com/Spreet-Project/Back-end/wiki/Redis-%EC%BA%90%EC%8B%B1,-%EC%A7%84%EC%A7%9C-%EB%B9%A0%EB%A5%BC%EA%B9%8C%3F)
 <br>
 <br>
   
