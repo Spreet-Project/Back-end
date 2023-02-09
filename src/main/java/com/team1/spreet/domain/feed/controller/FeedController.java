@@ -25,11 +25,12 @@ public class FeedController {
 
     //feed 최신순 조회
     @ApiOperation(value = "피드 최신순 조회 API")
-    @GetMapping("/recent")
-
-    public CustomResponseBody<List<FeedDto.ResponseDto>> getRecentFeed(@RequestParam(value ="page") @ApiParam(value = "조회할 페이지") Long page,
-                                                                       @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") Long size){
-        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getRecentFeed(page, size));
+    @GetMapping("")
+    public CustomResponseBody<List<FeedDto.ResponseDto>> getSortedFeed(
+            @RequestParam(value = "sort", defaultValue = "popular") @ApiParam(value = "정렬방법") String sort,
+            @RequestParam(value ="page") @ApiParam(value = "조회할 페이지") Long page,
+            @RequestParam(value = "size") @ApiParam(value = "조회할 사이즈") Long size){
+        return new CustomResponseBody<>(SuccessStatusCode.GET_FEED, feedService.getSortedFeed(sort, page, size));
     }
     @ApiOperation(value = "메인 화면에서 feed 조회 API")
     @GetMapping("/main")
