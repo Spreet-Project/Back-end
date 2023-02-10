@@ -60,7 +60,7 @@
 [Redis 캐싱, 진짜 빠를까?](https://github.com/Spreet-Project/Back-end/wiki/Redis-%EC%BA%90%EC%8B%B1,-%EC%A7%84%EC%A7%9C-%EB%B9%A0%EB%A5%BC%EA%B9%8C%3F)
 <br>
 <br>  
-## 💪 추후 추가하고 싶은 기능
+## 💪 앞으로 추가하고 싶은 기능
 - [ ] 검색   
 - [ ] 대댓글  
 - [ ] 공연정보 기간별 조회 
