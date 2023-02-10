@@ -1,7 +1,14 @@
+buildscript {  // QueryDSL
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.7'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"   // QueryDSL
 }
 
 group = 'com.team1'
@@ -48,14 +55,34 @@ dependencies {
     implementation 'io.sentry:sentry-spring-boot-starter:6.11.0'
     implementation 'io.sentry:sentry-logback:6.6.0'
 
-    //이메일 인증
+    // social login
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.3'
+
+    // slack webhook logging
+    implementation("com.github.maricn:logback-slack-appender:1.6.1")
+
+    //이메일
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.5.RELEASE'
-    // https://mvnrepository.com/artifact/org.redisson/redisson
-    implementation 'org.redisson:redisson:3.16.8'
-    // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
-    implementation 'org.springframework.session:spring-session-data-redis:2.3.0.RELEASE'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.data:spring-data-redis:2.3.4.RELEASE'
+
+    // QueryDSL
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation 'junit:junit:4.12'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // 역직렬화
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // imgscalr
+    implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
 }
 
 // 빌드 시 plain-jar 파일이 만들어지지 않도록 함
@@ -65,4 +92,27 @@ jar {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// QueryDSL
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }
