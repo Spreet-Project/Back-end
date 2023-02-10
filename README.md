@@ -60,10 +60,12 @@
 [Redis 캐싱, 진짜 빠를까?](https://github.com/Spreet-Project/Back-end/wiki/Redis-%EC%BA%90%EC%8B%B1,-%EC%A7%84%EC%A7%9C-%EB%B9%A0%EB%A5%BC%EA%B9%8C%3F)
 <br>
 <br>  
-## 💪 추후 개발하고 싶은 기능
-- [ ] 검색 기능  
+## 💪 추후 추가하고 싶은 기능
+- [ ] 검색   
 - [ ] 대댓글  
-- [ ] 공연정보 기간별 조회  
+- [ ] 공연정보 기간별 조회 
+- [ ] 마이페이지: 좋아요한 게시글 목록
+- [ ] 마이페이지: 구독 리스트 
 <br>
   
 ## 👩🏻‍💻🧑🏻‍💻 BackEnd 팀원소개
