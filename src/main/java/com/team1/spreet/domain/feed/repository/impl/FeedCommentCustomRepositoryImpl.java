@@ -36,11 +36,20 @@ public class FeedCommentCustomRepositoryImpl implements FeedCommentCustomReposit
                 .orderBy(feedComment.createdAt.desc())
                 .fetch();
     }
+    @Override
     public void updateDeletedTrueByFeedId(Long feedId){
         jpaQueryFactory
                 .update(feedComment)
                 .set(feedComment.deleted, true)
                 .where(feedComment.feed.id.eq(feedId))
+                .execute();
+    }
+    @Override
+    public void updateDeletedTrueByUserId(Long userId){
+        jpaQueryFactory
+                .update(feedComment)
+                .set(feedComment.deleted, true)
+                .where(feedComment.user.id.eq(userId))
                 .execute();
     }
 }

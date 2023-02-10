@@ -10,4 +10,5 @@ public interface ShortsCommentCustomRepository {
 
 	// Shorts 삭제에 따른 comment 의 상태(deleted) 변경
 	void updateDeletedTrueByShortsId(Long shortsId);
+	void updateDeletedTrueByUserId(Long userId);
 }

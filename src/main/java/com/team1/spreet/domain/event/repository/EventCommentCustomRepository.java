@@ -10,4 +10,7 @@ public interface EventCommentCustomRepository {
 
 	// Shorts 삭제에 따른 comment 의 상태(deleted) 변경
 	void updateDeletedTrueByEventId(Long eventId);
+
+	// 회원탈퇴 시 event comment soft delete
+	void updateDeletedTrueByUserId(Long userId);
 }

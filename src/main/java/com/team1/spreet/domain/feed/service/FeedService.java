@@ -41,12 +41,11 @@ public class FeedService {
 
 	//feed 최신순 조회
 	@Transactional(readOnly = true)
-	public List<FeedDto.ResponseDto> getRecentFeed(Long page, Long size) {
+	public List<FeedDto.ResponseDto> getSortedFeed(String sort, Long page, Long size) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
-		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findAllOrderByCreatedAtDesc(
-			page - 1,
-			size, userId);
+
+		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findAllSortBy(sort,page - 1,size, userId);
 		for (FeedDto.ResponseDto responseDto : recentFeedList) {
 			List<String> imageUrlList = getFeedImageUrlList(responseDto.getFeedId());
 			responseDto.addImageUrlList(imageUrlList);
@@ -56,7 +55,7 @@ public class FeedService {
 
 	@Transactional(readOnly = true)
 	public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
-		return feedRepository.getSimpleFeed();
+		return feedRepository.findMainFeed();
 	}
 
 	//feed 조회
@@ -131,7 +130,7 @@ public class FeedService {
 	}
 
 	//이미지 파일 삭제
-	private void deleteImage(Long feedId) {
+	public void deleteImage(Long feedId) {
 		List<FeedImage> imageList = imageRepository.findByFeedId(feedId);
 		if (!imageList.isEmpty()) {
 			for (FeedImage image : imageList) {

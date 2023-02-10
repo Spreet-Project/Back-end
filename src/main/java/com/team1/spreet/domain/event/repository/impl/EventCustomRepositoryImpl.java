@@ -104,4 +104,12 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
 			.fetch();
 	}
 
+	@Override
+	public void updateDeletedTrueByUserId(Long userId) {
+		jpaQueryFactory
+				.update(event)
+				.set(event.deleted, true)
+				.where(event.user.id.eq(userId))
+				.execute();
+	}
 }

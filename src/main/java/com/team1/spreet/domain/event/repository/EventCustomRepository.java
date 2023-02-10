@@ -18,4 +18,7 @@ public interface EventCustomRepository {
 
 	// 지역별 event 게시글 조회
 	List<EventDto.ResponseDto> findAllByAreaCode(AreaCode areaCode);
+
+	// 회원탈퇴 시 event soft delete
+	void updateDeletedTrueByUserId(Long userId);
 }

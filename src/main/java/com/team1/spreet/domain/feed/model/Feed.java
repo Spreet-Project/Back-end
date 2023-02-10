@@ -29,6 +29,9 @@ public class Feed extends TimeStamped {
     private String content;     //피드 내용
 
     @Column(nullable = false)
+    private Long likeCount = 0L;
+
+    @Column(nullable = false)
     private boolean deleted = Boolean.FALSE;  //피드 삭제 여부, 기본값=FALSE
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,5 +58,12 @@ public class Feed extends TimeStamped {
     }
     public void isDeleted(){
         deleted = true;
+    }
+    public void addLike() {
+        this.likeCount++;
+    }
+
+    public void cancelLike() {
+        this.likeCount--;
     }
 }
