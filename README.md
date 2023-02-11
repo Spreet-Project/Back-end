@@ -9,6 +9,7 @@
    
 [😎Front-End GitHub](https://github.com/Spreet-Project/Front-end)  
 [🛹Spreet Notion](https://www.notion.so/Spreet-30f5391e7e524289b3d44ec0abc11cbc)  
+[🧑🏻‍🏫최종 발표 영상](https://www.youtube.com/watch?v=kZ0G1pJHBGY)
 
 ----   
 ## 아키텍처  
