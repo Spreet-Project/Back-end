@@ -3,6 +3,7 @@ package com.team1.spreet.domain.feed.dto;
 import com.team1.spreet.domain.feed.model.Feed;
 import com.team1.spreet.domain.user.model.User;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -69,7 +70,7 @@ public class FeedDto {
     }
     @NoArgsConstructor
     @Getter
-    public static class SimpleResponseDto{
+    public static class SimpleResponseDto implements Serializable {
 
         @ApiModelProperty(value = "피드 ID")
         private Long feedId;
