@@ -18,6 +18,8 @@ import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.s3.service.AwsS3Service;
 import com.team1.spreet.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +55,7 @@ public class FeedService {
 		return recentFeedList;
 	}
 
+	@Cacheable(cacheNames = "feedList")
 	@Transactional(readOnly = true)
 	public List<FeedDto.SimpleResponseDto> getSimpleFeed() {
 		return feedRepository.findMainFeed();
@@ -87,6 +90,7 @@ public class FeedService {
 	}
 
 	//feed 수정
+	@CacheEvict(cacheNames = "feedList", allEntries = true)
 	@Transactional
 	public void updateFeed(Long feedId, FeedDto.RequestDto requestDto) {
 		User user = checkUser();
@@ -104,6 +108,7 @@ public class FeedService {
 	}
 
 	//feed 삭제
+	@CacheEvict(cacheNames = "feedList", allEntries = true)
 	@Transactional
 	public void deleteFeed(Long feedId) {
 		User user = checkUser();
