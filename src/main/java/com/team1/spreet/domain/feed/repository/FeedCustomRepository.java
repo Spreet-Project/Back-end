@@ -11,7 +11,7 @@ public interface FeedCustomRepository {
 
 	// 회원이 작성한 feed 조회
 	List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId);
-    List<FeedDto.ResponseDto> findAllSortBy(String sort, Long page, Long size, Long userId);
+    List<FeedDto.ResponseDto> findAllSortBy(String sort, Long page, Long size, Long userId, String searchType, String searchKeyword);
 
     List<FeedDto.SimpleResponseDto> findMainFeed();
 
