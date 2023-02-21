@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.team1.spreet.domain.shorts.model.Category;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 public class MyPageDto {
 
@@ -55,7 +53,7 @@ public class MyPageDto {
 	// 회원이 작성한 게시글을 반환하기 위한 Dto
 	@NoArgsConstructor
 	@Getter
-	public static class PostResponseDto implements Serializable {
+	public static class PostResponseDto {
 		@ApiModelProperty(value = "게시글 분류")
 		private String classification;
 

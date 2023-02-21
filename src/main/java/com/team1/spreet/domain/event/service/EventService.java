@@ -18,6 +18,9 @@ import com.team1.spreet.global.util.SecurityUtil;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,10 @@ public class EventService {
 	private final BadWordService badWordService;
 
 	// Event 게시글 등록
+	@Caching(evict = {
+		@CacheEvict(cacheNames = "eventList", allEntries = true),
+		@CacheEvict(cacheNames = "eventByArea", allEntries = true)
+	})
 	public void saveEvent(EventDto.RequestDto requestDto) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
@@ -62,6 +69,10 @@ public class EventService {
 	}
 
 	// Event 게시글 수정
+	@Caching(evict = {
+		@CacheEvict(cacheNames = "eventList", allEntries = true),
+		@CacheEvict(cacheNames = "eventByArea", allEntries = true)
+	})
 	public void updateEvent(EventDto.UpdateRequestDto requestDto, Long eventId) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
@@ -106,6 +117,10 @@ public class EventService {
 	}
 
 	// Event 게시글 삭제
+	@Caching(evict = {
+		@CacheEvict(cacheNames = "eventList", allEntries = true),
+		@CacheEvict(cacheNames = "eventByArea", allEntries = true)
+	})
 	public void deleteEvent(Long eventId) {
 		User user = SecurityUtil.getCurrentUser();
 		if (user == null) {
@@ -133,12 +148,14 @@ public class EventService {
 	}
 
 	// Event 게시글 전체조회
+	@Cacheable(cacheNames = "eventList")
 	@Transactional(readOnly = true)
 	public List<EventDto.ResponseDto> getEventList() {
 		return eventRepository.findAllSortByNew();
 	}
 
 	// Event 게시글 지역별 조회
+	@Cacheable(key = "#areaCode", cacheNames = "eventByArea")
 	@Transactional(readOnly = true)
 	public List<EventDto.ResponseDto> getEventListByAreaCode(AreaCode areaCode) {
 		return eventRepository.findAllByAreaCode(areaCode);

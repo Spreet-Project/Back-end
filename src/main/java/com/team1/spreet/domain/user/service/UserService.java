@@ -21,6 +21,8 @@ import com.team1.spreet.global.error.model.ErrorStatusCode;
 import com.team1.spreet.global.infra.email.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -68,6 +70,12 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Caching(evict = {
+		@CacheEvict(cacheNames = "shortsList", allEntries = true),
+		@CacheEvict(cacheNames = "feedList", allEntries = true),
+		@CacheEvict(cacheNames = "eventList", allEntries = true),
+        @CacheEvict(cacheNames = "eventByArea", allEntries = true)
+    })
     @Transactional
     public void userWithdraw(String password, User user) {
         if (bcryptPasswordEncoder.matches(password, user.getPassword())) {
