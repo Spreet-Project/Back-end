@@ -72,4 +72,13 @@ public class EventController {
 		@RequestParam @ApiParam(value = "조회할 지역코드") AreaCode code) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventListByAreaCode(code));
 	}
+
+	// Event 기간별 조회
+	@ApiOperation(value = "행사 게시글 기간별 조회 API")
+	@GetMapping("/date")
+	public CustomResponseBody<List<EventDto.ResponseDto>> getEventListByDate(
+		@RequestParam(required = false) @ApiParam(value = "검색 시작 날짜") String startDate,
+		@RequestParam(required = false) @ApiParam(value = "검색 종료 날짜") String endDate) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_EVENT_LIST, eventService.getEventListByDate(startDate, endDate));
+	}
 }
