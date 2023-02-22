@@ -5,6 +5,7 @@ import com.team1.spreet.domain.event.repository.EventRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
+import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.model.Provider;
 import com.team1.spreet.domain.user.model.User;
 import com.team1.spreet.domain.user.repository.UserRepository;
@@ -34,6 +35,7 @@ public class MyPageService {
 	private final EventRepository eventRepository;
 	private final EmailService emailService;
 	private final BadWordService badWordService;
+	private final SubscribeRepository subscribeRepository;
 
 	// 회원 정보 조회
 	@Transactional(readOnly = true)
@@ -143,4 +145,14 @@ public class MyPageService {
 		return null;
 	}
 
+
+	// 회원의 구독 리스트 조회
+	@Transactional(readOnly = true)
+	public List<MyPageDto.SubscribeInfoDto> getSubscribeList(Long page) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+		return subscribeRepository.findAllBySubscriberId(user.getId(), page);
+	}
 }

@@ -73,4 +73,11 @@ public class MyPageController {
 			myPageService.getPostList(classification, page));
 	}
 
+	// 회원의 구독 리스트 조회
+	@ApiOperation(value = "회원의 구독 리스트 조회 API")
+	@GetMapping("/subscribe")
+	public CustomResponseBody<List<MyPageDto.SubscribeInfoDto>> getSubscribeList (
+		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SUBSCRIBE_LIST, myPageService.getSubscribeList(page));
+	}
 }
