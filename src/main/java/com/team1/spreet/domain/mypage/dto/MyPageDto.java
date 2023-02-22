@@ -86,4 +86,19 @@ public class MyPageDto {
 			this.createdAt = createdAt;
 		}
 	}
+
+	@NoArgsConstructor
+	@Getter
+	public static class SubscribeInfoDto{
+		@ApiModelProperty(value = "구독 대상이 되는 유저의 ID")
+		private Long userId;      // 구독 대상이 되는 유저의 ID
+
+		@ApiModelProperty(value = "구독 대상이 되는 유저의 닉네임")
+		private String nickname;
+
+		public SubscribeInfoDto(Long userId, String nickname) {
+			this.userId = userId;
+			this.nickname = nickname;
+		}
+	}
 }
