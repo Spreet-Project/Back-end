@@ -7,5 +7,5 @@ public interface SubscribeCustomRepository {
 
     void deleteByUserId(Long userId);
 
-    List<MyPageDto.SubscribeInfoDto> findAllBySubscriberId(Long subscriberId, Long page);
+    List<MyPageDto.SubscribeInfoDto> findAllBySubscriberId(Long page, Long subscriberId);
 }

@@ -153,6 +153,6 @@ public class MyPageService {
 		if (user == null) {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
-		return subscribeRepository.findAllBySubscriberId(user.getId(), page);
+		return subscribeRepository.findAllBySubscriberId(page - 1, user.getId());
 	}
 }
