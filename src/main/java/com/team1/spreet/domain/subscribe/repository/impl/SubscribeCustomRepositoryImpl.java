@@ -36,7 +36,8 @@ public class SubscribeCustomRepositoryImpl implements SubscribeCustomRepository 
 			.from(subscribe)
 			.join(subscribe.publisher, user)
 			.where(subscribe.subscriber.id.eq(subscriberId))
-			.limit(page * 10)
+			.offset(page * 10)
+			.limit(10)
 			.fetch();
 	}
 
