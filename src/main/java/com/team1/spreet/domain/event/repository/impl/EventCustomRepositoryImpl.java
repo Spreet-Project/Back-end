@@ -112,4 +112,26 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
 				.where(event.user.id.eq(userId))
 				.execute();
 	}
+
+	@Override
+	public List<EventDto.ResponseDto> findAllByDate(String startDate, String endDate) {
+		return jpaQueryFactory
+			.select(Projections.fields(
+				EventDto.ResponseDto.class,
+				event.id.as("eventId"),
+				event.title,
+				event.content,
+				event.location,
+				event.date,
+				event.time,
+				event.eventImageUrl,
+				event.user.nickname,
+				event.user.profileImage.as("profileImageUrl")
+			))
+			.from(event)
+			.join(event.user, user)
+			.where(event.date.between(startDate, endDate), event.deleted.eq(false))
+			.orderBy(event.date.asc(), event.time.asc())
+			.fetch();
+	}
 }

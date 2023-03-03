@@ -21,4 +21,7 @@ public interface EventCustomRepository {
 
 	// 회원탈퇴 시 event soft delete
 	void updateDeletedTrueByUserId(Long userId);
+
+	// 기간별 event 게시글 조회
+	List<EventDto.ResponseDto> findAllByDate(String startDate, String endDate);
 }
