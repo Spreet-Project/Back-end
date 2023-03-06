@@ -2,8 +2,10 @@ package com.team1.spreet.domain.mypage.service;
 
 import com.team1.spreet.domain.admin.service.BadWordService;
 import com.team1.spreet.domain.event.repository.EventRepository;
+import com.team1.spreet.domain.feed.repository.FeedLikeCustomRepository;
 import com.team1.spreet.domain.feed.repository.FeedRepository;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
+import com.team1.spreet.domain.shorts.repository.ShortsLikeCustomRepository;
 import com.team1.spreet.domain.shorts.repository.ShortsRepository;
 import com.team1.spreet.domain.subscribe.repository.SubscribeRepository;
 import com.team1.spreet.domain.user.model.Provider;
@@ -36,6 +38,8 @@ public class MyPageService {
 	private final EmailService emailService;
 	private final BadWordService badWordService;
 	private final SubscribeRepository subscribeRepository;
+	private final ShortsLikeCustomRepository shortsLikeRepository;
+	private final FeedLikeCustomRepository feedLikeRepository;
 
 	// 회원 정보 조회
 	@Transactional(readOnly = true)
@@ -154,5 +158,25 @@ public class MyPageService {
 			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
 		}
 		return subscribeRepository.findAllBySubscriberId(user.getId(), page);
+	}
+
+	// 좋아요한 게시글 목록 조회
+	@Transactional(readOnly = true)
+	public List<MyPageDto.PostResponseDto> getPostLikeList(String classification, Long page) {
+		User user = SecurityUtil.getCurrentUser();
+		if (user == null) {
+			throw new RestApiException(ErrorStatusCode.NOT_EXIST_AUTHORIZATION);
+		}
+
+		// shorts
+		if (classification.equals("shorts")) {
+			return shortsLikeRepository.findAllByUserId(page - 1, user.getId());
+		}
+
+		// feed
+		if (classification.equals("feed")) {
+			return feedLikeRepository.findAllByUserId(page - 1, user.getId());
+		}
+		return null;
 	}
 }

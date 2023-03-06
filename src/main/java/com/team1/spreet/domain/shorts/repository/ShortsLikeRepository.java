@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ShortsLikeRepository  extends JpaRepository<ShortsLike, Long> {
+public interface ShortsLikeRepository  extends JpaRepository<ShortsLike, Long>, ShortsLikeCustomRepository {
 
 	Optional<ShortsLike> findByShortsIdAndUserId(Long shortsId, Long userId);
 
