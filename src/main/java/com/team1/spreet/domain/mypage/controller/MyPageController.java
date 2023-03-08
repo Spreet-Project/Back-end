@@ -80,4 +80,14 @@ public class MyPageController {
 		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
 		return new CustomResponseBody<>(SuccessStatusCode.GET_SUBSCRIBE_LIST, myPageService.getSubscribeList(page));
 	}
+
+	// 좋아요한 게시글 목록 조회
+	@ApiOperation(value = "회원이 좋아요한 게시글 리스트 조회 API")
+	@GetMapping("/like")
+	public CustomResponseBody<List<MyPageDto.PostResponseDto>> getPostLikeList (
+		@RequestParam(value = "classification") @ApiParam(value = "게시글 분류") String classification,
+		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
+		return new CustomResponseBody<>(SuccessStatusCode.GET_POST_LIST,
+			myPageService.getPostLikeList(classification, page));
+	}
 }

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
+public interface FeedLikeRepository extends JpaRepository<FeedLike, Long>, FeedLikeCustomRepository {
 
     Optional<FeedLike> findByUserIdAndFeedId(Long userId, Long feedId);
 
