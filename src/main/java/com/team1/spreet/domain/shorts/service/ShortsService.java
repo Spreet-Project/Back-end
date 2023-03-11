@@ -115,12 +115,12 @@ public class ShortsService {
 
 	// 카테고리별 shorts 조회(최신순, 인기순)
 	@Transactional(readOnly = true)
-	public List<ShortsDto.ResponseDto> getShortsByCategory(String sort, Category category, Long page) {
+	public List<ShortsDto.ResponseDto> getShortsByCategory(String sort, Category category, Long page, String searchType, String searchKeyword) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
 
-		return sort.equals("popular") ? shortsRepository.findAllSortByPopularAndCategory(category, page - 1, userId)
-			: shortsRepository.findAllSortByNewAndCategory(category, page - 1, userId);
+		return sort.equals("popular") ? shortsRepository.findAllSortByPopularAndCategoryAndKeyword(category, page - 1, userId, searchType, searchKeyword)
+			: shortsRepository.findAllSortByNewAndCategoryAndKeyword(category, page - 1, userId, searchType, searchKeyword);
 	}
 
 	// 메인화면에서 shorts 조회(페이징)

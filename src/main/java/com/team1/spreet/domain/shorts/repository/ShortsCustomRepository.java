@@ -11,10 +11,10 @@ public interface ShortsCustomRepository {
 	List<ShortsDto.MainResponseDto> findMainShortsByCategory(Category category);
 
 	// 최신순 + 카테고리 (shorts 화면)
-	List<ShortsDto.ResponseDto> findAllSortByNewAndCategory(Category category, Long page, Long userId);
+	List<ShortsDto.ResponseDto> findAllSortByNewAndCategoryAndKeyword(Category category, Long page, Long userId, String searchType, String searchKeyword);
 
 	// 좋아요순 + 카테고리 (shorts 화면)
-	List<ShortsDto.ResponseDto> findAllSortByPopularAndCategory(Category category, Long page, Long userId);
+	List<ShortsDto.ResponseDto> findAllSortByPopularAndCategoryAndKeyword(Category category, Long page, Long userId, String searchType, String searchKeyword);
 
 	// shorts 상세조회
 	ShortsDto.ResponseDto findByIdAndUserId(Long shortsId, Long userId);
