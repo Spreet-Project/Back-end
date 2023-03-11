@@ -62,10 +62,12 @@ public class ShortsController {
 	@ApiOperation(value = "쇼츠 카테고리별 조회 API")
 	@GetMapping
 	public CustomResponseBody<List<ShortsDto.ResponseDto>> getShortsByCategory(
+			@RequestParam(value = "searchType", required = false) @ApiParam(value = "검색타입") String searchType,
+			@RequestParam(value = "searchKeyword", required = false) @ApiParam(value = "검색단어") String searchKeyword,
 		@RequestParam(value = "sort", defaultValue = "popular") @ApiParam(value = "정렬 방법")String sort,
 		@RequestParam(value = "category") @ApiParam(value = "조회할 카테고리") Category category,
 		@RequestParam(value = "page") @ApiParam(value = "조회할 페이지") Long page) {
-		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(sort, category, page));
+		return new CustomResponseBody<>(SuccessStatusCode.GET_SHORTS_BY_CATEGORY, shortsService.getShortsByCategory(sort, category, page, searchType, searchKeyword));
 	}
 
 	// 메인화면에서 카테고리별 조회

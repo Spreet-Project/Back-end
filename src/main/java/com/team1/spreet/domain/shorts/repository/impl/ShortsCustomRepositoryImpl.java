@@ -2,6 +2,7 @@ package com.team1.spreet.domain.shorts.repository.impl;
 
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team1.spreet.domain.mypage.dto.MyPageDto;
 import com.team1.spreet.domain.shorts.dto.ShortsDto;
@@ -45,8 +46,8 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 	}
 
 	@Override
-	public List<ShortsDto.ResponseDto> findAllSortByNewAndCategory(Category category, Long page,
-		Long userId) {
+	public List<ShortsDto.ResponseDto> findAllSortByNewAndCategoryAndKeyword(
+			Category category, Long page, Long userId, String searchType, String searchKeyword) {
 		return jpaQueryFactory
 			.select(Projections.fields(
 				ShortsDto.ResponseDto.class,
@@ -81,8 +82,8 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 	}
 
 	@Override
-	public List<ShortsDto.ResponseDto> findAllSortByPopularAndCategory(Category category, Long page,
-		Long userId) {
+	public List<ShortsDto.ResponseDto> findAllSortByPopularAndCategoryAndKeyword(
+			Category category, Long page, Long userId, String searchType, String searchKeyword) {
 		return jpaQueryFactory
 			.select(Projections.fields(
 				ShortsDto.ResponseDto.class,
@@ -108,13 +109,17 @@ public class ShortsCustomRepositoryImpl implements ShortsCustomRepository {
 			)
 			.from(shorts)
 			.join(shorts.user, user)
-			.where(shorts.category.eq(category), shorts.deleted.eq(false))
+			.where(shorts.category.eq(category), shorts.deleted.eq(false), searchCondition(searchType, searchKeyword))
 			.orderBy(shorts.likeCount.desc(), shorts.id.desc())
 			.offset(page * 10)
 			.limit(10)
 			.fetch();
 	}
-
+	private BooleanExpression searchCondition(String searchType, String searchKeyword) {
+		if (searchType.equals("title")) return shorts.title.contains(searchKeyword);
+		if (searchType.equals("content")) return shorts.content.contains(searchKeyword);
+		return null;
+	}
 	@Override
 	public ShortsDto.ResponseDto findByIdAndUserId(Long shortsId, Long userId) {
 		return jpaQueryFactory
