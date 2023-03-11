@@ -161,6 +161,19 @@ public class EventService {
 		return eventRepository.findAllByAreaCode(areaCode);
 	}
 
+	// Event 게시글 기간별 조회
+	public List<EventDto.ResponseDto> getEventListByDate(String startDate, String endDate) {
+		// 입력된 날짜가 빈값일 때
+		if (startDate.equals("")) {
+			startDate = "0001-01-01";
+		}
+
+		if (endDate.equals("")) {
+			endDate = "9999-12-31";
+		}
+		return eventRepository.findAllByDate(startDate, endDate);
+	}
+
 	// Event 게시글이 존재하는지 확인
 	private Event getEventWithUserIfExists(Long eventId) {
 		return eventRepository.findByIdAndDeletedFalseWithUser(eventId).orElseThrow(

@@ -37,7 +37,7 @@ public enum SuccessStatusCode {
     ID_DUPLICATE_CHECK("아이디 중복 확인 성공. 사용 가능한 아이디입니다.", HttpStatus.OK.value()),
     NICKNAME_DUPLICATE_CHECK("닉네임 중복 확인 성공. 사용 가능한 닉네임입니다.", HttpStatus.OK.value()),
     GET_USER_INFO("회원 정보 조회 성공", HttpStatus.OK.value()),
-    GET_POST_LIST("회원 등록 게시글 조회 성공", HttpStatus.OK.value()),
+    GET_POST_LIST("게시글 리스트 조회 성공", HttpStatus.OK.value()),
     UPDATE_USER_INFO("회원 정보 수정 성공", HttpStatus.OK.value()),
     UPDATE_PASSWORD("회원 비밀번호 수정 성공", HttpStatus.OK.value()),
     SAVE_EVENT("행사 게시글 등록 성공", HttpStatus.OK.value()),
@@ -45,7 +45,8 @@ public enum SuccessStatusCode {
     DELETE_EVENT("행사 게시글 삭제 성공", HttpStatus.OK.value()),
     GET_EVENT("행사 게시글 상세조회 성공", HttpStatus.OK.value()),
     GET_EVENT_LIST("행사 게시글 리스트 조회 성공", HttpStatus.OK.value()),
-    SAVE_BAD_WORD("비속어 저장 완료", HttpStatus.OK.value());
+    SAVE_BAD_WORD("비속어 저장 완료", HttpStatus.OK.value()),
+    GET_SUBSCRIBE_LIST("구독 리스트 조회 성공", HttpStatus.OK.value());
 
     private final String msg;
     private final int statusCode;

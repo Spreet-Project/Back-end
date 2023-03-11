@@ -43,11 +43,11 @@ public class FeedService {
 
 	//feed 최신순 조회
 	@Transactional(readOnly = true)
-	public List<FeedDto.ResponseDto> getSortedFeed(String sort, Long page, Long size) {
+	public List<FeedDto.ResponseDto> getSortedFeed(String sort, Long page, Long size, String searchType, String searchKeyword) {
 		User user = SecurityUtil.getCurrentUser();
 		Long userId = user == null ? 0L : user.getId();
 
-		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findAllSortBy(sort,page - 1,size, userId);
+		List<FeedDto.ResponseDto> recentFeedList = feedRepository.findAllSortBy(sort,page - 1,size, userId, searchType, searchKeyword);
 		for (FeedDto.ResponseDto responseDto : recentFeedList) {
 			List<String> imageUrlList = getFeedImageUrlList(responseDto.getFeedId());
 			responseDto.addImageUrlList(imageUrlList);

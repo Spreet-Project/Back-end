@@ -54,9 +54,6 @@ public class MyPageDto {
 	@NoArgsConstructor
 	@Getter
 	public static class PostResponseDto {
-		@ApiModelProperty(value = "게시글 분류")
-		private String classification;
-
 		@ApiModelProperty(value = "게시글 ID")
 		private Long id;
 
@@ -71,19 +68,32 @@ public class MyPageDto {
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm")
 		private LocalDateTime createdAt;
 
-		public PostResponseDto(String classification, Long id, String title, Category category, LocalDateTime createdAt) {
-			this.classification = classification;
+		public PostResponseDto(Long id, String title, Category category, LocalDateTime createdAt) {
 			this.id = id;
 			this.title = title;
 			this.category = category;
 			this.createdAt = createdAt;
 		}
 
-		public PostResponseDto(String classification, Long id, String title, LocalDateTime createdAt) {
-			this.classification = classification;
+		public PostResponseDto(Long id, String title, LocalDateTime createdAt) {
 			this.id = id;
 			this.title = title;
 			this.createdAt = createdAt;
+		}
+	}
+
+	@NoArgsConstructor
+	@Getter
+	public static class SubscribeInfoDto{
+		@ApiModelProperty(value = "구독 대상이 되는 유저의 ID")
+		private Long userId;      // 구독 대상이 되는 유저의 ID
+
+		@ApiModelProperty(value = "구독 대상이 되는 유저의 닉네임")
+		private String nickname;
+
+		public SubscribeInfoDto(Long userId, String nickname) {
+			this.userId = userId;
+			this.nickname = nickname;
 		}
 	}
 }

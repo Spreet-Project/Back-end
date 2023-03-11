@@ -3,6 +3,7 @@ package com.team1.spreet.domain.feed.repository.impl;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team1.spreet.domain.feed.dto.FeedDto;
 import com.team1.spreet.domain.feed.repository.FeedCustomRepository;
@@ -60,7 +61,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .fetchOne();
     }
     @Override
-    public List<FeedDto.ResponseDto> findAllSortBy(String sort, Long page, Long size, Long userId){
+    public List<FeedDto.ResponseDto> findAllSortBy(String sort, Long page, Long size, Long userId, String searchType, String searchKeyword){
         OrderSpecifier sorting = sort.equals("popular") ? feed.likeCount.desc() : feed.createdAt.desc();
         return jpaQueryFactory
                 .select(Projections
@@ -87,11 +88,16 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 )
                 .from(feed)
                 .join(feed.user, user)
-                .where(feed.deleted.eq(false))
+                .where(feed.deleted.eq(false), searchCondition(searchType, searchKeyword))
                 .orderBy(sorting)
                 .offset(page*10)
                 .limit(size)
                 .fetch();
+    }
+    private BooleanExpression searchCondition(String searchType, String searchKeyword) {
+        if(searchType.equals("title")) return feed.title.contains(searchKeyword);
+        if(searchType.equals("content")) return feed.content.contains(searchKeyword);
+        return null;
     }
     @Override
     public List<FeedDto.SimpleResponseDto> findMainFeed() {
@@ -112,9 +118,8 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
 	@Override
 	public List<MyPageDto.PostResponseDto> findAllByUserId(String classification, Long page, Long userId) {
 		return jpaQueryFactory
-				.select(Projections.constructor(
+				.select(Projections.fields(
 						MyPageDto.PostResponseDto.class,
-						ExpressionUtils.toExpression(classification),
 						feed.id,
 						feed.title,
 						feed.createdAt
